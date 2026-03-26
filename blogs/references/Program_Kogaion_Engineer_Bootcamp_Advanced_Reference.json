@@ -1,0 +1,316 @@
+{
+  "meta": {
+    "programSlug": "kogaion-engineer-bootcamp-2",
+    "programName": "Kogaion Engineer Bootcamp",
+    "organization": "Kogaion Gifted Academy",
+    "sourceUrl": "https://kogaionacademy.ro/programe/kogaion-engineer-bootcamp-2/",
+    "extractedOn": "2026-03-20",
+    "status": "ready_for_article_generation"
+  },
+  "audience": {
+    "ageBands": [
+      "7-9",
+      "10-12"
+    ],
+    "label": "copii 7-9 ani si 10-12 ani"
+  },
+  "schedule": {
+    "dateText": "12-17 iulie 2026",
+    "durationDays": 6
+  },
+  "location": {
+    "cityArea": "Moieciu de Sus",
+    "venue": "Pensiunea Nicoleta Moieciu de Sus",
+    "context": "la poalele masivului Bucegi",
+    "venueUrl": "https://www.moeciu-nicoleta.ro"
+  },
+  "positioning": {
+    "corePromise": "Experienta educationala de reconectare cu elementele vietii (pamant, foc, aer, apa), care combina stiinta, natura si munca in echipa.",
+    "coreMessage": [
+      "Nu este doar o tabara despre natura.",
+      "Este o reintoarcere la ordinea vietii.",
+      "Copilul invata sa construiasca, sa simta si sa traiasca in armonie."
+    ],
+    "valueProposition": "Program de descoperire a pasiunilor, dezvoltare a abilitatilor si cultivare a bucuriei de a trai."
+  },
+  "explorationDirections": [
+    "Constructie",
+    "Inginerie",
+    "Fizica",
+    "Cunoastere de sine",
+    "Problem solving",
+    "Conectare in natura"
+  ],
+  "activities": [
+    {
+      "title": "Constructii / Inginerie - Constructia unui cuptor de lut",
+      "description": "Proiectare si realizare a unui cuptor functional din lut.",
+      "learningPoints": [
+        "proprietatile materialelor naturale",
+        "procese fizice implicate in constructii",
+        "principii de eficienta termica"
+      ],
+      "skills": [
+        "coordonare practica",
+        "gandire inginereasca aplicata",
+        "spirit de echipa"
+      ],
+      "framing": [
+        "lucru manual autentic",
+        "resurse naturale",
+        "responsabilitate ecologica"
+      ]
+    },
+    {
+      "title": "Fizica experimentala",
+      "description": "Experimente interactive despre magnetism, electricitate, forte si presiune.",
+      "learningPoints": [
+        "observare",
+        "formulare de ipoteze",
+        "adresare de intrebari",
+        "concluzionare"
+      ],
+      "skills": [
+        "curiozitate stiintifica",
+        "intelegerea relatiei cauza-efect",
+        "transfer in viata cotidiana"
+      ]
+    },
+    {
+      "title": "Cunoastere de sine - Proiect problem solving Semintele Bucuriei",
+      "description": "Joc, reflectie si creatie pentru recunoasterea si mentinerea starii de bucurie autentica.",
+      "learningPoints": [
+        "transformarea emotiilor in resurse",
+        "sens interior",
+        "curaj"
+      ],
+      "skills": [
+        "autoreglare emotionala",
+        "autocunoastere",
+        "rezilienta"
+      ]
+    },
+    {
+      "title": "Drumetie si conectare in natura",
+      "description": "Activitati outdoor zilnice: inviorare, trasee montane, reflectie si jocuri de relationare.",
+      "learningPoints": [
+        "echilibru corp-minte",
+        "observarea mediului",
+        "relatie armonioasa cu natura"
+      ]
+    },
+    {
+      "title": "Carnaval si seri la foc de tabara",
+      "description": "Momente de joaca, dans si apartenenta la o comunitate autentica."
+    }
+  ],
+  "mentors": [
+    {
+      "name": "Diana Antoci",
+      "role": "Fondator, formator in psihopedagogia excelentei si Feuerstein"
+    },
+    {
+      "name": "Irina Nicolaescu",
+      "role": "Psiholog"
+    },
+    {
+      "name": "Alin Mardare",
+      "role": "Inginer constructor"
+    },
+    {
+      "name": "Carlos Catana",
+      "role": "Trainer fizica experimentala"
+    },
+    {
+      "name": "Constantin Caprioreanu",
+      "role": "Ghid montan"
+    }
+  ],
+  "benefits": {
+    "primary": [
+      {
+        "title": "Redescoperirea legaturii vii dintre om si elementele naturii",
+        "details": "Experiente autentice cu pamant, foc, aer si apa ca profesori de echilibru, logica si simtire."
+      },
+      {
+        "title": "Invata sa creeze si sa construiasca cu sens",
+        "details": "Proiectele de inginerie practica cresc coordonarea, perseverenta si increderea in propriile forte."
+      },
+      {
+        "title": "Echilibru intre gandire, emotie si actiune",
+        "details": "Mix de experimente, reflectie si natura pentru inteligenta completa: stiintifica si intuitiva, logica si empatica."
+      }
+    ],
+    "secondary": [
+      {
+        "title": "Gandire aplicata si sistemica",
+        "details": "Intelegerea legaturilor cauza-efect, natura-tehnologie, observatie-intelegere."
+      },
+      {
+        "title": "Spirit de echipa si cooperare",
+        "details": "Activitatile in grup cresc rabdarea, empatia si constiinta colaborarii."
+      },
+      {
+        "title": "Ritm interior si bucurie naturala",
+        "details": "Prin Semintele Bucuriei si contactul cu natura, copilul invata reglare emotionala si stare de bine."
+      }
+    ]
+  },
+  "logistics": {
+    "transport": {
+      "included": "Tren pana la Brasov + autocar autorizat Brasov - Moieciu de Sus (retur inclus).",
+      "optional": "Autocar din localitatea de resedinta, in functie de numarul de copii.",
+      "contact": {
+        "name": "Iulia",
+        "phone": "0736.770.669"
+      }
+    },
+    "menu": {
+      "options": [
+        "traditional",
+        "vegetarian"
+      ],
+      "allergies": "Meniu separat pentru copiii cu alergii."
+    },
+    "accommodation": {
+      "name": "Pensiunea Nicoleta Moieciu de Sus",
+      "stars": 3,
+      "features": [
+        "camere 2/3/4 locuri",
+        "baie proprie",
+        "balcon",
+        "TV",
+        "internet wireless",
+        "spatiu de joaca",
+        "foisor",
+        "sala de jocuri (biliard, ping-pong)",
+        "terasa",
+        "parcare",
+        "restaurant"
+      ]
+    }
+  },
+  "enrollment": {
+    "flow": [
+      "Discutie initiala cu reprezentantii Kogaion pentru verificarea potrivirii programului.",
+      "Ghidare catre programul educational potrivit copilului."
+    ],
+    "groupOffer": "Oferte personalizate pentru grupuri de minim 5 copii.",
+    "cta": {
+      "contactName": "Diana Antoci",
+      "contactRole": "consultant educational",
+      "phone": "0720.529.398",
+      "enrollmentFormUrl": "https://kogaionacademy.ro/programe/kogaion-engineer-bootcamp-2/inscriere/"
+    }
+  },
+  "articleGeneration": {
+    "angles": [
+      "tabara STEM cu componenta de autocunoastere",
+      "inginerie practica pentru copii",
+      "cum se construieste increderea prin proiecte reale",
+      "echilibrul dintre stiinta, emotie si natura"
+    ],
+    "seoSeedsRo": [
+      "tabara inginerie copii 7-12 ani",
+      "tabara fizica experimentala copii",
+      "tabara dezvoltare personala copii in natura",
+      "tabara constructii copii Romania",
+      "tabara STEM si cunoastere de sine",
+      "program educational cu mentorat pentru copii",
+      "tabara problem solving copii",
+      "tabara Moieciu de Sus copii"
+    ],
+    "requiredCtaElements": [
+      "telefon 0720.529.398",
+      "link formular inscriere"
+    ],
+    "contentConstraints": [
+      "nu inventa activitati, mentori, cifre sau rezultate garantate",
+      "pastreaza framing-ul stiinta + natura + autocunoastere + cooperare",
+      "foloseste datele de varsta, locatie si perioada exact cum sunt in referinta"
+    ]
+  },
+  "sourceCapture": {
+    "pageSectionsInOrder": [
+      "Directii principale de cunoastere si explorare",
+      "Activitatile taberei",
+      "Mentorii copilului tau",
+      "Beneficii principale",
+      "Beneficii secundare",
+      "Galerie foto",
+      "Transport",
+      "Meniu",
+      "Locatie",
+      "Inscriere"
+    ],
+    "ctaElements": [
+      {
+        "label": "Suna",
+        "type": "phone",
+        "value": "+40720529398"
+      },
+      {
+        "label": "Cere detalii",
+        "type": "cta_text",
+        "value": "present-on-page"
+      },
+      {
+        "label": "Formular de inscriere",
+        "type": "url",
+        "value": "https://kogaionacademy.ro/programe/kogaion-engineer-bootcamp-2/inscriere/"
+      },
+      {
+        "label": "Call Now Button",
+        "type": "phone",
+        "value": "+4 0720 529 398"
+      }
+    ],
+    "contactsFound": [
+      {
+        "name": "Diana Antoci",
+        "role": "consultant educational",
+        "phone": "0720.529.398",
+        "context": "inscriere / contact principal"
+      },
+      {
+        "name": "Iulia",
+        "role": "detalii transport",
+        "phone": "0736.770.669",
+        "context": "transport"
+      }
+    ],
+    "heroFacts": {
+      "programLine": "Program de descoperire a pasiunilor, dezvoltare a abilitatilor si cultivare a bucuriei de a trai",
+      "ageLine": "copii 7-9 ani si 10-12 ani",
+      "dateLine": "12-17 iulie 2026, 6 zile",
+      "locationLine": "Moieciu de Sus"
+    },
+    "verbatimBlocks": {
+      "coreNarrative": "KOGAION ENGINEER BOOTCAMP este o experienta educationala de reconectare cu elementele vietii -- pamantul, focul, aerul si apa -- prin care copiii descopera cum stiinta, natura si munca in echipa pot da sens actiunilor noastre si redescopera bucuria de a trai.",
+      "positioning": "KOGAION ENGINEER BOOTCAMP nu este doar o tabara despre natura -- este o reintoarcere la ordinea vietii, unde copilul invata sa construiasca, sa simta si sa traiasca in armonie cu tot ce exista.",
+      "activityLeadIn": "Exploratorii cunoasterii si bucuriei de a trai vor calatori prin:"
+    },
+    "gallery": {
+      "sectionPresent": true,
+      "extractedPlaceholderItems": 34,
+      "note": "Text export does not include concrete image descriptions; only placeholder markers were captured."
+    },
+    "secondaryMenuObserved": [
+      "Redirectioneaza",
+      "Mentori",
+      "Blog",
+      "Contact",
+      "Despre noi",
+      "Termeni si conditii",
+      "Politica de confidentialitate",
+      "Politica cookie"
+    ],
+    "quality": {
+      "coverageMode": "maximal",
+      "includesStrategicSummary": true,
+      "includesOperationalDetails": true,
+      "includesRawCopyBlocks": true,
+      "includesConversionSignals": true
+    }
+  }
+}
