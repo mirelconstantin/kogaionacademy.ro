@@ -73,7 +73,7 @@
 		ctaSecondaryLink: data?.hero?.ctaSecondaryLink
 	});
 
-	const heroLabel = $derived(aboutHeroPayload?.label ?? m.about_story_label());
+	const heroLabel = $derived((aboutHeroPayload?.label ?? '').trim());
 	const heroTitle = $derived(aboutHeroPayload?.title ?? m.about_title());
 	const heroTagline = $derived(aboutHeroPayload?.tagline ?? m.about_hero_tagline());
 	const heroSubline = $derived(aboutHeroPayload?.subline ?? m.about_hero_subline());
@@ -384,11 +384,8 @@
 		>
 			<div class="mx-auto w-full max-w-[1600px] px-6 py-12 md:px-10 md:py-14">
 				<div data-cms-type="section" data-cms-page="about" data-cms-section="timeline" data-cms-field="title" data-cms-locale="ro">
-					<p class="text-center text-xs font-semibold tracking-[0.2em] text-white/85 uppercase [font-family:var(--font-sans)]">
-						{m.about_story_label()}
-					</p>
 					<h2
-						class="mx-auto mt-4 max-w-[900px] text-center text-[1.45rem] leading-tight font-medium text-white md:text-[2rem] lg:text-[2.2rem] [font-family:var(--font-spectral)]"
+						class="mx-auto max-w-[900px] text-center text-[1.45rem] leading-tight font-medium text-white md:text-[2rem] lg:text-[2.2rem] [font-family:var(--font-spectral)]"
 					>
 						{timelinePayload?.title ?? m.about_timeline_title()}
 					</h2>

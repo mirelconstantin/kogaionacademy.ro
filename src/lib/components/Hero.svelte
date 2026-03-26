@@ -92,7 +92,7 @@
 
 	<!-- Spațiu sub AdminBar (variabilă CSS) + nav fixă (--nav-height / extra pe md+) -->
 	<div
-		class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pb-10 text-center md:min-h-[46vh] md:px-12 md:pb-12 lg:px-16 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem))] md:pt-[calc(var(--admin-bar-height,0px)+7rem)]"
+		class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pb-10 text-center md:min-h-[46vh] md:px-12 md:pb-12 lg:px-16 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))]"
 	>
 		{#if showEyebrow && heroLabel}
 			<div

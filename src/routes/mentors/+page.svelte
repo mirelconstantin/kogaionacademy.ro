@@ -89,7 +89,7 @@
 			/>
 			<div class="absolute inset-0 bg-gradient-to-b from-[#154b6a]/85 via-[#154b6a]/58 to-[#091328]/82"></div>
 		</div>
-		<div class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pt-24 pb-10 text-center md:min-h-[46vh] md:px-12 md:pt-28 md:pb-12 lg:px-16">
+		<div class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pb-10 text-center md:min-h-[46vh] md:px-12 md:pb-12 lg:px-16 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))]">
 			<div data-cms-type="section" data-cms-page="mentors" data-cms-section="hero" data-cms-field="title" data-cms-locale="ro">
 				<h1
 					class="mt-4 max-w-5xl text-4xl leading-tight font-semibold text-white md:text-5xl lg:text-6xl"

@@ -497,7 +497,7 @@
 		</div>
 
 		<div
-			class="relative mx-auto max-w-6xl px-6 pb-12 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem))] md:px-10 md:pb-14 md:pt-[calc(var(--admin-bar-height,0px)+7rem)] lg:px-16"
+			class="relative mx-auto max-w-6xl px-6 pb-12 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:px-10 md:pb-14 md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))] lg:px-16"
 		>
 			<div class="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,22rem)] lg:items-end">
 				<div>

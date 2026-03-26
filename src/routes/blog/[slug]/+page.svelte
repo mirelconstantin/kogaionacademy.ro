@@ -27,8 +27,8 @@
 	<meta name="description" content={metaDescription} />
 </svelte:head>
 
-<!-- pt-32 eliberează spațiul sub bara admin + meniul fix, ca titlul și conținutul să se vadă -->
-<main class="min-h-dvh bg-muted/30 pt-32">
+<!-- spațiu sub bara admin + meniul fix + mic aer suplimentar -->
+<main class="min-h-dvh bg-muted/30 pt-[calc(8rem+var(--below-nav-gap,0px))]">
 	<article class="mx-auto max-w-3xl px-6 pb-14 pt-6 md:px-12 md:pb-20 md:pt-8">
 		<a
 			href={contentHref('blog')}

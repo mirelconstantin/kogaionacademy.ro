@@ -23,7 +23,7 @@
 			class="absolute inset-0"
 			style="background: linear-gradient(130deg, rgba(16,28,55,0.88) 10%, rgba(16,28,55,0.75) 50%, rgba(216,97,21,0.45) 100%);"
 		></div>
-		<div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 md:px-12 lg:px-16">
+		<div class="relative mx-auto max-w-6xl px-6 pb-16 pt-[calc(8rem+var(--below-nav-gap,0px))] md:px-12 lg:px-16">
 			<a
 				href={contentHref('home')}
 				class="inline-flex items-center gap-2 text-sm text-white/90 transition-colors hover:text-white"

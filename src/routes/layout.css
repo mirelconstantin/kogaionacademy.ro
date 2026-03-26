@@ -10,6 +10,8 @@
 :root {
 	--admin-bar-height: 0px;
 	--nav-height: 5rem;
+	/* Spațiu suplimentar sub meniul fix pe paginile publice */
+	--below-nav-gap: 10px;
 	--scrollbar-accent: #154b6a;
 	--brand-blue: #154b6a;
 	--brand-blue-hover: #1f6f96;

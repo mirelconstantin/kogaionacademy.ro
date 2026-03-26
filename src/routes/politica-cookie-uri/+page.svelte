@@ -38,7 +38,9 @@
 	<meta name="robots" content="index,follow" />
 </svelte:head>
 
-<div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+<div
+	class="mx-auto max-w-3xl px-4 pb-12 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] sm:px-6 sm:pb-16"
+>
 	<h1 class="text-3xl font-semibold tracking-tight text-foreground">{data.pageTitle}</h1>
 	<p class="mt-3 text-sm text-muted-foreground">
 		Mai jos îți poți seta preferințele pentru cookie-uri, apoi găsești textul complet al politicii.
