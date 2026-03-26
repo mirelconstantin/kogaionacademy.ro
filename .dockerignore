@@ -1,0 +1,17 @@
+node_modules
+.git
+.svelte-kit
+build
+.output
+.env
+.env.*
+!.env.example
+!.env.test
+.cursor
+*.md
+!README.md
+Thumbs.db
+.DS_Store
+vite.config.ts.timestamp-*
+vite.config.js.timestamp-*
+project.inlang/cache
