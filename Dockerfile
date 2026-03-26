@@ -13,6 +13,26 @@ WORKDIR /code
 COPY --from=deps /code/node_modules ./node_modules
 COPY . .
 RUN bun install --frozen-lockfile
+
+# Easypanel --build-arg does not become process.env unless declared here.
+# SvelteKit / Better Auth evaluate auth and DB during `vite build`.
+ARG DATABASE_URL
+ARG ORIGIN
+ARG PUBLIC_SITE_URL
+ARG BETTER_AUTH_SECRET
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG GIT_SHA
+
+ENV DATABASE_URL=${DATABASE_URL} \
+	ORIGIN=${ORIGIN} \
+	PUBLIC_SITE_URL=${PUBLIC_SITE_URL} \
+	BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET} \
+	GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
+	GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+	GIT_SHA=${GIT_SHA} \
+	BETTER_AUTH_URL=${ORIGIN}
+
 ENV NODE_ENV=production
 RUN bun run build
 
