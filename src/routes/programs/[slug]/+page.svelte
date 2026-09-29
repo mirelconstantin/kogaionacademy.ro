@@ -1,10 +1,14 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { contentHref } from '$lib/content-routes';
 	import { buildScheduleLines, formatAgeRangeLabel } from '$lib/program-schedule';
 	import { programCategories } from '$lib/programs-data';
 	import type { ProgramForDisplay } from '$lib/server/content';
 	import type { MentorForDisplay } from '$lib/server/content';
+	import MentorCard from '$lib/components/mentors/MentorCard.svelte';
+	import MentorProfileModal from '$lib/components/mentors/MentorProfileModal.svelte';
+	import { mentorLabels } from '$lib/components/mentors/mentor-content';
 	import { Button } from '$lib/components/ui/button';
 	import MapPin from '@lucide/svelte/icons/map-pin';
 	import Calendar from '@lucide/svelte/icons/calendar';
@@ -82,9 +86,15 @@
 
 	const FB46_ENROLLMENT_STEPS: { order: number; label: string }[] = [
 		{ order: 1, label: 'Ne lași datele sau ne suni — înțelegem contextul și întrebările voastre.' },
-		{ order: 2, label: 'Discuție scurtă cu echipa: potrivire între nevoile voastre și formatul taberei.' },
+		{
+			order: 2,
+			label: 'Discuție scurtă cu echipa: potrivire între nevoile voastre și formatul taberei.'
+		},
 		{ order: 3, label: 'Confirmare loc și detalii practice: cazare, rutină, masă.' },
-		{ order: 4, label: 'Pregătire înainte de tabără și materiale de sprijin, ca să intrați liniștiți.' }
+		{
+			order: 4,
+			label: 'Pregătire înainte de tabără și materiale de sprijin, ca să intrați liniștiți.'
+		}
 	];
 
 	const FB46_ENROLLMENT_SIDEBAR_TITLE = 'Preferi WhatsApp';
@@ -137,7 +147,8 @@
 	const isFamilyBootcamp46 = $derived(program.slug === FAMILY_BOOTCAMP_46_SLUG);
 
 	const categoryTitleKey = $derived(
-		(data.programCategories ?? programCategories).find((c) => c.id === program.categoryId)?.titleKey ?? ''
+		(data.programCategories ?? programCategories).find((c) => c.id === program.categoryId)
+			?.titleKey ?? ''
 	);
 	const FALLBACK_IMAGE = '/media/uploads/about/age-3-6.webp';
 	const hasSections = $derived(Array.isArray(program.sections) && program.sections.length > 0);
@@ -171,7 +182,9 @@
 			name: program.title,
 			description: metaDescription,
 			...(ogImage && { image: ogImage }),
-			...(program.datesText && { courseSchedule: { '@type': 'Schedule', duration: program.datesText } }),
+			...(program.datesText && {
+				courseSchedule: { '@type': 'Schedule', duration: program.datesText }
+			}),
 			provider: { '@type': 'Organization', name: 'Kogaion Gifted Academy' }
 		};
 		if (isFamilyBootcamp46) {
@@ -188,9 +201,9 @@
 		return base;
 	});
 
-	function getSection(key: string):
-		| { section: string; sortOrder: number; payload: Record<string, unknown> }
-		| undefined {
+	function getSection(
+		key: string
+	): { section: string; sortOrder: number; payload: Record<string, unknown> } | undefined {
 		return program.sections?.find((s) => s.section === key);
 	}
 
@@ -211,7 +224,10 @@
 			const rest = raw.slice(spacedEm + 3).trim();
 			const colon = rest.indexOf(': ');
 			if (colon > 0) {
-				return { headline: head + ' — ' + rest.slice(0, colon).trim(), body: rest.slice(colon + 2).trim() };
+				return {
+					headline: head + ' — ' + rest.slice(0, colon).trim(),
+					body: rest.slice(colon + 2).trim()
+				};
 			}
 			return { headline: head, body: rest };
 		}
@@ -228,8 +244,15 @@
 		if (!s) return raw;
 		let out = s.toLocaleLowerCase('ro-RO');
 		out = out.charAt(0).toUpperCase() + out.slice(1);
-		out = out.replace(/&(\s*)(\p{L})/gu, (_m, spaces: string, letter: string) => `&${spaces}${letter.toUpperCase()}`);
-		out = out.replace(/(—|–)(\s*)(\p{L})/gu, (_m, dash: string, spaces: string, letter: string) => `${dash}${spaces}${letter.toUpperCase()}`);
+		out = out.replace(
+			/&(\s*)(\p{L})/gu,
+			(_m, spaces: string, letter: string) => `&${spaces}${letter.toUpperCase()}`
+		);
+		out = out.replace(
+			/(—|–)(\s*)(\p{L})/gu,
+			(_m, dash: string, spaces: string, letter: string) =>
+				`${dash}${spaces}${letter.toUpperCase()}`
+		);
 		return out;
 	}
 
@@ -238,10 +261,7 @@
 		const out: Array<{ section: string; sortOrder: number; payload: Record<string, unknown> }> = [];
 		let mentorsInjected = false;
 		for (const s of sections) {
-			if (
-				isFamilyBootcamp46 &&
-				(s.section === 'transport' || s.section === 'menu')
-			) {
+			if (isFamilyBootcamp46 && (s.section === 'transport' || s.section === 'menu')) {
 				continue;
 			}
 			if (
@@ -264,7 +284,8 @@
 	});
 
 	const heroHighlightsItems = $derived.by(() => {
-		const fromDb = (getSection('hero_highlights')?.payload as { items?: string[] } | undefined)?.items;
+		const fromDb = (getSection('hero_highlights')?.payload as { items?: string[] } | undefined)
+			?.items;
 		if (isFamilyBootcamp46) return FB46_HIGHLIGHTS;
 		return fromDb ?? [];
 	});
@@ -289,11 +310,10 @@
 	});
 
 	let heroVideoError = $state(false);
-	let expandedMentors = $state<Record<number, boolean>>({});
 
 	const galleryImages = $derived(
-		((getSection('gallery')?.payload as { images?: { url: string; alt?: string }[] } | undefined)?.images ??
-			[]) as { url: string; alt?: string }[]
+		((getSection('gallery')?.payload as { images?: { url: string; alt?: string }[] } | undefined)
+			?.images ?? []) as { url: string; alt?: string }[]
 	);
 	const programGalleryRowOne = $derived(galleryImages.filter((_, index) => index % 2 === 0));
 	const programGalleryRowTwo = $derived(galleryImages.filter((_, index) => index % 2 === 1));
@@ -324,61 +344,24 @@
 		}
 	}
 
-	type BioPart = { type: 'text' | 'link' | 'break'; value: string; href?: string };
+	// Mentor profiles: small cards stay in the page, a click opens the large popup.
+	// Mirrors src/routes/mentors/+page.svelte so the two surfaces behave identically.
+	const mentorLabelsRO = mentorLabels('ro');
+	let activeMentor = $state<MentorForDisplay | null>(null);
+	let restoreFocusTo = $state<HTMLElement | null>(null);
 
-	function toggleMentorBio(mentorId: number): void {
-		expandedMentors = { ...expandedMentors, [mentorId]: !expandedMentors[mentorId] };
+	async function openMentor(mentor: MentorForDisplay, trigger: HTMLElement | null): Promise<void> {
+		if (activeMentor?.id === mentor.id) return;
+		restoreFocusTo = trigger;
+		activeMentor = mentor;
 	}
 
-	function cleanMentorBio(bio: string, yearJoined: number | null): string {
-		if (!bio) return '';
-		const normalized = bio.replace(/\r\n/g, '\n');
-		const withoutMentorSince = normalized
-			.replace(/\bDin\s+\d{4},\s*/gi, '')
-			.replace(/\b(?:începând|incepand)\s+cu\s+anul\s+\d{4},?\s*/gi, '')
-			.replace(/\bdin\s+anul\s+\d{4}\b/gi, '')
-			.replace(/\b(?:este|e)\s+mentor[^.\n!?]*[.\n!?]?/gi, '')
-			.replace(/\n{3,}/g, '\n\n')
-			.trim();
-		void yearJoined;
-		return withoutMentorSince || normalized.trim();
-	}
-
-	function buildMentorBioParts(text: string): BioPart[] {
-		const parts: BioPart[] = [];
-		const lines = text.replace(/\r\n/g, '\n').split('\n');
-		const linkPattern = /\b((?:https?:\/\/|www\.)[^\s<]+|(?:instagram\.com\/[^\s<]+))/gi;
-
-		for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-			const line = lines[lineIndex] ?? '';
-			let cursor = 0;
-			let match: RegExpExecArray | null;
-			linkPattern.lastIndex = 0;
-
-			while ((match = linkPattern.exec(line)) !== null) {
-				const raw = match[0];
-				const start = match.index;
-				if (start > cursor) {
-					parts.push({ type: 'text', value: line.slice(cursor, start) });
-				}
-				parts.push({
-					type: 'link',
-					value: raw,
-					href: /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
-				});
-				cursor = start + raw.length;
-			}
-
-			if (cursor < line.length) {
-				parts.push({ type: 'text', value: line.slice(cursor) });
-			}
-
-			if (lineIndex < lines.length - 1) {
-				parts.push({ type: 'break', value: '' });
-			}
-		}
-
-		return parts;
+	async function closeMentor(): Promise<void> {
+		activeMentor = null;
+		await tick();
+		const target = restoreFocusTo;
+		restoreFocusTo = null;
+		if (target?.isConnected) target.focus();
 	}
 
 	type HeroCtaPayload = {
@@ -419,8 +402,13 @@
 		];
 	}
 
-	function enrollPrimaryTel(buttons: { type: string; value?: string }[]): { href: string; display: string } {
-		const tel = buttons.find((b) => b.type === 'tel' && b.value && b.value.replace(/\D/g, '').length >= 9);
+	function enrollPrimaryTel(buttons: { type: string; value?: string }[]): {
+		href: string;
+		display: string;
+	} {
+		const tel = buttons.find(
+			(b) => b.type === 'tel' && b.value && b.value.replace(/\D/g, '').length >= 9
+		);
 		const digits = (tel?.value ?? FB46_DEFAULT_TEL_VALUE).replace(/\D/g, '');
 		return {
 			href: `tel:${digits}`,
@@ -429,7 +417,9 @@
 	}
 
 	function enrollWhatsappHref(buttons: { type: string; value?: string }[]): string {
-		const tel = buttons.find((b) => b.type === 'tel' && b.value && b.value.replace(/\D/g, '').length >= 9);
+		const tel = buttons.find(
+			(b) => b.type === 'tel' && b.value && b.value.replace(/\D/g, '').length >= 9
+		);
 		let d = (tel?.value ?? FB46_DEFAULT_TEL_VALUE).replace(/\D/g, '');
 		if (d.startsWith('0')) {
 			d = `40${d.slice(1)}`;
@@ -468,7 +458,9 @@
 
 <main class="min-h-dvh bg-white text-foreground" data-cms-type="program" data-cms-id={program.id}>
 	<!-- Hero program: aliniat tonului homepage/about, păstrând imaginea de fundal -->
-	<header class="relative min-h-[44vh] overflow-hidden rounded-br-[5.6rem] border-b-2 border-white/20 bg-[#0c3044] md:min-h-[46vh] md:rounded-br-[7rem]">
+	<header
+		class="relative min-h-[44vh] overflow-hidden rounded-br-[5.6rem] border-b-2 border-white/20 bg-[#0c3044] md:min-h-[46vh] md:rounded-br-[7rem]"
+	>
 		<div class="absolute inset-0">
 			{#if program.videoUrl && !heroVideoError}
 				<video
@@ -485,11 +477,17 @@
 			{:else}
 				<img
 					src={program.image ?? FALLBACK_IMAGE}
-					alt={isFamilyBootcamp46 ? FB46_HERO_IMAGE_ALT : (program.title ? `Imagine program: ${program.title}` : '')}
+					alt={isFamilyBootcamp46
+						? FB46_HERO_IMAGE_ALT
+						: program.title
+							? `Imagine program: ${program.title}`
+							: ''}
 					class="size-full object-cover object-center opacity-95"
 				/>
 			{/if}
-			<div class="absolute inset-0 bg-gradient-to-b from-[#154b6a]/85 via-[#154b6a]/58 to-[#091328]/82"></div>
+			<div
+				class="absolute inset-0 bg-gradient-to-b from-[#154b6a]/85 via-[#154b6a]/58 to-[#091328]/82"
+			></div>
 			<div
 				class="pointer-events-none absolute -right-24 -bottom-24 size-[28rem] rounded-full bg-[#c25067]/18 blur-3xl"
 				aria-hidden="true"
@@ -497,42 +495,47 @@
 		</div>
 
 		<div
-			class="relative mx-auto max-w-6xl px-6 pb-12 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:px-10 md:pb-14 md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))] lg:px-16"
+			class="relative mx-auto max-w-6xl px-6 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] pb-12 md:px-10 md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))] md:pb-14 lg:px-16"
 		>
 			<div class="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,22rem)] lg:items-end">
 				<div>
 					{#if categoryTitleKey}
 						<p
-							class="text-xs font-semibold tracking-[0.22em] text-white/85 uppercase [font-family:var(--font-sans)]"
+							class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.22em] text-white/85 uppercase"
 						>
 							{msg(categoryTitleKey)}
 						</p>
 					{/if}
 					<h1
-						class="mt-3 max-w-none text-[1.85rem] leading-[1.1] font-medium tracking-[-0.02em] text-white md:text-[2.5rem] lg:text-[2.7rem] xl:text-[2.8rem] [font-family:var(--font-spectral)]"
+						class="mt-3 max-w-none [font-family:var(--font-spectral)] text-[1.85rem] leading-[1.1] font-medium tracking-[-0.02em] text-white md:text-[2.5rem] lg:text-[2.7rem] xl:text-[2.8rem]"
 					>
 						{program.title}
 					</h1>
 					{#if displayHeroSubtitle}
 						<p
-							class="mt-4 max-w-xl text-[0.98rem] leading-relaxed text-white/90 md:text-base [font-family:var(--font-sans)]"
+							class="mt-4 max-w-xl [font-family:var(--font-sans)] text-[0.98rem] leading-relaxed text-white/90 md:text-base"
 						>
 							{displayHeroSubtitle}
 						</p>
 					{/if}
 
 					<div
-						class="mt-7 space-y-3 text-[0.95rem] font-semibold leading-snug text-white md:space-y-3.5 md:text-[1.05rem] [font-family:var(--font-sans)]"
+						class="mt-7 space-y-3 [font-family:var(--font-sans)] text-[0.95rem] leading-snug font-semibold text-white md:space-y-3.5 md:text-[1.05rem]"
 					>
 						{#if formatAgeRangeLabel(program.categoryId, program.ageRange)}
 							<p class="flex items-center gap-3">
 								<Users class="size-5 shrink-0 text-[var(--brand-green)]" aria-hidden="true" />
-								<span class="tracking-wide">{formatAgeRangeLabel(program.categoryId, program.ageRange)}</span>
+								<span class="tracking-wide"
+									>{formatAgeRangeLabel(program.categoryId, program.ageRange)}</span
+								>
 							</p>
 						{/if}
 						{#if buildScheduleLines(program.datesText, program.durationText).length > 0}
 							<p class="flex items-start gap-3 text-white">
-								<Calendar class="mt-0.5 size-5 shrink-0 text-[var(--brand-green)]" aria-hidden="true" />
+								<Calendar
+									class="mt-0.5 size-5 shrink-0 text-[var(--brand-green)]"
+									aria-hidden="true"
+								/>
 								<span class="space-y-1 font-semibold">
 									{#each buildScheduleLines(program.datesText, program.durationText) as line, idx (`sched-${idx}`)}
 										<span class="block tracking-wide">{line}</span>
@@ -542,7 +545,10 @@
 						{/if}
 						{#if program.locationText || program.location}
 							<p class="flex items-start gap-3 text-white">
-								<MapPin class="mt-0.5 size-5 shrink-0 text-[var(--brand-green)]" aria-hidden="true" />
+								<MapPin
+									class="mt-0.5 size-5 shrink-0 text-[var(--brand-green)]"
+									aria-hidden="true"
+								/>
 								<span class="tracking-wide">{program.locationText ?? program.location}</span>
 							</p>
 						{/if}
@@ -554,7 +560,7 @@
 								{#if btn.type === 'tel'}
 									<a
 										href={'tel:' + (btn.value?.replace(/\D/g, '') ?? '')}
-										class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center text-[0.9rem] font-semibold normal-case tracking-normal text-[var(--brand-blue)] shadow-lg shadow-black/15 transition-colors hover:bg-transparent hover:text-white [font-family:var(--font-sans)] md:text-[0.96rem]"
+										class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold tracking-normal text-[var(--brand-blue)] normal-case shadow-lg shadow-black/15 transition-colors hover:bg-transparent hover:text-white md:text-[0.96rem]"
 									>
 										<Phone class="size-5 shrink-0" aria-hidden="true" />
 										{btn.label}
@@ -562,7 +568,7 @@
 								{:else if btn.type === 'link'}
 									<a
 										href={btn.href ?? contentHref('contact')}
-										class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center text-[0.9rem] font-semibold normal-case tracking-normal text-white transition-colors hover:bg-white hover:text-[var(--brand-blue)] [font-family:var(--font-sans)] md:text-[0.96rem]"
+										class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold tracking-normal text-white normal-case transition-colors hover:bg-white hover:text-[var(--brand-blue)] md:text-[0.96rem]"
 									>
 										{btn.label}
 										<ChevronRight class="size-4 shrink-0" aria-hidden="true" />
@@ -575,7 +581,7 @@
 
 				{#if hasSections}
 					<div
-						class="h-fit space-y-3 rounded-tl-[2.2rem] rounded-br-[2.2rem] border border-white/35 bg-white/12 p-5 shadow-[0_16px_40px_-22px_rgba(0,0,0,0.35)] backdrop-blur-md md:p-6 [font-family:var(--font-sans)] {isFamilyBootcamp46
+						class="h-fit space-y-3 rounded-tl-[2.2rem] rounded-br-[2.2rem] border border-white/35 bg-white/12 p-5 [font-family:var(--font-sans)] shadow-[0_16px_40px_-22px_rgba(0,0,0,0.35)] backdrop-blur-md md:p-6 {isFamilyBootcamp46
 							? 'hidden md:block'
 							: ''}"
 					>
@@ -595,28 +601,35 @@
 							{#if isFamilyBootcamp46}
 								{FB46_HERO_CARD_LEAD}
 							{:else}
-								Program intensiv Kogaion: conținut structurat, mentori dedicați și suport pentru familie.
+								Program intensiv Kogaion: conținut structurat, mentori dedicați și suport pentru
+								familie.
 							{/if}
 						</p>
 						<ul class="mt-4 space-y-2 text-[0.9rem] text-white/88">
 							{#if isFamilyBootcamp46}
 								{#each FB46_HERO_CARD_BULLETS as bullet (`hb-${bullet.slice(0, 20)}`)}
 									<li class="flex gap-2">
-										<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"></span>
+										<span
+											class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80"
+											aria-hidden="true"
+										></span>
 										<span>{bullet}</span>
 									</li>
 								{/each}
 							{:else}
 								<li class="flex gap-2">
-									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"></span>
+									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"
+									></span>
 									<span>Mediu mic, atenție reală la fiecare copil</span>
 								</li>
 								<li class="flex gap-2">
-									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"></span>
+									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"
+									></span>
 									<span>Mentori cu experiență în educație integrată</span>
 								</li>
 								<li class="flex gap-2">
-									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"></span>
+									<span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/80" aria-hidden="true"
+									></span>
 									<span>Natură, ritm blând, conversații cu sens</span>
 								</li>
 							{/if}
@@ -628,13 +641,16 @@
 	</header>
 
 	{#if hasSections && heroHighlightsItems.length > 0}
-		<section class="relative border-b border-border bg-white px-0 py-6 md:py-8" aria-label="Repere program">
+		<section
+			class="relative border-b border-border bg-white px-0 py-6 md:py-8"
+			aria-label="Repere program"
+		>
 			<div
 				class="w-full overflow-hidden rounded-tl-[5.6rem] rounded-br-[5.6rem] bg-[#fcfeff] md:rounded-tl-[7rem] md:rounded-br-[7rem]"
 			>
 				<div class="mx-auto max-w-6xl px-6 py-10 md:py-12">
 					<p
-						class="text-center text-xs font-semibold tracking-[0.22em] text-primary uppercase [font-family:var(--font-sans)]"
+						class="text-center [font-family:var(--font-sans)] text-xs font-semibold tracking-[0.22em] text-primary uppercase"
 					>
 						Despre ce este vorba
 					</p>
@@ -643,7 +659,7 @@
 					>
 						{#each heroHighlightsItems as item, hi (`hl-${hi}`)}
 							<span
-								class="btn-diagonal inline-block shrink-0 border border-[#dfeaf8] bg-[#f5fafd] px-4 py-2.5 text-center text-[0.88rem] font-medium normal-case tracking-normal text-[#0c3044] transition-colors hover:border-[#cfd9e6] hover:bg-[#e4eaf1] [font-family:var(--font-sans)] md:text-sm"
+								class="btn-diagonal inline-block shrink-0 border border-[#dfeaf8] bg-[#f5fafd] px-4 py-2.5 text-center [font-family:var(--font-sans)] text-[0.88rem] font-medium tracking-normal text-[#0c3044] normal-case transition-colors hover:border-[#cfd9e6] hover:bg-[#e4eaf1] md:text-sm"
 							>
 								{item}
 							</span>
@@ -669,12 +685,12 @@
 						>
 							<div class="mx-auto max-w-3xl text-center">
 								<p
-									class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+									class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 								>
 									{isFamilyBootcamp46 ? FB46_INTRO_EYEBROW : 'De ce există această tabără'}
 								</p>
 								<h2
-									class="mt-3 text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+									class="mt-3 [font-family:var(--font-spectral)] text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl"
 								>
 									{isFamilyBootcamp46
 										? FB46_INTRO_H2
@@ -682,7 +698,9 @@
 								</h2>
 							</div>
 							{#if introPayload?.videoBetweenBlocks?.videoId}
-								<div class="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-border shadow-md">
+								<div
+									class="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-border shadow-md"
+								>
 									{#if introPayload.videoBetweenBlocks.provider === 'vimeo'}
 										<LazyVideoEmbed
 											embedSrc={`https://player.vimeo.com/video/${introPayload.videoBetweenBlocks.videoId}?dnt=1`}
@@ -714,7 +732,9 @@
 								</div>
 							</article>
 							{#if introPayload?.imageBetweenBlocks}
-								<div class="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-border">
+								<div
+									class="mx-auto w-full max-w-4xl overflow-hidden rounded-3xl border border-border"
+								>
 									<img
 										src={introPayload.imageBetweenBlocks}
 										alt={isFamilyBootcamp46 ? FB46_INTRO_IMAGE_ALT : ''}
@@ -734,7 +754,7 @@
 					}}
 					{#if isFamilyBootcamp46}
 						<section
-							class="relative left-1/2 right-1/2 -mx-[50vw] mb-16 w-screen border-b border-border bg-white px-0 pb-0"
+							class="relative right-1/2 left-1/2 -mx-[50vw] mb-16 w-screen border-b border-border bg-white px-0 pb-0"
 							data-cms-type="program_section"
 							data-cms-program-id={program.id}
 							data-cms-section={section}
@@ -744,19 +764,19 @@
 							>
 								<div class="mx-auto w-full max-w-[1600px] px-6 py-12 md:px-10 md:py-14">
 									<p
-										class="text-center text-xs font-semibold tracking-[0.2em] text-white/85 uppercase [font-family:var(--font-sans)]"
+										class="text-center [font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-white/85 uppercase"
 									>
 										Parcursul zilelor
 									</p>
 									{#if cur.title}
 										<h2
-											class="mx-auto mt-4 max-w-[1200px] text-center text-[1.45rem] leading-tight font-medium text-white md:text-[2rem] lg:text-[2.35rem] xl:text-[2.55rem] [font-family:var(--font-spectral)]"
+											class="mx-auto mt-4 max-w-[1200px] text-center [font-family:var(--font-spectral)] text-[1.45rem] leading-tight font-medium text-white md:text-[2rem] lg:text-[2.35rem] xl:text-[2.55rem]"
 										>
 											{cur.title}
 										</h2>
 									{/if}
 									<p
-										class="mx-auto mt-4 max-w-3xl text-center text-sm leading-relaxed text-white/88 [font-family:var(--font-sans)] md:text-base"
+										class="mx-auto mt-4 max-w-3xl text-center [font-family:var(--font-sans)] text-sm leading-relaxed text-white/88 md:text-base"
 									>
 										{FB46_CURRICULUM_LEAD}
 									</p>
@@ -777,7 +797,7 @@
 											{#each cur.groups as group (`g-${group.title}`)}
 												<div>
 													<h3
-														class="mb-6 text-center text-xl font-semibold text-white [font-family:var(--font-spectral)]"
+														class="mb-6 text-center [font-family:var(--font-spectral)] text-xl font-semibold text-white"
 													>
 														{group.title}
 													</h3>
@@ -785,18 +805,20 @@
 														<div class="grid gap-5 md:grid-cols-2 md:gap-6 xl:grid-cols-3">
 															{#each group.areas as area, areaIndex (`ga-${areaIndex}`)}
 																{@const parsed = splitCurriculumTitle(area.title)}
-																{@const curriculumHeadline = formatCurriculumHeadline(parsed.headline)}
+																{@const curriculumHeadline = formatCurriculumHeadline(
+																	parsed.headline
+																)}
 																<article
 																	class="media-diagonal-reverse group relative flex min-h-[19rem] flex-col overflow-hidden border-2 border-transparent bg-[#245f4e] p-7 shadow-[0_14px_36px_-18px_rgba(8,35,28,0.5)] transition-[border-color,box-shadow] duration-300 ease-out hover:border-white hover:shadow-[0_20px_44px_-20px_rgba(5,24,18,0.55)] md:min-h-[17.5rem] md:p-8"
 																>
 																	<h4
-																		class="pr-2 text-[1.35rem] leading-[1.12] font-medium tracking-[-0.02em] text-white md:text-[1.5rem] [font-family:var(--font-spectral)]"
+																		class="pr-2 [font-family:var(--font-spectral)] text-[1.35rem] leading-[1.12] font-medium tracking-[-0.02em] text-white md:text-[1.5rem]"
 																	>
 																		{curriculumHeadline}
 																	</h4>
 																	{#if parsed.body}
 																		<p
-																			class="mt-4 flex-1 text-[0.98rem] leading-relaxed text-white/92 [font-family:var(--font-sans)]"
+																			class="mt-4 flex-1 [font-family:var(--font-sans)] text-[0.98rem] leading-relaxed text-white/92"
 																		>
 																			{parsed.body}
 																		</p>
@@ -817,13 +839,13 @@
 													class="media-diagonal-reverse group relative flex min-h-[19rem] flex-col overflow-hidden border-2 border-transparent bg-[#245f4e] p-7 shadow-[0_14px_36px_-18px_rgba(8,35,28,0.5)] transition-[border-color,box-shadow] duration-300 ease-out hover:border-white hover:shadow-[0_20px_44px_-20px_rgba(5,24,18,0.55)] md:min-h-[17.5rem] md:p-8"
 												>
 													<h3
-														class="pr-2 text-[1.35rem] leading-[1.12] font-medium tracking-[-0.02em] text-white md:text-[1.5rem] [font-family:var(--font-spectral)]"
+														class="pr-2 [font-family:var(--font-spectral)] text-[1.35rem] leading-[1.12] font-medium tracking-[-0.02em] text-white md:text-[1.5rem]"
 													>
 														{curriculumHeadline}
 													</h3>
 													{#if parsed.body}
 														<p
-															class="mt-4 flex-1 text-[0.98rem] leading-relaxed text-white/92 [font-family:var(--font-sans)]"
+															class="mt-4 flex-1 [font-family:var(--font-sans)] text-[0.98rem] leading-relaxed text-white/92"
 														>
 															{parsed.body}
 														</p>
@@ -844,18 +866,20 @@
 						>
 							<div class="mx-auto max-w-3xl text-center">
 								<p
-									class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+									class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 								>
 									Parcursul zilelor
 								</p>
 								{#if cur.title}
 									<h2
-										class="mt-3 text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+										class="mt-3 [font-family:var(--font-spectral)] text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl"
 									>
 										{cur.title}
 									</h2>
 								{/if}
-								<p class="mt-4 text-sm text-muted-foreground [font-family:var(--font-sans)] md:text-base">
+								<p
+									class="mt-4 [font-family:var(--font-sans)] text-sm text-muted-foreground md:text-base"
+								>
 									Fiecare temă leagă experiența din tabără de ce se întâmplă acasă: același limbaj,
 									aceleași obiective, pași mici.
 								</p>
@@ -869,7 +893,9 @@
 								<div class="mt-10 space-y-8">
 									{#each cur.groups as group (`g-${group.title}`)}
 										<div class="rounded-3xl border border-border bg-white p-6 shadow-sm md:p-8">
-											<h3 class="text-lg font-semibold text-[#0c3044] [font-family:var(--font-spectral)]">
+											<h3
+												class="[font-family:var(--font-spectral)] text-lg font-semibold text-[#0c3044]"
+											>
 												{group.title}
 											</h3>
 											{#if group.areas?.length}
@@ -881,13 +907,13 @@
 															class="flex flex-col gap-2 rounded-2xl border border-[#eef4fb] bg-[#f7fbff] p-5"
 														>
 															<p
-																class="text-sm font-semibold leading-snug text-[#0c3044] [font-family:var(--font-sans)]"
+																class="[font-family:var(--font-sans)] text-sm leading-snug font-semibold text-[#0c3044]"
 															>
 																{curriculumHeadline}
 															</p>
 															{#if parsed.body}
 																<p
-																	class="text-sm leading-relaxed text-muted-foreground [font-family:var(--font-sans)]"
+																	class="[font-family:var(--font-sans)] text-sm leading-relaxed text-muted-foreground"
 																>
 																	{parsed.body}
 																</p>
@@ -908,19 +934,19 @@
 											class="group flex flex-col gap-3 rounded-3xl border border-border bg-white p-6 shadow-[0_12px_32px_-24px_rgba(21,75,106,0.2)] transition hover:border-[#c25067]/35"
 										>
 											<span
-												class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#c25067]/15 to-[#154b6a]/10 text-sm font-bold text-[#0c3044] [font-family:var(--font-sans)]"
+												class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#c25067]/15 to-[#154b6a]/10 [font-family:var(--font-sans)] text-sm font-bold text-[#0c3044]"
 											>
 												{i + 1}
 											</span>
 											<div>
 												<h3
-													class="text-base font-semibold leading-snug text-[#0c3044] [font-family:var(--font-spectral)]"
+													class="[font-family:var(--font-spectral)] text-base leading-snug font-semibold text-[#0c3044]"
 												>
 													{curriculumHeadline}
 												</h3>
 												{#if parsed.body}
 													<p
-														class="mt-2 text-sm leading-relaxed text-muted-foreground [font-family:var(--font-sans)]"
+														class="mt-2 [font-family:var(--font-sans)] text-sm leading-relaxed text-muted-foreground"
 													>
 														{parsed.body}
 													</p>
@@ -946,7 +972,7 @@
 					>
 						{#if pkg.title}
 							<h2
-								class="text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="[font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 							>
 								{pkg.title}
 							</h2>
@@ -959,16 +985,18 @@
 										open={pIndex === 0}
 									>
 										<summary
-											class="cursor-pointer list-none rounded-3xl px-5 py-4 text-base font-semibold text-[#0c3044] transition hover:bg-[#f7fbff] md:px-6 md:py-5 [font-family:var(--font-sans)]"
+											class="cursor-pointer list-none rounded-3xl px-5 py-4 [font-family:var(--font-sans)] text-base font-semibold text-[#0c3044] transition hover:bg-[#f7fbff] md:px-6 md:py-5"
 										>
 											{p.title}
 										</summary>
 										<ul
-											class="space-y-2 border-t border-[#eef4fb] px-5 py-5 text-sm text-muted-foreground md:px-6 [font-family:var(--font-sans)]"
+											class="space-y-2 border-t border-[#eef4fb] px-5 py-5 [font-family:var(--font-sans)] text-sm text-muted-foreground md:px-6"
 										>
 											{#each p.items as item (`${p.title}-${item.slice(0, 24)}`)}
 												<li class="flex gap-2">
-													<span class="mt-2 size-1 shrink-0 rounded-full bg-primary/70" aria-hidden="true"
+													<span
+														class="mt-2 size-1 shrink-0 rounded-full bg-primary/70"
+														aria-hidden="true"
 													></span>
 													<span>{item}</span>
 												</li>
@@ -979,7 +1007,9 @@
 							</div>
 						{/if}
 						{#if pkg.note}
-							<p class="mt-6 text-sm text-muted-foreground [font-family:var(--font-sans)]">{pkg.note}</p>
+							<p class="mt-6 [font-family:var(--font-sans)] text-sm text-muted-foreground">
+								{pkg.note}
+							</p>
 						{/if}
 					</section>
 				{:else if section === 'extracurricular'}
@@ -996,7 +1026,7 @@
 					>
 						{#if extra.title}
 							<h2
-								class="text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="[font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 							>
 								{extra.title}
 							</h2>
@@ -1007,25 +1037,29 @@
 									<div class="rounded-3xl border border-border bg-white p-6 shadow-sm">
 										<div class="flex items-start gap-3">
 											<span
-												class="inline-flex size-10 shrink-0 items-center justify-center rounded-2xl border border-[#dfeaf8] bg-[#f5fafd] text-sm font-semibold text-[#0c3044] [font-family:var(--font-sans)]"
+												class="inline-flex size-10 shrink-0 items-center justify-center rounded-2xl border border-[#dfeaf8] bg-[#f5fafd] [font-family:var(--font-sans)] text-sm font-semibold text-[#0c3044]"
 											>
 												{gi + 1}
 											</span>
 											<h3
-												class="pt-1 text-lg font-semibold leading-snug text-[#0c3044] [font-family:var(--font-spectral)]"
+												class="pt-1 [font-family:var(--font-spectral)] text-lg leading-snug font-semibold text-[#0c3044]"
 											>
 												{g.title}
 											</h3>
 										</div>
 										{#if g.subtitle}
-											<p class="mt-3 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+											<p class="mt-3 [font-family:var(--font-sans)] text-sm text-muted-foreground">
 												{g.subtitle}
 											</p>
 										{/if}
-										<ul class="mt-4 space-y-2 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+										<ul
+											class="mt-4 space-y-2 [font-family:var(--font-sans)] text-sm text-muted-foreground"
+										>
 											{#each g.items as item (`${g.title}-${item.slice(0, 20)}`)}
 												<li class="flex gap-2">
-													<span class="mt-2 size-1 shrink-0 rounded-full bg-[#c25067]/60" aria-hidden="true"
+													<span
+														class="mt-2 size-1 shrink-0 rounded-full bg-[#c25067]/60"
+														aria-hidden="true"
 													></span>
 													<span>{item}</span>
 												</li>
@@ -1037,7 +1071,7 @@
 						{/if}
 						{#if extra.methods}
 							<p
-								class="mt-8 rounded-2xl border border-border bg-[#f7fbff] p-5 text-sm leading-relaxed text-[#0c3044]/90 [font-family:var(--font-sans)]"
+								class="mt-8 rounded-2xl border border-border bg-[#f7fbff] p-5 [font-family:var(--font-sans)] text-sm leading-relaxed text-[#0c3044]/90"
 							>
 								{extra.methods}
 							</p>
@@ -1052,7 +1086,9 @@
 						otherItems?: string[];
 					}}
 					{@const displayTitle =
-						ben.title === 'BENEFICII PENTRU FAMILIE' ? 'Beneficii pentru familie' : (ben.title ?? '')}
+						ben.title === 'BENEFICII PENTRU FAMILIE'
+							? 'Beneficii pentru familie'
+							: (ben.title ?? '')}
 					<section
 						class="mb-16 border-b border-border pb-16"
 						data-cms-type="program_section"
@@ -1061,7 +1097,7 @@
 					>
 						{#if displayTitle}
 							<h2
-								class="text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="[font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 							>
 								{displayTitle}
 							</h2>
@@ -1072,7 +1108,9 @@
 									<div
 										class="rounded-3xl border border-[#f0d6dc] bg-gradient-to-br from-[#fff5f7] to-[#f7fbff] p-5 shadow-sm"
 									>
-										<p class="text-sm leading-relaxed text-[#0c3044]/90 [font-family:var(--font-sans)]">
+										<p
+											class="[font-family:var(--font-sans)] text-sm leading-relaxed text-[#0c3044]/90"
+										>
 											{item}
 										</p>
 									</div>
@@ -1081,19 +1119,24 @@
 						{/if}
 						{#if ben.note}
 							<p
-								class="mt-6 rounded-2xl border border-border bg-white px-4 py-3 text-sm text-muted-foreground [font-family:var(--font-sans)]"
+								class="mt-6 rounded-2xl border border-border bg-white px-4 py-3 [font-family:var(--font-sans)] text-sm text-muted-foreground"
 							>
 								{ben.note}
 							</p>
 						{/if}
 						{#if ben.other}
-							<p class="mt-8 font-semibold text-[#0c3044] [font-family:var(--font-sans)]">{ben.other}</p>
+							<p class="mt-8 [font-family:var(--font-sans)] font-semibold text-[#0c3044]">
+								{ben.other}
+							</p>
 						{/if}
 						{#if ben.otherItems?.length}
-							<ul class="mt-3 space-y-2 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+							<ul
+								class="mt-3 space-y-2 [font-family:var(--font-sans)] text-sm text-muted-foreground"
+							>
 								{#each ben.otherItems as item (`bo-${item.slice(0, 24)}`)}
 									<li class="flex gap-2">
-										<span class="mt-2 size-1 shrink-0 rounded-full bg-primary/70" aria-hidden="true"></span>
+										<span class="mt-2 size-1 shrink-0 rounded-full bg-primary/70" aria-hidden="true"
+										></span>
 										<span>{item}</span>
 									</li>
 								{/each}
@@ -1104,16 +1147,18 @@
 					<section class="mb-16 border-b border-border pb-16">
 						<div class="mx-auto max-w-3xl text-center">
 							<p
-								class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+								class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 							>
 								{isFamilyBootcamp46 ? FB46_MENTORS_SECTION_EYEBROW : 'Echipa'}
 							</p>
 							<h2
-								class="mt-3 text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="mt-3 [font-family:var(--font-spectral)] text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl"
 							>
 								{isFamilyBootcamp46 ? FB46_MENTORS_SECTION_H2 : 'Mentorii care merg alături de voi'}
 							</h2>
-							<p class="mt-4 text-sm text-muted-foreground md:text-base [font-family:var(--font-sans)]">
+							<p
+								class="mt-4 [font-family:var(--font-sans)] text-sm text-muted-foreground md:text-base"
+							>
 								{isFamilyBootcamp46
 									? FB46_MENTORS_SECTION_INTRO
 									: 'Oameni cu experiență în educație și dezvoltare — prezenți, disponibili, ancorați în practică.'}
@@ -1121,106 +1166,12 @@
 						</div>
 						<div class="mt-10 grid gap-6 md:grid-cols-2">
 							{#each mentors as mentor (mentor.id)}
-								{@const cleanedBio = cleanMentorBio(mentor.bio, mentor.yearJoined)}
-								{@const bioParts = buildMentorBioParts(cleanedBio)}
-								{@const isExpanded = !!expandedMentors[mentor.id]}
-								<div
-									class="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-white shadow-[0_14px_40px_-28px_rgba(21,75,106,0.2)]"
-									data-cms-type="mentor"
-									data-cms-id={mentor.id}
-									role="button"
-									tabindex="0"
-									aria-expanded={isExpanded}
-									onclick={() => toggleMentorBio(mentor.id)}
-									onkeydown={(event) => {
-										if (event.key === 'Enter' || event.key === ' ') {
-											event.preventDefault();
-											toggleMentorBio(mentor.id);
-										}
-									}}
-								>
-									<div class="grid items-start gap-5 p-5 sm:grid-cols-[120px_1fr] sm:gap-6 sm:p-6">
-										<div class="w-32 shrink-0 justify-self-start sm:w-32">
-											<div
-												class="aspect-square overflow-hidden rounded-3xl border border-border bg-muted/30"
-												data-profile-photo
-											>
-												<img
-													src={mentor.image ?? FALLBACK_IMAGE}
-													alt={mentor.name}
-													class="size-full object-cover"
-													loading="lazy"
-												/>
-											</div>
-										</div>
-										<div class="min-w-0">
-											<h3 class="text-lg font-semibold text-[#0c3044] [font-family:var(--font-spectral)]">
-												{mentor.name}
-											</h3>
-											<p class="text-sm font-medium text-primary [font-family:var(--font-sans)]">
-												{mentor.title}
-											</p>
-											{#if mentor.yearJoined}
-												<p class="mt-1 text-sm text-muted-foreground [font-family:var(--font-sans)]">
-													{m.mentors_since()}
-													{mentor.yearJoined}
-												</p>
-											{/if}
-											<div class="relative mt-3">
-												<div
-													class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
-													style={`max-height: ${isExpanded ? '220rem' : '4.8em'}`}
-												>
-													<p
-														class="text-[0.9375rem] leading-relaxed text-muted-foreground [font-family:var(--font-sans)]"
-													>
-														{#each bioParts as part, partIndex (`bio-${mentor.id}-${partIndex}`)}
-															{#if part.type === 'link'}
-																<a
-																	href={part.href}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	class="font-medium text-primary underline decoration-primary/60 underline-offset-2"
-																	onclick={(event) => event.stopPropagation()}
-																>
-																	{part.value}
-																</a>
-															{:else if part.type === 'break'}
-																<br />
-															{:else}
-																{part.value}
-															{/if}
-														{/each}
-													</p>
-												</div>
-												{#if !isExpanded}
-													<div
-														class="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent"
-													></div>
-												{/if}
-											</div>
-											<button
-												type="button"
-												class="mt-5 inline-flex items-center justify-center gap-3 text-[0.9rem] text-[var(--brand-blue)] [font-family:var(--font-sans)]"
-												onclick={(event) => {
-													event.stopPropagation();
-													toggleMentorBio(mentor.id);
-												}}
-												aria-expanded={isExpanded}
-											>
-												<span
-													class="btn-diagonal inline-flex size-10 items-center justify-center border border-current bg-transparent text-current transition-colors group-hover:bg-[var(--brand-blue)] group-hover:text-white"
-													aria-hidden="true"
-												>
-													<ChevronRight class="size-4 transition-transform duration-300 {isExpanded ? 'rotate-90' : ''}" />
-												</span>
-												<span class="inline-flex min-w-[8.5rem] items-center text-left">
-													{isExpanded ? 'Mai puțin' : 'Citește profilul'}
-												</span>
-											</button>
-										</div>
-									</div>
-								</div>
+								<MentorCard
+									{mentor}
+									labels={mentorLabelsRO}
+									expanded={activeMentor?.id === mentor.id}
+									onopen={openMentor}
+								/>
 							{/each}
 						</div>
 					</section>
@@ -1242,16 +1193,21 @@
 						: (benMain.title ?? 'Beneficii principale și secundare')}
 					{@const benefitsIntro =
 						benMain.intro ?? (isFamilyBootcamp46 ? FB46_BENEFITS_INTRO : undefined)}
-					{@const benSecondary = (getSection('benefits_secondary')?.payload as {
-						title?: string;
-						items?: string[];
-						note?: string;
-						other?: string;
-						otherItems?: string[];
-						image?: string;
-					} | undefined)}
+					{@const benSecondary = getSection('benefits_secondary')?.payload as
+						| {
+								title?: string;
+								items?: string[];
+								note?: string;
+								other?: string;
+								otherItems?: string[];
+								image?: string;
+						  }
+						| undefined}
 					{@const mergedBenefitItems = [...(benMain.items ?? []), ...(benSecondary?.items ?? [])]}
-					{@const mergedOtherItems = [...(benMain.otherItems ?? []), ...(benSecondary?.otherItems ?? [])]}
+					{@const mergedOtherItems = [
+						...(benMain.otherItems ?? []),
+						...(benSecondary?.otherItems ?? [])
+					]}
 					<section
 						class="mb-16 border-b border-border pb-16"
 						data-cms-type="program_section"
@@ -1261,24 +1217,30 @@
 						<div class="mx-auto max-w-3xl text-center">
 							{#if benefitsEyebrow}
 								<p
-									class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+									class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 								>
 									{benefitsEyebrow}
 								</p>
 							{/if}
 							<h2
-								class="{benefitsEyebrow ? 'mt-3' : ''} text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="{benefitsEyebrow
+									? 'mt-3'
+									: ''} [font-family:var(--font-spectral)] text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl"
 							>
 								{benefitsTitle}
 							</h2>
 							{#if benefitsIntro}
-								<p class="mt-4 text-sm text-muted-foreground md:text-base [font-family:var(--font-sans)]">
+								<p
+									class="mt-4 [font-family:var(--font-sans)] text-sm text-muted-foreground md:text-base"
+								>
 									{benefitsIntro}
 								</p>
 							{/if}
 						</div>
 						{#if benMain.image}
-							<div class="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-border shadow-sm">
+							<div
+								class="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-border shadow-sm"
+							>
 								<img
 									src={benMain.image}
 									alt={isFamilyBootcamp46 ? FB46_BENEFITS_IMAGE_ALT : ''}
@@ -1288,7 +1250,7 @@
 							</div>
 						{/if}
 						{#if mergedBenefitItems.length}
-							<div class="mt-8 grid w-full gap-4 md:grid-cols-3 [font-family:var(--font-sans)]">
+							<div class="mt-8 grid w-full gap-4 [font-family:var(--font-sans)] md:grid-cols-3">
 								{#each mergedBenefitItems as item (`bm-${item.slice(0, 32)}`)}
 									<div
 										class="rounded-2xl border border-border bg-white p-4 text-sm leading-relaxed text-muted-foreground md:text-[0.95rem]"
@@ -1305,20 +1267,25 @@
 							</div>
 						{/if}
 						{#if benMain.note || benSecondary?.note}
-							<p class="mt-6 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+							<p class="mt-6 [font-family:var(--font-sans)] text-sm text-muted-foreground">
 								{benMain.note ?? benSecondary?.note}
 							</p>
 						{/if}
 						{#if benMain.other || benSecondary?.other}
-							<p class="mt-8 font-semibold text-[#0c3044] [font-family:var(--font-sans)]">
+							<p class="mt-8 [font-family:var(--font-sans)] font-semibold text-[#0c3044]">
 								{benMain.other ?? benSecondary?.other}
 							</p>
 						{/if}
 						{#if mergedOtherItems.length}
-							<ul class="mt-3 space-y-2 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+							<ul
+								class="mt-3 space-y-2 [font-family:var(--font-sans)] text-sm text-muted-foreground"
+							>
 								{#each mergedOtherItems as item (`bmo-${item.slice(0, 24)}`)}
 									<li class="flex gap-2">
-										<span class="mt-2 size-1 shrink-0 rounded-full bg-[var(--brand-blue)]" aria-hidden="true"></span>
+										<span
+											class="mt-2 size-1 shrink-0 rounded-full bg-[var(--brand-blue)]"
+											aria-hidden="true"
+										></span>
 										<span>{item}</span>
 									</li>
 								{/each}
@@ -1331,7 +1298,7 @@
 					{@const gal = payload as { title?: string; images?: { url: string; alt?: string }[] }}
 					{#if gal.images?.length}
 						<section
-							class="relative left-1/2 right-1/2 -mx-[50vw] mb-16 w-screen border-b border-border bg-white px-0 pb-14 md:pb-20"
+							class="relative right-1/2 left-1/2 -mx-[50vw] mb-16 w-screen border-b border-border bg-white px-0 pb-14 md:pb-20"
 							data-cms-type="program_section"
 							data-cms-program-id={program.id}
 							data-cms-section={section}
@@ -1342,17 +1309,17 @@
 								<div class="w-full py-12 md:py-14">
 									<div class="px-6 md:px-10">
 										<p
-											class="text-center text-xs font-semibold tracking-[0.22em] text-primary uppercase [font-family:var(--font-sans)]"
+											class="text-center [font-family:var(--font-sans)] text-xs font-semibold tracking-[0.22em] text-primary uppercase"
 										>
 											Galerie
 										</p>
 										<h2
-											class="mx-auto mt-4 max-w-[1400px] text-center text-[1.45rem] leading-tight font-semibold text-foreground md:text-[2rem] lg:text-[2.35rem] [font-family:var(--font-spectral)]"
+											class="mx-auto mt-4 max-w-[1400px] text-center [font-family:var(--font-spectral)] text-[1.45rem] leading-tight font-semibold text-foreground md:text-[2rem] lg:text-[2.35rem]"
 										>
 											{gal.title ?? 'Momente din tabără'}
 										</h2>
 										<p
-											class="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground md:text-base [font-family:var(--font-sans)]"
+											class="mx-auto mt-4 max-w-2xl text-center [font-family:var(--font-sans)] text-sm leading-relaxed text-muted-foreground md:text-base"
 										>
 											{isFamilyBootcamp46
 												? FB46_GALLERY_LEAD
@@ -1363,7 +1330,7 @@
 										<!-- Mobil: carusel snap (ca pe homepage) -->
 										<div
 											id="program-gallery-track-mobile"
-											class="flex gap-3 overflow-x-auto scroll-smooth px-4 pb-1 [scrollbar-width:none] snap-x snap-mandatory md:hidden [&::-webkit-scrollbar]:hidden"
+											class="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-4 pb-1 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
 										>
 											{#each galleryImages as img, i (`program-gallery-mobile-${img.url}-${i}`)}
 												<div
@@ -1384,7 +1351,7 @@
 										<div class="hidden space-y-3 md:block">
 											<div
 												id="program-gallery-track-top"
-												class="-mx-[145px] flex gap-3 overflow-x-auto px-[145px] scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+												class="-mx-[145px] flex gap-3 overflow-x-auto scroll-smooth px-[145px] pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 											>
 												{#each programGalleryRowOne as img, i (`program-gallery-top-${img.url}-${i}`)}
 													<div
@@ -1403,7 +1370,7 @@
 											</div>
 											<div
 												id="program-gallery-track-bottom"
-												class="-mx-[145px] flex gap-3 overflow-x-auto px-[145px] scroll-smooth pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+												class="-mx-[145px] flex gap-3 overflow-x-auto scroll-smooth px-[145px] pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 											>
 												{#each programGalleryRowTwo as img, i (`program-gallery-bottom-${img.url}-${i}`)}
 													<div
@@ -1454,19 +1421,19 @@
 					>
 						{#if trans.title}
 							<h2
-								class="text-center text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="text-center [font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 							>
 								{trans.title}
 							</h2>
 						{/if}
 						<p
-							class="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted-foreground [font-family:var(--font-sans)] md:text-[0.95rem]"
+							class="mt-6 [font-family:var(--font-sans)] text-sm leading-relaxed whitespace-pre-line text-muted-foreground md:text-[0.95rem]"
 						>
 							{trans.body}
 						</p>
 						{#if trans.contact}
 							<p
-								class="mt-6 flex items-center justify-center gap-2 text-[#0c3044] [font-family:var(--font-sans)]"
+								class="mt-6 flex items-center justify-center gap-2 [font-family:var(--font-sans)] text-[#0c3044]"
 							>
 								<Phone class="size-5 shrink-0 text-primary" aria-hidden="true" />
 								<a href="tel:+40736770669" class="font-medium underline-offset-2 hover:underline">
@@ -1485,18 +1452,20 @@
 					>
 						{#if menu.title}
 							<h2
-								class="text-center text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+								class="text-center [font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 							>
 								{menu.title}
 							</h2>
 						{/if}
 						<p
-							class="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted-foreground [font-family:var(--font-sans)] md:text-[0.95rem]"
+							class="mt-6 [font-family:var(--font-sans)] text-sm leading-relaxed whitespace-pre-line text-muted-foreground md:text-[0.95rem]"
 						>
 							{menu.body}
 						</p>
 						{#if menu.note}
-							<p class="mt-6 text-sm text-muted-foreground [font-family:var(--font-sans)]">{menu.note}</p>
+							<p class="mt-6 [font-family:var(--font-sans)] text-sm text-muted-foreground">
+								{menu.note}
+							</p>
 						{/if}
 					</section>
 				{:else if section === 'location'}
@@ -1530,20 +1499,24 @@
 							<div class="mx-auto max-w-3xl text-center">
 								{#if locationEyebrow}
 									<p
-										class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+										class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 									>
 										{locationEyebrow}
 									</p>
 								{/if}
 								{#if locationTitle}
 									<h2
-										class="{locationEyebrow ? 'mt-3' : ''} text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+										class="{locationEyebrow
+											? 'mt-3'
+											: ''} [font-family:var(--font-spectral)] text-2xl font-medium tracking-[-0.02em] text-[#0c3044] md:text-3xl"
 									>
 										{locationTitle}
 									</h2>
 								{/if}
 								{#if locationIntro}
-									<p class="mt-4 text-sm text-muted-foreground md:text-base [font-family:var(--font-sans)]">
+									<p
+										class="mt-4 [font-family:var(--font-sans)] text-sm text-muted-foreground md:text-base"
+									>
 										{locationIntro}
 									</p>
 								{/if}
@@ -1575,28 +1548,38 @@
 						</div>
 						<div class="mt-6">
 							{#if loc.subtitle && loc.subtitle.trim() !== (locationTitle ?? '').trim()}
-								<h3 class="text-xl font-semibold text-[#0c3044] [font-family:var(--font-spectral)]">
+								<h3 class="[font-family:var(--font-spectral)] text-xl font-semibold text-[#0c3044]">
 									{loc.subtitle}
 								</h3>
 							{/if}
-							<p class="mt-3 text-sm leading-relaxed text-muted-foreground [font-family:var(--font-sans)] md:text-base">{loc.body}</p>
+							<p
+								class="mt-3 [font-family:var(--font-sans)] text-sm leading-relaxed text-muted-foreground md:text-base"
+							>
+								{loc.body}
+							</p>
 							{#if loc.amenities?.length}
 								<ul class="mt-4 flex flex-wrap gap-2 [font-family:var(--font-sans)]">
 									{#each loc.amenities as a (`am-${a}`)}
-										<li class="rounded-full border border-[#d9e6f7] bg-[#f7fbff] px-3 py-1 text-sm text-[#0c3044]">
+										<li
+											class="rounded-full border border-[#d9e6f7] bg-[#f7fbff] px-3 py-1 text-sm text-[#0c3044]"
+										>
 											{a}
 										</li>
 									{/each}
 								</ul>
 							{/if}
 							{#if loc.closing}
-								<p class="mt-4 text-sm text-muted-foreground [font-family:var(--font-sans)]">{loc.closing}</p>
+								<p class="mt-4 [font-family:var(--font-sans)] text-sm text-muted-foreground">
+									{loc.closing}
+								</p>
 							{/if}
 						</div>
 						{#if (loc.images ?? []).filter(Boolean).length}
 							<div class="mt-7 grid grid-cols-2 gap-2 sm:grid-cols-3">
 								{#each (loc.images ?? []).filter(Boolean) as url, locImgIdx (locImgIdx)}
-									<div class="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted/20">
+									<div
+										class="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted/20"
+									>
 										<img
 											src={url}
 											alt={isFamilyBootcamp46
@@ -1630,7 +1613,7 @@
 						>
 							{#if test.title}
 								<h2
-									class="text-2xl font-medium text-[#0c3044] md:text-3xl [font-family:var(--font-spectral)]"
+									class="[font-family:var(--font-spectral)] text-2xl font-medium text-[#0c3044] md:text-3xl"
 								>
 									{test.title}
 								</h2>
@@ -1639,7 +1622,9 @@
 								<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 									{#each test.items as t, ti (`test-${ti}`)}
 										{#if t.videoId}
-											<div class="overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
+											<div
+												class="overflow-hidden rounded-3xl border border-border bg-white shadow-sm"
+											>
 												{#if t.provider === 'vimeo'}
 													<LazyVideoEmbed
 														embedSrc={`https://player.vimeo.com/video/${t.videoId}?dnt=1`}
@@ -1658,11 +1643,13 @@
 											</div>
 										{:else if t.quote}
 											<blockquote
-												class="rounded-3xl border border-border bg-[#f7fbff] p-6 text-[#0c3044]/90 [font-family:var(--font-sans)]"
+												class="rounded-3xl border border-border bg-[#f7fbff] p-6 [font-family:var(--font-sans)] text-[#0c3044]/90"
 											>
 												<p class="text-sm leading-relaxed italic md:text-base">„{t.quote}”</p>
 												{#if t.author}
-													<cite class="mt-3 block text-sm font-semibold not-italic text-muted-foreground">
+													<cite
+														class="mt-3 block text-sm font-semibold text-muted-foreground not-italic"
+													>
 														— {t.author}
 													</cite>
 												{/if}
@@ -1676,18 +1663,22 @@
 				{:else if section === 'enrollment'}
 					{@const rawEnroll = payload as EnrollPayload}
 					{@const enroll = resolveEnrollment(rawEnroll)}
-					{@const enrollButtons = enroll.buttons?.length ? enroll.buttons : defaultEnrollmentButtons()}
+					{@const enrollButtons = enroll.buttons?.length
+						? enroll.buttons
+						: defaultEnrollmentButtons()}
 					{@const enrollTel = enrollPrimaryTel(enrollButtons)}
 					{@const enrollWhatsapp = enrollWhatsappHref(enrollButtons)}
 					{@const enrollTelBtns = enrollButtons.filter((b) => b.type === 'tel')}
 					{@const enrollLinkBtns = enrollButtons.filter((b) => b.type === 'link')}
 					<section
-						class="relative left-1/2 right-1/2 -mx-[50vw] mb-8 w-screen bg-white px-0 pb-0"
+						class="relative right-1/2 left-1/2 -mx-[50vw] mb-8 w-screen bg-white px-0 pb-0"
 						data-cms-type="program_section"
 						data-cms-program-id={program.id}
 						data-cms-section={section}
 					>
-						<div class="w-full overflow-hidden rounded-br-[5.6rem] bg-[#245f4e] text-white md:rounded-br-[7rem]">
+						<div
+							class="w-full overflow-hidden rounded-br-[5.6rem] bg-[#245f4e] text-white md:rounded-br-[7rem]"
+						>
 							<div class="mx-auto w-full max-w-[1600px] px-6 py-12 md:px-10 md:py-14">
 								<div
 									class="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] lg:items-start lg:gap-10 xl:gap-12"
@@ -1695,21 +1686,21 @@
 									<div class="min-w-0">
 										{#if enroll.title}
 											<h2
-												class="text-[1.65rem] leading-tight font-medium text-white md:text-[2.1rem] [font-family:var(--font-spectral)]"
+												class="[font-family:var(--font-spectral)] text-[1.65rem] leading-tight font-medium text-white md:text-[2.1rem]"
 											>
 												{enroll.title}
 											</h2>
 										{/if}
 										{#if enroll.intro}
 											<p
-												class="mt-4 max-w-2xl text-base leading-relaxed text-white/85 [font-family:var(--font-sans)]"
+												class="mt-4 max-w-2xl [font-family:var(--font-sans)] text-base leading-relaxed text-white/85"
 											>
 												{enroll.intro}
 											</p>
 										{/if}
 										{#if enroll.steps?.length}
 											<ol
-												class="mt-8 max-w-2xl list-decimal space-y-3 pl-5 text-sm text-white/88 md:text-base [font-family:var(--font-sans)]"
+												class="mt-8 max-w-2xl list-decimal space-y-3 pl-5 [font-family:var(--font-sans)] text-sm text-white/88 md:text-base"
 											>
 												{#each [...enroll.steps].sort((a, b) => a.order - b.order) as step (`step-${step.order}`)}
 													<li>{step.label}</li>
@@ -1720,7 +1711,7 @@
 											{#each enrollTelBtns as btn, ei (`enroll-tel-${ei}`)}
 												<a
 													href={'tel:' + (btn.value?.replace(/\D/g, '') ?? '')}
-													class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center text-[0.9rem] font-semibold normal-case tracking-normal text-[var(--brand-blue)] shadow-lg shadow-black/15 transition-colors hover:bg-transparent hover:text-white [font-family:var(--font-sans)] md:text-[0.96rem]"
+													class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold tracking-normal text-[var(--brand-blue)] normal-case shadow-lg shadow-black/15 transition-colors hover:bg-transparent hover:text-white md:text-[0.96rem]"
 												>
 													<Phone class="size-5 shrink-0" aria-hidden="true" />
 													{btn.label}
@@ -1729,7 +1720,7 @@
 											{#each enrollLinkBtns as btn, ei (`enroll-link-${ei}`)}
 												<a
 													href={btn.href ?? contentHref('contact')}
-													class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center text-[0.9rem] font-semibold normal-case tracking-normal text-white transition-colors hover:bg-white hover:text-[var(--brand-blue)] [font-family:var(--font-sans)] md:text-[0.96rem]"
+													class="btn-diagonal inline-flex min-h-12 items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold tracking-normal text-white normal-case transition-colors hover:bg-white hover:text-[var(--brand-blue)] md:text-[0.96rem]"
 												>
 													{btn.label}
 												</a>
@@ -1738,10 +1729,10 @@
 									</div>
 									{#if isFamilyBootcamp46}
 										<aside
-											class="mt-10 flex h-fit w-full shrink-0 flex-col rounded-tl-[1.25rem] rounded-br-[1.25rem] border-2 border-[#25D366]/45 bg-[#1a332b]/75 p-8 shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)] backdrop-blur-sm [font-family:var(--font-sans)] md:rounded-tl-[1.4rem] md:rounded-br-[1.4rem] md:p-9 lg:mt-0"
+											class="mt-10 flex h-fit w-full shrink-0 flex-col rounded-tl-[1.25rem] rounded-br-[1.25rem] border-2 border-[#25D366]/45 bg-[#1a332b]/75 p-8 [font-family:var(--font-sans)] shadow-[0_20px_40px_-28px_rgba(0,0,0,0.5)] backdrop-blur-sm md:rounded-tl-[1.4rem] md:rounded-br-[1.4rem] md:p-9 lg:mt-0"
 										>
 											<p
-												class="text-[1.2rem] font-semibold leading-tight tracking-tight text-[#25D366] md:text-[1.3rem]"
+												class="text-[1.2rem] leading-tight font-semibold tracking-tight text-[#25D366] md:text-[1.3rem]"
 											>
 												{FB46_ENROLLMENT_SIDEBAR_TITLE}
 											</p>
@@ -1752,7 +1743,7 @@
 												href={enrollWhatsapp}
 												target="_blank"
 												rel="noopener noreferrer"
-												class="mt-6 inline-flex w-full min-h-[3.1rem] items-center justify-center gap-2 rounded-tl-[1.05rem] rounded-br-[1.05rem] border-0 bg-[#25D366] px-4 py-3 text-center text-[0.95rem] font-semibold text-[#0a1f18] shadow-[0_10px_28px_-14px_rgba(0,0,0,0.55)] transition-[filter,transform] hover:brightness-105 active:scale-[0.99]"
+												class="mt-6 inline-flex min-h-[3.1rem] w-full items-center justify-center gap-2 rounded-tl-[1.05rem] rounded-br-[1.05rem] border-0 bg-[#25D366] px-4 py-3 text-center text-[0.95rem] font-semibold text-[#0a1f18] shadow-[0_10px_28px_-14px_rgba(0,0,0,0.55)] transition-[filter,transform] hover:brightness-105 active:scale-[0.99]"
 											>
 												<MessageCircle class="size-5 shrink-0" aria-hidden="true" />
 												{FB46_ENROLLMENT_SIDEBAR_WHATSAPP_CTA}
@@ -1779,7 +1770,7 @@
 		<div class="mx-auto max-w-6xl px-5 py-16 md:px-10 md:py-24 lg:px-14">
 			<div class="rounded-3xl border border-border bg-white p-8 shadow-sm md:p-12">
 				{#if program.description}
-					<p class="text-lg leading-relaxed text-muted-foreground [font-family:var(--font-sans)]">
+					<p class="[font-family:var(--font-sans)] text-lg leading-relaxed text-muted-foreground">
 						{program.description}
 					</p>
 				{/if}
@@ -1796,15 +1787,17 @@
 					{/if}
 					<p class="flex items-center gap-3 text-[#0c3044]">
 						<MapPin class="size-5 shrink-0 text-primary" aria-hidden="true" />
-						<span class="text-sm md:text-base">{program.locationText ?? program.location ?? ''}</span>
+						<span class="text-sm md:text-base"
+							>{program.locationText ?? program.location ?? ''}</span
+						>
 					</p>
 				</div>
 				<div class="mt-10 flex flex-wrap gap-3">
-					<Button href={contentHref('programs')} variant="outline" class="rounded-2xl gap-2">
+					<Button href={contentHref('programs')} variant="outline" class="gap-2 rounded-2xl">
 						<ArrowLeft class="size-4 shrink-0" aria-hidden="true" />
 						{m.nav_programs()}
 					</Button>
-					<Button href={contentHref('home')} class="rounded-2xl gap-2">
+					<Button href={contentHref('home')} class="gap-2 rounded-2xl">
 						{m.nav_home()}
 						<ChevronRight class="size-4 shrink-0" aria-hidden="true" />
 					</Button>
@@ -1813,6 +1806,8 @@
 		</div>
 	{/if}
 </main>
+
+<MentorProfileModal mentor={activeMentor} labels={mentorLabelsRO} onclose={closeMentor} />
 
 <style>
 	:global(main[data-cms-type='program'] .rounded-3xl) {
