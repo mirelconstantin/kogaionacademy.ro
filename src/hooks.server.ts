@@ -1,7 +1,7 @@
 import { sequence } from '@sveltejs/kit/hooks';
 import { building } from '$app/environment';
 import { redirect } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
+import { getAuth, initAuth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import type { Handle } from '@sveltejs/kit';
 import { getTextDirection } from '$lib/paraglide/runtime';
@@ -23,6 +23,7 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 	});
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
+	const auth = getAuth();
 	const session = await auth.api.getSession({ headers: event.request.headers });
 
 	if (session) {
@@ -71,3 +72,10 @@ export const handle: Handle = sequence(
 	handleAdminGuard,
 	handleAdminActionAudit
 );
+
+/**
+ * Called once when the server starts (adapter-node's `server.init()`), never during
+ * `vite build`. Warms the Better Auth instance so a missing `BETTER_AUTH_SECRET` fails at
+ * boot rather than on the first request.
+ */
+export const init = initAuth;

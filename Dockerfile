@@ -15,14 +15,18 @@ COPY . .
 RUN bun install --frozen-lockfile
 
 # Easypanel --build-arg does not become process.env unless declared here.
-# SvelteKit / Better Auth evaluate auth and DB during `vite build`.
-ARG DATABASE_URL
-ARG ORIGIN
-ARG PUBLIC_SITE_URL
-ARG BETTER_AUTH_SECRET
-ARG GOOGLE_CLIENT_ID
-ARG GOOGLE_CLIENT_SECRET
-ARG GIT_SHA
+# SvelteKit evaluates the server hooks during `vite build`, so these must be *set*, but they
+# must never be *real* at build time: `.env` is excluded by .dockerignore and the build stage
+# only needs the module graph to evaluate. Every ARG therefore carries a build-time default,
+# so the build succeeds even when the platform passes only `--build-arg GIT_SHA=...`.
+# The runtime values come from the container environment in the `runner` stage.
+ARG DATABASE_URL=postgres://localhost:5432/kogaion
+ARG ORIGIN=http://localhost:3000
+ARG PUBLIC_SITE_URL=http://localhost:3000
+ARG BETTER_AUTH_SECRET=build-time-placeholder-not-used-at-runtime
+ARG GOOGLE_CLIENT_ID=
+ARG GOOGLE_CLIENT_SECRET=
+ARG GIT_SHA=
 
 ENV DATABASE_URL=${DATABASE_URL} \
 	ORIGIN=${ORIGIN} \
