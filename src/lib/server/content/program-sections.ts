@@ -4,6 +4,7 @@
 
 export type ProgramSectionKey =
 	| 'hero_highlights'
+	| 'hero_cta'
 	| 'intro'
 	| 'curriculum_areas'
 	| 'packages'
@@ -23,6 +24,25 @@ export interface HeroHighlightsPayload {
 	items: string[];
 }
 
+export interface HeroCtaButton {
+	label: string;
+	type: 'tel' | 'link';
+	/** Phone digits for `type: 'tel'`. */
+	value?: string;
+	/** Target path for `type: 'link'`. */
+	href?: string;
+}
+
+export interface HeroCtaPayload {
+	buttons: HeroCtaButton[];
+}
+
+export interface IntroVideo {
+	provider: 'youtube' | 'vimeo';
+	videoId: string;
+	title?: string;
+}
+
 export interface IntroBlock {
 	title?: string;
 	body: string;
@@ -33,6 +53,8 @@ export interface IntroPayload {
 	imageBetweenBlocks?: string;
 	/** Optional index after which intro image is rendered. Defaults to end of intro. */
 	imageAfterBlockIndex?: number;
+	/** Optional video rendered between intro blocks. */
+	videoBetweenBlocks?: IntroVideo;
 }
 
 export interface CurriculumArea {
@@ -133,6 +155,9 @@ export interface TestimonialItem {
 	quote?: string;
 	author?: string;
 	role?: string;
+	/** Video source for a testimonial rendered as a clip. */
+	provider?: 'youtube' | 'vimeo';
+	videoId?: string;
 }
 
 export interface TestimonialsPayload {
@@ -150,6 +175,8 @@ export interface EnrollmentPayload {
 	intro?: string;
 	steps: EnrollmentStep[];
 	contactNote?: string;
+	/** Call-to-action buttons shown after the steps. */
+	buttons?: HeroCtaButton[];
 }
 
 export interface VideoLink {
@@ -164,6 +191,7 @@ export interface VideoLinksPayload {
 
 export type ProgramSectionPayload =
 	| HeroHighlightsPayload
+	| HeroCtaPayload
 	| IntroPayload
 	| CurriculumAreasPayload
 	| PackagesPayload

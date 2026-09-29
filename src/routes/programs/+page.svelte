@@ -97,7 +97,9 @@
 	}
 
 	const lockedProgramHint = $derived(
-		locale === 'en' ? 'Program page not available yet' : 'Pagina programului nu este încă disponibilă'
+		locale === 'en'
+			? 'Program page not available yet'
+			: 'Pagina programului nu este încă disponibilă'
 	);
 
 	function formatProgramLocation(program: ProgramForDisplay): string | null {
@@ -132,7 +134,7 @@
 	<div class="relative">
 		<Hero
 			hero={heroConfig}
-			heroLabel={heroLabel}
+			{heroLabel}
 			introHeading={heroTitle}
 			introBody={heroIntro}
 			cmsPage="programs"
@@ -148,7 +150,9 @@
 	{#if activeAgeFilterLabel}
 		<section class="border-b border-border bg-[#f4f8ff] px-6 py-4">
 			<div class="mx-auto max-w-6xl text-center">
-				<p class="inline-flex items-center gap-2 text-sm text-[#0c3044] [font-family:var(--font-sans)]">
+				<p
+					class="inline-flex items-center gap-2 [font-family:var(--font-sans)] text-sm text-[#0c3044]"
+				>
 					<span class="size-1.5 rounded-full bg-[var(--brand-green)]"></span>
 					{activeAgeFilterLabel}
 				</p>
@@ -162,13 +166,19 @@
 				class="rounded-tl-[4.3rem] rounded-br-[4.3rem] border border-[#dfeaf8] bg-[#f7fbff] px-6 py-9 shadow-[0_10px_24px_-18px_rgba(21,75,106,0.18)] md:px-10 md:py-11"
 			>
 				<div class="mx-auto max-w-4xl text-center">
-					<p class="text-xs font-semibold tracking-[0.2em] text-[#0c3044]/70 uppercase [font-family:var(--font-sans)]">
+					<p
+						class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-[#0c3044]/70 uppercase"
+					>
 						{m.programs_list_eyebrow()}
 					</p>
-					<h2 class="mt-4 text-3xl font-medium text-[#0c3044] md:text-5xl [font-family:var(--font-spectral)]">
+					<h2
+						class="mt-4 [font-family:var(--font-spectral)] text-3xl font-medium text-[#0c3044] md:text-5xl"
+					>
 						{m.programs_list_heading()}
 					</h2>
-					<p class="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-muted-foreground md:text-lg [font-family:var(--font-sans)]">
+					<p
+						class="mx-auto mt-5 max-w-3xl [font-family:var(--font-sans)] text-base leading-relaxed text-muted-foreground md:text-lg"
+					>
 						{m.programs_list_lead()}
 					</p>
 				</div>
@@ -176,7 +186,9 @@
 					{#each ageFilterOptions as opt (opt.value ?? 'all')}
 						<a
 							href={filterHref(opt.value)}
-							class="btn-diagonal inline-flex min-h-11 items-center justify-center border px-5 py-2.5 text-sm font-semibold transition-colors [font-family:var(--font-sans)] {isAgeFilterActive(opt.value)
+							class="btn-diagonal inline-flex min-h-11 items-center justify-center border px-5 py-2.5 [font-family:var(--font-sans)] text-sm font-semibold transition-colors {isAgeFilterActive(
+								opt.value
+							)
 								? 'border-[var(--brand-blue)] bg-[var(--brand-blue)] text-white'
 								: 'border-[#dfeaf8] bg-white text-[#0c3044] hover:border-[#cfd9e6] hover:bg-[#e4eaf1]'}"
 						>
@@ -191,15 +203,15 @@
 	{#if programCount === 0}
 		<section class="px-6 py-16 md:py-20">
 			<div class="mx-auto max-w-3xl text-center">
-				<h2 class="text-2xl text-[#0c3044] [font-family:var(--font-spectral)]">
+				<h2 class="[font-family:var(--font-spectral)] text-2xl text-[#0c3044]">
 					{m.programs_empty_title()}
 				</h2>
-				<p class="mt-3 text-muted-foreground [font-family:var(--font-sans)]">
+				<p class="mt-3 [font-family:var(--font-sans)] text-muted-foreground">
 					{m.programs_empty_body()}
 				</p>
 				<a
 					href={filterHref(null)}
-					class="btn-diagonal mt-7 inline-flex min-h-11 items-center justify-center border border-[var(--brand-blue)] px-6 py-2.5 text-sm font-semibold text-[var(--brand-blue)] transition-colors hover:bg-[var(--brand-blue)] hover:text-white [font-family:var(--font-sans)]"
+					class="btn-diagonal mt-7 inline-flex min-h-11 items-center justify-center border border-[var(--brand-blue)] px-6 py-2.5 [font-family:var(--font-sans)] text-sm font-semibold text-[var(--brand-blue)] transition-colors hover:bg-[var(--brand-blue)] hover:text-white"
 				>
 					{m.programs_empty_cta()}
 				</a>
@@ -209,50 +221,67 @@
 		{#each categoriesWithPrograms as entry (entry.category.id)}
 			<section class="relative bg-white px-6 py-9 md:py-12">
 				<div class="mx-auto w-full max-w-6xl">
-					<div class="rounded-tl-[4.3rem] rounded-br-[4.3rem] border border-transparent bg-[#f7fbff] px-6 py-9 md:px-10 md:py-11">
-						<h2 class="mx-auto max-w-[1200px] text-center text-[1.45rem] leading-tight font-medium text-[#0c3044] md:text-[2rem] lg:text-[2.35rem] [font-family:var(--font-spectral)]">
+					<div
+						class="rounded-tl-[4.3rem] rounded-br-[4.3rem] border border-transparent bg-[#f7fbff] px-6 py-9 md:px-10 md:py-11"
+					>
+						<h2
+							class="mx-auto max-w-[1200px] text-center [font-family:var(--font-spectral)] text-[1.45rem] leading-tight font-medium text-[#0c3044] md:text-[2rem] lg:text-[2.35rem]"
+						>
 							{msg(entry.category.titleKey)}
 						</h2>
-						<p class="mx-auto mt-4 max-w-4xl text-center text-base leading-relaxed text-muted-foreground [font-family:var(--font-sans)]">
+						<p
+							class="mx-auto mt-4 max-w-4xl text-center [font-family:var(--font-sans)] text-base leading-relaxed text-muted-foreground"
+						>
 							{msg(entry.category.subtitleKey)}
 						</p>
 						<div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 							{#each entry.programs as program (program.slug)}
-								{@const isOpen = isProgramPubliclyOpen(program.slug)}
+								{@const isOpen = isProgramPubliclyOpen(program.slug, program.status)}
 								{@const cardInnerClass =
 									'media-diagonal-reverse relative isolate block min-h-[30rem] overflow-hidden bg-[#0b244f]'}
 								{#if isOpen}
-									<a
-										href={programHref(program.slug)}
-										class="{cardInnerClass} group cursor-pointer"
-									>
+									<a href={programHref(program.slug)} class="{cardInnerClass} group cursor-pointer">
 										<img
 											src={program.image ?? FALLBACK_IMAGE}
 											alt={program.title}
 											class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
 										/>
-										<div class="absolute inset-0 bg-gradient-to-t from-black/93 via-black/62 to-black/28"></div>
+										<div
+											class="absolute inset-0 bg-gradient-to-t from-black/93 via-black/62 to-black/28"
+										></div>
 										{#if program.badge}
-											<span class="media-diagonal-soft absolute top-4 left-4 z-20 inline-flex items-center border border-white/75 bg-[#0c3044]/40 px-3 py-1.5 text-[0.7rem] font-semibold tracking-[0.11em] uppercase text-white backdrop-blur-sm [font-family:var(--font-sans)]">
-												{program.badge === 'early_bird' ? m.programs_badge_early_bird() : m.programs_badge_new()}
+											<span
+												class="media-diagonal-soft absolute top-4 left-4 z-20 inline-flex items-center border border-white/75 bg-[#0c3044]/40 px-3 py-1.5 [font-family:var(--font-sans)] text-[0.7rem] font-semibold tracking-[0.11em] text-white uppercase backdrop-blur-sm"
+											>
+												{program.badge === 'early_bird'
+													? m.programs_badge_early_bird()
+													: m.programs_badge_new()}
 											</span>
 										{/if}
 										<div class="relative flex h-full flex-col p-6 pt-14 pb-20">
 											<div>
-												<h3 class="text-[1.42rem] leading-[1.12] font-medium text-white md:text-[1.68rem] [font-family:var(--font-spectral)]">
+												<h3
+													class="[font-family:var(--font-spectral)] text-[1.42rem] leading-[1.12] font-medium text-white md:text-[1.68rem]"
+												>
 													{program.title}
 												</h3>
 												{#if formatAgeRangeLabel(program.categoryId, program.ageRange)}
-													<p class="mt-2 text-[0.95rem] text-white/90 [font-family:var(--font-sans)]">
+													<p
+														class="mt-2 [font-family:var(--font-sans)] text-[0.95rem] text-white/90"
+													>
 														{formatAgeRangeLabel(program.categoryId, program.ageRange)}
 													</p>
 												{/if}
 												{#if program.description}
-													<p class="mt-4 line-clamp-4 text-[0.95rem] leading-relaxed text-white/86 [font-family:var(--font-sans)]">
+													<p
+														class="mt-4 line-clamp-4 [font-family:var(--font-sans)] text-[0.95rem] leading-relaxed text-white/86"
+													>
 														{program.description}
 													</p>
 												{/if}
-												<div class="mt-4 flex flex-col gap-1.5 text-sm text-white/85 [font-family:var(--font-sans)]">
+												<div
+													class="mt-4 flex flex-col gap-1.5 [font-family:var(--font-sans)] text-sm text-white/85"
+												>
 													{#if formatProgramLocation(program)}
 														<span class="flex items-center gap-1.5">
 															<MapPin class="size-4 shrink-0 opacity-90" />
@@ -271,7 +300,9 @@
 													{/if}
 												</div>
 											</div>
-											<span class="btn-diagonal absolute right-6 bottom-6 inline-flex size-10 items-center justify-center border border-white/90 text-white transition-colors group-hover:bg-[var(--brand-blue)]">
+											<span
+												class="btn-diagonal absolute right-6 bottom-6 inline-flex size-10 items-center justify-center border border-white/90 text-white transition-colors group-hover:bg-[var(--brand-blue)]"
+											>
 												<ArrowRight class="size-4" />
 											</span>
 										</div>
@@ -287,38 +318,52 @@
 											alt=""
 											class="absolute inset-0 size-full object-cover opacity-80"
 										/>
-										<div class="absolute inset-0 bg-gradient-to-t from-black/93 via-black/68 to-black/40"></div>
+										<div
+											class="absolute inset-0 bg-gradient-to-t from-black/93 via-black/68 to-black/40"
+										></div>
 										<div
 											class="pointer-events-none absolute inset-0 z-10 bg-[#0b244f]/25"
 											aria-hidden="true"
 										></div>
 										<span
-											class="media-diagonal-soft absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 border border-white/75 bg-black/45 px-3 py-1.5 text-[0.7rem] font-semibold tracking-[0.08em] uppercase text-white backdrop-blur-sm [font-family:var(--font-sans)]"
+											class="media-diagonal-soft absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 border border-white/75 bg-black/45 px-3 py-1.5 [font-family:var(--font-sans)] text-[0.7rem] font-semibold tracking-[0.08em] text-white uppercase backdrop-blur-sm"
 										>
 											<Lock class="size-3.5 shrink-0 opacity-95" aria-hidden="true" />
 											{locale === 'en' ? 'Coming soon' : 'În curând'}
 										</span>
 										{#if program.badge}
-											<span class="media-diagonal-soft absolute top-4 left-4 z-20 inline-flex items-center border border-white/75 bg-[#0c3044]/40 px-3 py-1.5 text-[0.7rem] font-semibold tracking-[0.11em] uppercase text-white backdrop-blur-sm [font-family:var(--font-sans)]">
-												{program.badge === 'early_bird' ? m.programs_badge_early_bird() : m.programs_badge_new()}
+											<span
+												class="media-diagonal-soft absolute top-4 left-4 z-20 inline-flex items-center border border-white/75 bg-[#0c3044]/40 px-3 py-1.5 [font-family:var(--font-sans)] text-[0.7rem] font-semibold tracking-[0.11em] text-white uppercase backdrop-blur-sm"
+											>
+												{program.badge === 'early_bird'
+													? m.programs_badge_early_bird()
+													: m.programs_badge_new()}
 											</span>
 										{/if}
 										<div class="relative flex h-full flex-col p-6 pt-14 pb-20">
 											<div>
-												<h3 class="text-[1.42rem] leading-[1.12] font-medium text-white md:text-[1.68rem] [font-family:var(--font-spectral)]">
+												<h3
+													class="[font-family:var(--font-spectral)] text-[1.42rem] leading-[1.12] font-medium text-white md:text-[1.68rem]"
+												>
 													{program.title}
 												</h3>
 												{#if formatAgeRangeLabel(program.categoryId, program.ageRange)}
-													<p class="mt-2 text-[0.95rem] text-white/90 [font-family:var(--font-sans)]">
+													<p
+														class="mt-2 [font-family:var(--font-sans)] text-[0.95rem] text-white/90"
+													>
 														{formatAgeRangeLabel(program.categoryId, program.ageRange)}
 													</p>
 												{/if}
 												{#if program.description}
-													<p class="mt-4 line-clamp-4 text-[0.95rem] leading-relaxed text-white/86 [font-family:var(--font-sans)]">
+													<p
+														class="mt-4 line-clamp-4 [font-family:var(--font-sans)] text-[0.95rem] leading-relaxed text-white/86"
+													>
 														{program.description}
 													</p>
 												{/if}
-												<div class="mt-4 flex flex-col gap-1.5 text-sm text-white/85 [font-family:var(--font-sans)]">
+												<div
+													class="mt-4 flex flex-col gap-1.5 [font-family:var(--font-sans)] text-sm text-white/85"
+												>
 													{#if formatProgramLocation(program)}
 														<span class="flex items-center gap-1.5">
 															<MapPin class="size-4 shrink-0 opacity-90" />
@@ -358,22 +403,24 @@
 		class="relative mb-14 overflow-hidden rounded-tl-none rounded-br-[5.6rem] border-t border-[#0e3d55] bg-[#154b6a] py-16 text-white md:mb-16 md:rounded-br-[7rem] md:py-20"
 	>
 		<div class="relative mx-auto max-w-[1300px] px-6 text-center md:px-10">
-			<h2 class="text-3xl leading-tight font-medium text-white md:text-[2.25rem] [font-family:var(--font-spectral)]">
+			<h2
+				class="[font-family:var(--font-spectral)] text-3xl leading-tight font-medium text-white md:text-[2.25rem]"
+			>
 				{m.programs_help_title()}
 			</h2>
-			<p class="mt-5 text-base leading-relaxed text-white [font-family:var(--font-sans)]">
+			<p class="mt-5 [font-family:var(--font-sans)] text-base leading-relaxed text-white">
 				{m.programs_help_body()}
 			</p>
 			<div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
 				<a
 					href={contactPath}
-					class="btn-diagonal inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-center text-[0.9rem] font-semibold text-[var(--brand-blue)] transition-colors hover:bg-white/95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[0.96rem] [font-family:var(--font-sans)]"
+					class="btn-diagonal inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold text-[var(--brand-blue)] transition-colors hover:bg-white/95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[0.96rem]"
 				>
 					{m.programs_help_contact()}
 				</a>
 				<a
 					href={aboutPath}
-					class="btn-diagonal inline-flex min-h-12 items-center justify-center border border-white bg-transparent px-6 py-3 text-center text-[0.9rem] font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[0.96rem] [font-family:var(--font-sans)]"
+					class="btn-diagonal inline-flex min-h-12 items-center justify-center border border-white bg-transparent px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.9rem] font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-[0.96rem]"
 				>
 					{m.programs_help_about()}
 				</a>

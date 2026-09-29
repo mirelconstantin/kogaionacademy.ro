@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		const programsPath = url.pathname.replace(/\/[^/]+$/, '') || '/programe';
 		redirect(302, programsPath);
 	}
-	if (!isProgramPubliclyOpen(params.slug)) {
+	if (!isProgramPubliclyOpen(params.slug, program.status)) {
 		const programsPath = url.pathname.replace(/\/[^/]+$/, '') || '/programe';
 		redirect(302, programsPath);
 	}

@@ -113,6 +113,7 @@ export type ProgramForDisplay = {
 	datesText: string | null;
 	durationText: string | null;
 	locationText: string | null;
+	status: string;
 	publishedAt: Date | null;
 	updatedAt: Date;
 	mentorIds: number[];
@@ -136,9 +137,7 @@ export async function getProgramSections(
 		const loc = await db
 			.select()
 			.from(programSection)
-			.where(
-				and(eq(programSection.programId, programId), eq(programSection.locale, locale))
-			)
+			.where(and(eq(programSection.programId, programId), eq(programSection.locale, locale)))
 			.orderBy(asc(programSection.sortOrder));
 		const rows = loc.length > 0 ? loc : ro;
 		return rows.map((r) => ({
@@ -172,9 +171,7 @@ export async function getPrograms(locale: Locale): Promise<ProgramForDisplay[]> 
 			const loc = await db
 				.select()
 				.from(programLocale)
-				.where(
-					and(eq(programLocale.programId, p.id), eq(programLocale.locale, locale))
-				)
+				.where(and(eq(programLocale.programId, p.id), eq(programLocale.locale, locale)))
 				.limit(1);
 			const localeRow = loc[0] ?? ro[0];
 			const mentorLinks = await db
@@ -199,6 +196,7 @@ export async function getPrograms(locale: Locale): Promise<ProgramForDisplay[]> 
 				datesText: localeRow?.datesText ?? null,
 				durationText: localeRow?.durationText ?? null,
 				locationText: localeRow?.locationText ?? null,
+				status: p.status,
 				publishedAt: p.publishedAt,
 				updatedAt: p.updatedAt,
 				mentorIds: mentorLinks.map((l) => l.mentorId)
@@ -229,9 +227,7 @@ export async function getProgramBySlug(
 		const loc = await db
 			.select()
 			.from(programLocale)
-			.where(
-				and(eq(programLocale.programId, p.id), eq(programLocale.locale, locale))
-			)
+			.where(and(eq(programLocale.programId, p.id), eq(programLocale.locale, locale)))
 			.limit(1);
 		const localeRow = loc[0] ?? ro[0];
 		const mentorLinks = await db
@@ -258,6 +254,7 @@ export async function getProgramBySlug(
 			datesText: localeRow?.datesText ?? null,
 			durationText: localeRow?.durationText ?? null,
 			locationText: localeRow?.locationText ?? null,
+			status: p.status,
 			publishedAt: p.publishedAt,
 			updatedAt: p.updatedAt,
 			mentorIds: mentorLinks.map((l) => l.mentorId),

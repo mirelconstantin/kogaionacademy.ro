@@ -8,6 +8,7 @@
  * Requires: DATABASE_URL, program and program_section tables (run migrations first).
  */
 import { mkdir, writeFile } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -20,7 +21,14 @@ const databaseUrl =
 		: 'postgres://localhost:5432/kogaion';
 
 const PROGRAM_SLUG = 'afterschool-kogaion-self-mastery';
-const UPLOAD_DIR = join(process.cwd(), 'static', 'media', 'uploads', 'programe', 'afterschool-self-mastery');
+const UPLOAD_DIR = join(
+	process.cwd(),
+	'static',
+	'media',
+	'uploads',
+	'programe',
+	'afterschool-self-mastery'
+);
 
 /** Mentor slugs displayed on the source page (order preserved). */
 const MENTOR_SLUGS = [
@@ -135,6 +143,31 @@ const GALLERY_IMAGE_URLS = [
 	'https://kogaionacademy.ro/wp-content/uploads/2017/05/Program-after-school_Kogaion-Gifted-Academy.jpg'
 ];
 
+/**
+ * All image URLs referenced by the source program page.
+ * GALLERY_IMAGE_URLS is the hand-curated "Galerie foto" slideshow set; the page
+ * also links the two section images (benefits, location) as plain <img> tags.
+ */
+const IMAGE_URLS: string[] = GALLERY_IMAGE_URLS;
+
+/** True when the URL belongs to the "Galerie foto" slideshow. */
+function isSlideshowImage(url: string): boolean {
+	return GALLERY_IMAGE_URLS.includes(url);
+}
+
+/**
+ * Curated gallery already on disk as webp (see scripts/update-afterschool-gallery.ts).
+ * Preferred over re-downloading the raw WordPress sources.
+ */
+const CURATED_GALLERY_COUNT = 18;
+
+function curatedGalleryUrls(localBase: string): string[] {
+	return Array.from(
+		{ length: CURATED_GALLERY_COUNT },
+		(_, i) => `${localBase}/afterschool-self-mastery-gallery-${String(i + 1).padStart(2, '0')}.webp`
+	);
+}
+
 async function downloadImage(url: string, localPath: string): Promise<void> {
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
@@ -155,7 +188,9 @@ function safeBasename(url: string, index: number): string {
 }
 
 /** Section payloads in display order (source: kogaionacademy.ro program page). */
-function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: string; sortOrder: number; payload: Record<string, unknown> }> {
+function buildSectionPayloads(
+	galleryImageUrls: string[]
+): Array<{ section: string; sortOrder: number; payload: Record<string, unknown> }> {
 	return [
 		{
 			section: 'hero_highlights',
@@ -207,7 +242,8 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 			section: 'curriculum_areas',
 			sortOrder: 2,
 			payload: {
-				title: 'Urmărim dezvoltarea armonioasă a copiilor prin deschiderea orizontului cunoașterii și aprofundare în 6 arii curriculare:',
+				title:
+					'Urmărim dezvoltarea armonioasă a copiilor prin deschiderea orizontului cunoașterii și aprofundare în 6 arii curriculare:',
 				areas: [
 					{ title: 'Exploratorium Lingvistică & Comunicare' },
 					{ title: 'Exploratorium Matematică, Logică & Intuiție' },
@@ -242,7 +278,8 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 						]
 					},
 					{
-						title: 'PACHET ENRICHMENT INTEGRAT – cursuri și activități în plus față de Pachetul Basic',
+						title:
+							'PACHET ENRICHMENT INTEGRAT – cursuri și activități în plus față de Pachetul Basic',
 						items: [
 							'Curs Public Speaking',
 							'Curs Teatru și Artă dramatică',
@@ -255,7 +292,8 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 						]
 					},
 					{
-						title: 'PACHET ENRICHMENT PREMIUM – cursuri și activități în plus față de Pachetul Integrat',
+						title:
+							'PACHET ENRICHMENT PREMIUM – cursuri și activități în plus față de Pachetul Integrat',
 						items: [
 							'Biologie experimentală',
 							'Robotică & Electronică',
@@ -284,7 +322,8 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 			section: 'extracurricular',
 			sortOrder: 4,
 			payload: {
-				title: 'În plus, copiii beneficiază de activități specifice legate de curricula școlară si alte activități extracurriculare:',
+				title:
+					'În plus, copiii beneficiază de activități specifice legate de curricula școlară si alte activități extracurriculare:',
 				groups: [
 					{ title: '1. Activități școlare', items: ['teme și alte cerințe școlare'] },
 					{
@@ -328,7 +367,8 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 					'5% la al doilea opțional și 2,5% pentru fiecare nou opțional'
 				],
 				note: 'Beneficiile pentru programul de afterschool sunt calculate la prețul serviciilor educaționale și se cumulează în limita a maxim 10%.',
-				other: 'Alte beneficii pentru copiii înscriși la afterschool Kogaion, precum și pentru părinții lor:',
+				other:
+					'Alte beneficii pentru copiii înscriși la afterschool Kogaion, precum și pentru părinții lor:',
 				otherItems: [
 					'10 % la toate taberele urbane de vară, taberele pentru copii și taberele de familie',
 					'10 % la toate conferințele de parenting, workshop-urile și proiectele realizate în comunitate'
@@ -413,9 +453,21 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 			payload: {
 				title: 'Testimoniale',
 				items: [
-					{ provider: 'vimeo', videoId: '1004150712', title: 'Testimonial Ingrid și Ioana Dragomir' },
-					{ provider: 'youtube', videoId: 'Lc_kZUr2HXY', title: 'De ce i-a plăcut lui Cezar la Kogaion?' },
-					{ provider: 'youtube', videoId: 'A2HjH8Wj3nQ', title: 'Experiența Anastasiei la Afterschool Kogaion' }
+					{
+						provider: 'vimeo',
+						videoId: '1004150712',
+						title: 'Testimonial Ingrid și Ioana Dragomir'
+					},
+					{
+						provider: 'youtube',
+						videoId: 'Lc_kZUr2HXY',
+						title: 'De ce i-a plăcut lui Cezar la Kogaion?'
+					},
+					{
+						provider: 'youtube',
+						videoId: 'A2HjH8Wj3nQ',
+						title: 'Experiența Anastasiei la Afterschool Kogaion'
+					}
 				]
 			}
 		},
@@ -428,7 +480,10 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 				steps: [
 					{ order: 1, label: 'stabilirea unei întâlniri de cunoaștere cu familia și copilul' },
 					{ order: 2, label: 'completarea formularului de înscriere' },
-					{ order: 3, label: 'semnarea contractului de prestări servicii și a documentelor aferente' },
+					{
+						order: 3,
+						label: 'semnarea contractului de prestări servicii și a documentelor aferente'
+					},
 					{ order: 4, label: 'plata taxei de înscriere, în sumă de 600 lei' }
 				],
 				buttons: [
@@ -445,7 +500,12 @@ function buildSectionPayloads(galleryImageUrls: string[]): Array<{ section: stri
 			sortOrder: 14,
 			payload: {
 				title: 'YouTube',
-				links: [{ label: 'Kogaion Gifted Academy', url: 'https://www.youtube.com/channel/UCoBFhLHz0qA0lFX3P0QOxcA' }]
+				links: [
+					{
+						label: 'Kogaion Gifted Academy',
+						url: 'https://www.youtube.com/channel/UCoBFhLHz0qA0lFX3P0QOxcA'
+					}
+				]
 			}
 		}
 	];
@@ -464,24 +524,37 @@ async function main() {
 	}
 	const programId = p.id;
 
-	console.log('Downloading images...');
 	const localBase = '/media/uploads/programe/afterschool-self-mastery';
 	const galleryImageUrls: string[] = [];
-	for (let i = 0; i < IMAGE_URLS.length; i++) {
-		const url = IMAGE_URLS[i];
-		const name = safeBasename(url, i);
-		const localPath = join(UPLOAD_DIR, name);
-		try {
-			await downloadImage(url, localPath);
-			if (isSlideshowImage(url)) {
-				galleryImageUrls.push(`${localBase}/${name}`);
+
+	// Prefer the curated webp gallery already on disk (production set). Downloading the
+	// 86 raw WordPress sources would pollute the folder with files the gallery never uses,
+	// and the curated set is what scripts/update-afterschool-gallery.ts maintains.
+	const curated = curatedGalleryUrls(localBase);
+	const curatedOnDisk = curated.filter((url) =>
+		existsSync(join(process.cwd(), 'static', url.replace('/media/', 'media/')))
+	);
+
+	if (curatedOnDisk.length === curated.length) {
+		galleryImageUrls.push(...curated);
+		console.log(`Using ${curated.length} curated gallery images already on disk.`);
+	} else {
+		console.log('Downloading images...');
+		for (let i = 0; i < IMAGE_URLS.length; i++) {
+			const url = IMAGE_URLS[i];
+			const name = safeBasename(url, i);
+			const localPath = join(UPLOAD_DIR, name);
+			try {
+				await downloadImage(url, localPath);
+				if (isSlideshowImage(url)) {
+					galleryImageUrls.push(`${localBase}/${name}`);
+				}
+				console.log('  ', name);
+			} catch (e) {
+				console.warn('  Skip', name, e);
 			}
-			console.log('  ', name);
-		} catch (e) {
-			console.warn('  Skip', name, e);
 		}
 	}
-
 	console.log('Linking mentors...');
 	await db.delete(programMentor).where(eq(programMentor.programId, programId));
 	let linked = 0;
