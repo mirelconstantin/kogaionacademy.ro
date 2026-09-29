@@ -22,10 +22,13 @@ function mergeSectionPayloadWithDefaults(
 	if (page === 'about' && section === 'age_cards') {
 		const defaultCards = (defaults as { cards?: Array<Record<string, unknown>> }).cards ?? [];
 		const payloadCards = (payload as { cards?: Array<Record<string, unknown>> }).cards ?? [];
-		const cards = Array.from({ length: Math.max(defaultCards.length, payloadCards.length, 3) }, (_, i) => ({
-			...(defaultCards[i] ?? {}),
-			...(payloadCards[i] ?? {})
-		}));
+		const cards = Array.from(
+			{ length: Math.max(defaultCards.length, payloadCards.length, 3) },
+			(_, i) => ({
+				...(defaultCards[i] ?? {}),
+				...(payloadCards[i] ?? {})
+			})
+		);
 		return { ...merged, cards };
 	}
 	return merged;
@@ -122,16 +125,12 @@ export const load: PageServerLoad = async (event) => {
 		}
 	}
 	const sectionKeysWithContent = [
-		...new Set(
-			sections
-				.filter((r) => sectionHasTextContent(r.payload))
-				.map((r) => r.section)
-		)
+		...new Set(sections.filter((r) => sectionHasTextContent(r.payload)).map((r) => r.section))
 	];
 	let heroRo = null;
 	let heroEn = null;
 	let programs: Awaited<ReturnType<typeof getPrograms>> = [];
-	let contactRo: (typeof contactSettings.$inferSelect) | null = null;
+	let contactRo: typeof contactSettings.$inferSelect | null = null;
 	if (pageKey === 'home') {
 		const heroes = await db.select().from(heroSettings);
 		heroRo = heroes.find((h) => h.locale === 'ro') ?? null;
@@ -226,7 +225,11 @@ export const actions: Actions = {
 		const ctaSecondaryLink = (formData.get('ctaSecondaryLink') as string)?.trim() || null;
 		if (!videoUrl) return fail(400, { error: 'Video URL required' });
 		const userId = event.locals.user?.id ?? null;
-		const [existing] = await db.select().from(heroSettings).where(eq(heroSettings.locale, locale)).limit(1);
+		const [existing] = await db
+			.select()
+			.from(heroSettings)
+			.where(eq(heroSettings.locale, locale))
+			.limit(1);
 		const afterPayload = {
 			locale,
 			videoUrl,
@@ -275,7 +278,7 @@ export const actions: Actions = {
 		requirePermission(event, 'pages.edit');
 		const formData = await event.request.formData();
 		const locale = (formData.get('locale') as string)?.trim() ?? 'ro';
-		const SOCIAL_KEYS = ['instagram', 'facebook', 'linkedin', 'youtube', 'twitter', 'tiktok'] as const;
+		const SOCIAL_KEYS = ['instagram', 'facebook', 'linkedin', 'youtube', 'tiktok'] as const;
 		const socials: { name: string; url: string }[] = [];
 		for (const key of SOCIAL_KEYS) {
 			const url = (formData.get(`social_${key}`) as string)?.trim();
@@ -288,7 +291,10 @@ export const actions: Actions = {
 			.where(eq(contactSettings.locale, locale))
 			.limit(1);
 		if (!existing) {
-			return fail(400, { error: 'Contact settings not found for locale. Run db:seed:cms first.', updateContactSocials: true });
+			return fail(400, {
+				error: 'Contact settings not found for locale. Run db:seed:cms first.',
+				updateContactSocials: true
+			});
 		}
 		await db
 			.update(contactSettings)

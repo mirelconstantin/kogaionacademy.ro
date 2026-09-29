@@ -130,7 +130,7 @@ function buildSectionPayloads(
 				blocks: [
 					{
 						title: 'copii 7-12 ani',
-						body: 'București, Centrul de enrichment Kogaion Gifted Academy\n9:00 – 18:00; copiii pot fi aduși începând cu ora 8.30'
+						body: 'Programul nu mai este oferit.'
 					},
 					{
 						title: 'Călătorie în lumea poveștilor',
@@ -631,8 +631,8 @@ function buildSectionPayloads(
 			sortOrder: 9,
 			payload: {
 				eyebrow: 'Locație',
-				title: 'Centrul de enrichment Kogaion Gifted Academy, București',
-				body: 'Locul de desfășurare a activităților este situat în București, Șoseaua Nordului nr. 94F, Sector 1, într-o zonă liniștită, la numai 150 de metri de Parcul Herăstrău. Imobilul dispune de 11 spații de desfășurare a activităților, spațioase și luminoase, cu o suprafață de 450 mp.',
+				title: 'Programul nu mai este oferit',
+				body: 'Programul nu mai este oferit.',
 				image: locationImage ?? undefined
 			}
 		}

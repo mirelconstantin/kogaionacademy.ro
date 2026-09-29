@@ -74,7 +74,7 @@ const ABOUT_DEFAULTS_RO: Record<string, Record<string, unknown>> = {
 		label: 'Kogaion Gifted Academy',
 		title: 'Despre noi',
 		tagline:
-			'Curiozitatea devine competență: educație integrată, mentorat și programe pentru copii 3–18 ani (afterschool București, tabere, familii).',
+			'Curiozitatea devine competență: educație integrată, mentorat și programe pentru copii 3–18 ani (tabere, familii).',
 		subline:
 			'Construim încredere și autonomie, cu structură clară și respect pentru ritmul copilului tău — nu doar „rezultate pe hârtie”.',
 		ctaLabel: 'Descopera programele noastre'
@@ -99,7 +99,7 @@ const ABOUT_DEFAULTS_RO: Record<string, Record<string, unknown>> = {
 	age_cards: {
 		title: 'Programe pentru fiecare etapă de creștere',
 		intro:
-			'Alegem formatele potrivite vârstei și vieții voastre: afterschool și enrichment în București, tabere în natură și experiențe pentru familii.',
+			'Alegem formatele potrivite vârstei și vieții voastre: tabere în natură și experiențe pentru familii.',
 		cards: [
 			{
 				title: 'Anii timpurii',

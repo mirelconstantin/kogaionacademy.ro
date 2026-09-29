@@ -12,7 +12,6 @@
 		{ key: 'facebook', label: 'Facebook' },
 		{ key: 'linkedin', label: 'LinkedIn' },
 		{ key: 'youtube', label: 'YouTube' },
-		{ key: 'twitter', label: 'X (Twitter)' },
 		{ key: 'tiktok', label: 'TikTok' }
 	] as const;
 
@@ -45,8 +44,14 @@
 		try {
 			const url = `/admin/api/contact/socials?locale=${encodeURIComponent(locale)}`;
 			const res = await fetch(url, { credentials: 'include', redirect: 'manual' });
-			if (res.type === 'opaqueredirect' || res.status === 302 || res.status === 401 || res.status === 403) {
-				error = 'Trebuie să fii autentificat ca editor. Formularul este completat cu datele afișate pe pagină.';
+			if (
+				res.type === 'opaqueredirect' ||
+				res.status === 302 ||
+				res.status === 401 ||
+				res.status === 403
+			) {
+				error =
+					'Trebuie să fii autentificat ca editor. Formularul este completat cu datele afișate pe pagină.';
 				loading = false;
 				return;
 			}
@@ -143,7 +148,8 @@
 					<p class="text-muted-foreground">Se încarcă...</p>
 				{:else}
 					<p class="mb-4 text-xs text-muted-foreground">
-						Rețelele fără URL nu sunt afișate pe site. Modificările se aplică pentru limba selectată ({locale}).
+						Rețelele fără URL nu sunt afișate pe site. Modificările se aplică pentru limba selectată
+						({locale}).
 					</p>
 					<div class="space-y-3">
 						{#each SOCIAL_NETWORKS as { key, label }}

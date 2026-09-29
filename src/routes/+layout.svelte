@@ -19,7 +19,10 @@
 		if (!browser) return;
 		if (showPublicAdminBar) {
 			adminBarLayoutHeightPx.set(adminBarWrapperHeight);
-			document.documentElement.style.setProperty('--admin-bar-height', `${adminBarWrapperHeight}px`);
+			document.documentElement.style.setProperty(
+				'--admin-bar-height',
+				`${adminBarWrapperHeight}px`
+			);
 		} else {
 			adminBarLayoutHeightPx.set(0);
 			document.documentElement.style.setProperty('--admin-bar-height', '0px');
@@ -59,7 +62,8 @@
 			return '/admin/legal';
 		}
 		// Home: only / or single segment ro|en (no extra segments like programe)
-		if (path === '/' || (segments.length === 1 && (segments[0] === 'ro' || segments[0] === 'en'))) return '/admin/pages/home';
+		if (path === '/' || (segments.length === 1 && (segments[0] === 'ro' || segments[0] === 'en')))
+			return '/admin/pages/home';
 		return null;
 	});
 
@@ -92,7 +96,7 @@
 				class="sticky top-0 z-[100] border-b border-border bg-card"
 				bind:clientHeight={adminBarWrapperHeight}
 			>
-				<AdminBar user={data.user} callbackURL="/admin" editPageUrl={editPageUrl} />
+				<AdminBar user={data.user} callbackURL="/admin" {editPageUrl} />
 			</div>
 		{/if}
 		{#if browser}
@@ -116,7 +120,8 @@
 					title={data?.consentBanner?.title}
 					bodyHtml={data?.consentBanner?.bodyHtml ?? ''}
 					cookiePolicyHref={data?.consentBanner?.cookiePolicyHref ?? '/politica-cookie-uri'}
-					privacyPolicyHref={data?.consentBanner?.privacyPolicyHref ?? '/politica-de-confidentialitate'}
+					privacyPolicyHref={data?.consentBanner?.privacyPolicyHref ??
+						'/politica-de-confidentialitate'}
 				/>
 			{/await}
 		{/if}
@@ -124,7 +129,6 @@
 		<Footer
 			contactEmail={data?.contactEmail}
 			contactPhone={data?.contactPhone}
-			contactAddress={data?.contactAddress}
 			socials={data?.contactSocials ?? []}
 			isEditor={data?.isEditor ?? false}
 			locale={data?.locale ?? 'ro'}
@@ -135,7 +139,7 @@
 	</Tooltip.Provider>
 {/if}
 {#if browser}
-		{#await import('$lib/components/ui/sonner') then { Toaster }}
-			<Toaster />
-		{/await}
-	{/if}
+	{#await import('$lib/components/ui/sonner') then { Toaster }}
+		<Toaster />
+	{/await}
+{/if}

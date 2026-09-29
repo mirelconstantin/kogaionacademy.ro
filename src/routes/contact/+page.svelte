@@ -4,7 +4,6 @@
 	import SocialLinksEditor from '$lib/components/SocialLinksEditor.svelte';
 	import Mail from '@lucide/svelte/icons/mail';
 	import Phone from '@lucide/svelte/icons/phone';
-	import MapPin from '@lucide/svelte/icons/map-pin';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import type { FormSchemaV1 } from '$lib/forms/types';
 
@@ -14,7 +13,6 @@
 		data: {
 			contactEmail?: string;
 			contactPhone?: string;
-			contactAddress?: string;
 			contactSocials?: { name: string; url: string }[];
 			sections?: Record<string, Record<string, unknown>>;
 			isEditor?: boolean;
@@ -26,7 +24,6 @@
 	const contactEmail = $derived(data?.contactEmail ?? 'diana@kogaionacademy.ro');
 	const contactEmailDisplay = $derived(contactEmail.toLowerCase());
 	const contactPhone = $derived(data?.contactPhone ?? '0720.529.398');
-	const contactAddress = $derived(data?.contactAddress ?? m.contact_address_line());
 	const contactSocials = $derived(data?.contactSocials ?? []);
 	const contactPhoneHref = $derived.by(() => {
 		const digits = contactPhone.replace(/\D/g, '');
@@ -52,23 +49,45 @@
 		data-cms-section="hero"
 		data-cms-locale="ro"
 	>
-		<img src="/media/uploads/home/hero-poster.webp" alt="" class="absolute inset-0 size-full object-cover" />
-		<div class="absolute inset-0 bg-gradient-to-b from-[#154b6a]/85 via-[#154b6a]/58 to-[#091328]/82"></div>
+		<img
+			src="/media/uploads/home/hero-poster.webp"
+			alt=""
+			class="absolute inset-0 size-full object-cover"
+		/>
 		<div
-			class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pb-10 text-center md:min-h-[46vh] md:px-12 md:pb-12 lg:px-16 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))]"
+			class="absolute inset-0 bg-gradient-to-b from-[#154b6a]/85 via-[#154b6a]/58 to-[#091328]/82"
+		></div>
+		<div
+			class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] pb-10 text-center md:min-h-[46vh] md:px-12 md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))] md:pb-12 lg:px-16"
 		>
-			<p class="text-xs font-semibold tracking-[0.2em] text-white/85 uppercase [font-family:var(--font-sans)]">
+			<p
+				class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-white/85 uppercase"
+			>
 				Contact Kogaion
 			</p>
-			<div data-cms-type="section" data-cms-page="contact" data-cms-section="hero" data-cms-field="title" data-cms-locale="ro">
+			<div
+				data-cms-type="section"
+				data-cms-page="contact"
+				data-cms-section="hero"
+				data-cms-field="title"
+				data-cms-locale="ro"
+			>
 				<h1
-					class="mt-4 max-w-5xl text-4xl leading-tight font-medium text-white md:text-5xl lg:text-6xl [font-family:var(--font-spectral)]"
+					class="mt-4 max-w-5xl [font-family:var(--font-spectral)] text-4xl leading-tight font-medium text-white md:text-5xl lg:text-6xl"
 				>
 					{heroTitle}
 				</h1>
 			</div>
-			<div data-cms-type="section" data-cms-page="contact" data-cms-section="hero" data-cms-field="intro" data-cms-locale="ro">
-				<p class="mt-5 max-w-5xl text-sm leading-relaxed text-white/90 md:text-base [font-family:var(--font-sans)]">
+			<div
+				data-cms-type="section"
+				data-cms-page="contact"
+				data-cms-section="hero"
+				data-cms-field="intro"
+				data-cms-locale="ro"
+			>
+				<p
+					class="mt-5 max-w-5xl [font-family:var(--font-sans)] text-sm leading-relaxed text-white/90 md:text-base"
+				>
 					{heroDescription}
 				</p>
 			</div>
@@ -82,16 +101,18 @@
 					class="media-diagonal h-full rounded-none border border-[#dfeaf8] bg-[#f7fbff] p-6 shadow-[0_10px_24px_-18px_rgba(21,75,106,0.18)] md:p-8"
 				>
 					<p
-						class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+						class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 					>
 						Formular prioritar
 					</p>
 					<h2
-						class="mt-3 text-[1.65rem] leading-tight font-medium tracking-[-0.02em] text-[#0c3044] md:text-[2rem] [font-family:var(--font-spectral)]"
+						class="mt-3 [font-family:var(--font-spectral)] text-[1.65rem] leading-tight font-medium tracking-[-0.02em] text-[#0c3044] md:text-[2rem]"
 					>
 						{m.contact_form_title()}
 					</h2>
-					<p class="mt-3 max-w-xl text-[0.98rem] leading-relaxed text-muted-foreground [font-family:var(--font-sans)]">
+					<p
+						class="mt-3 max-w-xl [font-family:var(--font-sans)] text-[0.98rem] leading-relaxed text-muted-foreground"
+					>
 						{m.contact_form_help()} Îți trimitem un răspuns personalizat, de regulă, în 24 de ore lucrătoare.
 					</p>
 
@@ -115,22 +136,24 @@
 						aria-hidden="true"
 					></div>
 					<p
-						class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+						class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 					>
 						Contact direct
 					</p>
 					<h3
-						class="relative mt-3 text-[1.38rem] leading-tight font-medium tracking-[-0.02em] text-[#0c3044] md:text-[1.62rem] [font-family:var(--font-spectral)]"
+						class="relative mt-3 [font-family:var(--font-spectral)] text-[1.38rem] leading-tight font-medium tracking-[-0.02em] text-[#0c3044] md:text-[1.62rem]"
 					>
 						{m.contact_person_name()}
 					</h3>
-					<p class="relative mt-3 max-w-md text-[0.96rem] leading-relaxed text-muted-foreground [font-family:var(--font-sans)]">
+					<p
+						class="relative mt-3 max-w-md [font-family:var(--font-sans)] text-[0.96rem] leading-relaxed text-muted-foreground"
+					>
 						Dacă ai nevoie de orientare imediată, ne poți contacta direct aici.
 					</p>
 					<div class="relative mt-6 grid gap-3.5 sm:grid-cols-2">
 						<a
 							href={contactPhoneHref}
-							class="btn-diagonal group flex min-h-12 items-center justify-between border border-[var(--brand-blue)] bg-transparent px-4 py-3 normal-case tracking-normal text-[var(--brand-blue)] transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)] hover:text-white [font-family:var(--font-sans)]"
+							class="btn-diagonal group flex min-h-12 items-center justify-between border border-[var(--brand-blue)] bg-transparent px-4 py-3 [font-family:var(--font-sans)] tracking-normal text-[var(--brand-blue)] normal-case transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)] hover:text-white"
 						>
 							<span class="flex items-center gap-3 text-left [font-family:var(--font-sans)]">
 								<Phone class="size-[1rem]" />
@@ -143,7 +166,7 @@
 						</a>
 						<a
 							href={'mailto:' + contactEmailDisplay}
-							class="btn-diagonal group flex min-h-12 items-center justify-between border border-[var(--brand-blue)] bg-transparent px-4 py-3 normal-case tracking-normal text-[var(--brand-blue)] transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)] hover:text-white [font-family:var(--font-sans)]"
+							class="btn-diagonal group flex min-h-12 items-center justify-between border border-[var(--brand-blue)] bg-transparent px-4 py-3 [font-family:var(--font-sans)] tracking-normal text-[var(--brand-blue)] normal-case transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)] hover:text-white"
 						>
 							<span class="flex items-center gap-3 text-left [font-family:var(--font-sans)]">
 								<Mail class="size-[1rem]" />
@@ -157,7 +180,7 @@
 					</div>
 					<div class="relative mt-6 border-t border-[#dfeaf8] pt-6">
 						<p
-							class="text-xs font-semibold tracking-[0.2em] text-primary uppercase [font-family:var(--font-sans)]"
+							class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-primary uppercase"
 						>
 							Rețele sociale
 						</p>
@@ -169,39 +192,6 @@
 								variant="default"
 							/>
 						</div>
-					</div>
-				</div>
-
-				<div
-					class="media-diagonal rounded-none border border-[#dfeaf8] bg-white p-6 shadow-[0_10px_24px_-18px_rgba(21,75,106,0.18)] md:p-8 lg:col-span-2"
-				>
-					<h3
-						class="text-[1.25rem] font-medium tracking-[-0.02em] text-[#0c3044] md:text-[1.45rem] [font-family:var(--font-spectral)]"
-					>
-						{m.contact_address_title()}
-					</h3>
-					<div class="mt-4 flex items-center gap-2.5 text-muted-foreground [font-family:var(--font-sans)]">
-						<MapPin class="size-4 shrink-0 text-[var(--brand-blue)]" />
-						<p class="text-sm leading-relaxed">{contactAddress} • {m.contact_address_note()}</p>
-					</div>
-					<div class="media-diagonal-soft mt-5 overflow-hidden border border-[#dfeaf8] bg-white">
-						<a
-							href="https://www.google.com/maps?cid=12063130565511101266"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="block"
-							aria-label={m.contact_address_title() + ' - ' + m.contact_address_line()}
-						>
-							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.587903677995!2d26.085061215524853!3d44.48261917910155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b20267fc6d485f%3A0xa768d9560c723b52!2sKogaion+Gifted+Academy!5e0!3m2!1sen!2sus!4v1494924214903"
-								width="100%"
-								height="300"
-								style="border:0; display:block;"
-								loading="lazy"
-								referrerpolicy="no-referrer-when-downgrade"
-								title="Kogaion Academy location"
-							></iframe>
-						</a>
 					</div>
 				</div>
 			</div>

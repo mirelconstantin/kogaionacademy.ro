@@ -24,19 +24,24 @@ export const actions: Actions = {
 		const locale = (formData.get('locale') as string) || 'ro';
 		const email = (formData.get('email') as string)?.trim() ?? '';
 		const phone = (formData.get('phone') as string)?.trim() ?? '';
+		/** Adresa este opțională: sediul s-a închis, deci poate rămâne goală. */
 		const address = (formData.get('address') as string)?.trim() ?? '';
 		const mapUrl = (formData.get('mapUrl') as string)?.trim() || null;
-		const SOCIAL_KEYS = ['instagram', 'facebook', 'linkedin', 'youtube', 'twitter', 'tiktok'] as const;
+		const SOCIAL_KEYS = ['instagram', 'facebook', 'linkedin', 'youtube', 'tiktok'] as const;
 		const socials: { name: string; url: string }[] = [];
 		for (const key of SOCIAL_KEYS) {
 			const url = (formData.get(`social_${key}`) as string)?.trim();
 			if (url) socials.push({ name: key, url });
 		}
-		if (!email || !phone || !address) {
-			return fail(400, { error: 'Email, phone and address are required', locale });
+		if (!email || !phone) {
+			return fail(400, { error: 'Email and phone are required', locale });
 		}
 		const userId = event.locals.user?.id ?? null;
-		const [existing] = await db.select().from(contactSettings).where(eq(contactSettings.locale, locale)).limit(1);
+		const [existing] = await db
+			.select()
+			.from(contactSettings)
+			.where(eq(contactSettings.locale, locale))
+			.limit(1);
 		try {
 			await db
 				.insert(contactSettings)

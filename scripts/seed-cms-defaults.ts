@@ -12,11 +12,11 @@ const databaseUrl =
 		: 'postgres://localhost:5432/kogaion';
 
 const defaultContact = {
-	email: 'diana@kogaionacademy.ro',
+	email: 'contact@kogaionacademy.ro',
 	phone: '0720.529.398',
-	address: 'Șoseaua Nordului nr. 94F, Sector 1, București',
-	mapUrl:
-		'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.587903677995!2d26.085061215524853!3d44.48261917910155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b20267fc6d485f%3A0xa768d9560c723b52!2sKogaion+Gifted+Academy!5e0!3m2!1sen!2sus!4v1494924214903',
+	// Fără sediu: coloana `address` este NOT NULL în schemă, deci se trimite șir gol.
+	address: '',
+	mapUrl: null,
 	socials: [
 		{ name: 'instagram', url: 'https://instagram.com' },
 		{ name: 'facebook', url: 'https://facebook.com' },

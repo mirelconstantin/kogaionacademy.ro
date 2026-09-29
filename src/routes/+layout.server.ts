@@ -31,7 +31,8 @@ export const load: LayoutServerLoad = async (event) => {
 		if (p) program = { id: p.id, title: p.title };
 	}
 
-	const isBlogDetail = segments.includes('blog') && segments.length > 1 && segments[segments.length - 1] !== 'blog';
+	const isBlogDetail =
+		segments.includes('blog') && segments.length > 1 && segments[segments.length - 1] !== 'blog';
 	let post: { id: number; title: string } | null = null;
 	if (isBlogDetail) {
 		const slug = segments[segments.length - 1];
@@ -71,9 +72,8 @@ export const load: LayoutServerLoad = async (event) => {
 		isEditor: getIsEditor(event),
 		user: u ? { name: u.name, email: u.email, image: u.image } : null,
 		locale,
-		contactEmail: contact?.email ?? 'diana@kogaionacademy.ro',
+		contactEmail: contact?.email ?? 'contact@kogaionacademy.ro',
 		contactPhone: contact?.phone ?? '0720.529.398',
-		contactAddress: contact?.address ?? 'Șoseaua Nordului nr. 94F, Sector 1, București',
 		contactSocials,
 		program,
 		post,

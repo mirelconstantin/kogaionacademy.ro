@@ -415,7 +415,7 @@ function buildSectionPayloads(
 			sortOrder: 9,
 			payload: {
 				title: 'Transport',
-				body: 'Transportul se poate asigura la cerere, separat de pachetul educațional și se calculează în funcție de numărul de km parcurși de la scoală până la sediul Kogaion Gifted Academy. Opțiunea se face la înscriere. Cererile vor fi discutate individual, în funcție de nevoile fiecărui copil în parte.\n\nPentru școlile aflate în proximitatea sediului nostru, costul transportului este de 500 lei/lună și se achită ca abonament lunar: Liceul Jean Monet, Pia Brătianu, Școala 10 Maria Rosetti, Liceul Alexandru Vlahuță, Școala Waldorf, Școala Herăstrău, Școala nr. 7, Liceul Nicolae Iorga, Școala 45 Titu Maiorescu, Școala 11 Ion Heliade Rădulescu. Dacă este o alta școală, contactează-ne. Prețul abonamentului lunar poate suferi modificări, în funcție de majorarea prețului la furnizori.',
+				body: 'Programul nu mai este oferit.',
 				contact: '0736.770.669 – Iulia'
 			}
 		},
@@ -433,18 +433,8 @@ function buildSectionPayloads(
 			sortOrder: 11,
 			payload: {
 				title: 'Locație',
-				subtitle: 'Centrul de enrichment Kogaion Gifted Academy, București',
-				body: 'Locul de desfășurare a activităților este situat în București, Șoseaua Nordului nr. 94F, Sector 1, într-o zonă liniștită, la numai 150 de metri de Parcul Herăstrău. Imobilul dispune de 11 spații de desfășurare a activităților, spațioase și luminoase, desfășurate pe o suprafață de 450 mp, astfel:',
-				amenities: [
-					'4 Săli de clasă pentru desfășurarea activităților ce țin de curricula școlară',
-					'Sală de IT, Electronică și Robotică, dotată cu televizor, 15 seturi de Lego Mindstorms și 17 seturi de Lego Boost, laptopuri și materiale specifice pentru Electronică',
-					'Sală de Științe și Arte, dotată cu o tablă inteligentă și material didactic specific pentru cursurile de Fizică, Chimie, Corpul uman, Pictură, Arhitectură, Teatru, Dans',
-					'Ludotecă, ce cuprinde peste 400 de volume de cărți și jocuri specifice pentru copii, precum și pian, orgă, chitară, vioară și peste 40 de instrumente muzicale și de percuție',
-					'Sală de sport dotată cu saltele și materiale specifice',
-					'Sală de servire a mesei'
-				],
-				closing:
-					'Dotările și materialul didactic pus la dispoziție susțin o educație de calitate și o dezvoltare experiențială a fiecărui copil, având ca punct de plecare dezvoltarea creativității.'
+				subtitle: 'Programul nu mai este oferit',
+				body: 'Programul nu mai este oferit.'
 			}
 		},
 		{

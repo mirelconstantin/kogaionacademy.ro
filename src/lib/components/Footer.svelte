@@ -3,13 +3,11 @@
 	import { contentHref } from '$lib/content-routes';
 	import Phone from '@lucide/svelte/icons/phone';
 	import Mail from '@lucide/svelte/icons/mail';
-	import MapPin from '@lucide/svelte/icons/map-pin';
 	import SocialLinksEditor from '$lib/components/SocialLinksEditor.svelte';
 
 	let {
 		contactEmail = 'diana@kogaionacademy.ro',
 		contactPhone = '0720.529.398',
-		contactAddress = 'Șoseaua Nordului nr. 94F, Sector 1, București',
 		socials = [],
 		isEditor = false,
 		locale = 'ro',
@@ -19,7 +17,6 @@
 	}: {
 		contactEmail?: string;
 		contactPhone?: string;
-		contactAddress?: string;
 		socials?: { name: string; url: string }[];
 		isEditor?: boolean;
 		locale?: string;
@@ -31,13 +28,11 @@
 	// Hover: contrast clar pe fundal închis — accent verde brand, nu albastru
 	const linkHover =
 		'transition-colors duration-200 text-white/80 hover:text-[var(--brand-green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1228]';
-
-	const mapsHref = $derived(
-		`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactAddress)}`
-	);
 </script>
 
-<footer class="relative overflow-hidden rounded-tr-[5.6rem] bg-[#0a1228] text-white md:rounded-tr-[7rem]">
+<footer
+	class="relative overflow-hidden rounded-tr-[5.6rem] bg-[#0a1228] text-white md:rounded-tr-[7rem]"
+>
 	<!-- Subtle top edge -->
 	<div
 		class="absolute inset-x-0 top-0 h-px opacity-60"
@@ -48,7 +43,10 @@
 		<div class="grid gap-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-x-12 lg:gap-y-16">
 			<!-- Brand + tagline + socials -->
 			<div class="lg:col-span-5">
-				<a href={contentHref('home')} class="inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1228]">
+				<a
+					href={contentHref('home')}
+					class="inline-block focus-visible:ring-2 focus-visible:ring-[var(--brand-green)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1228] focus-visible:outline-none"
+				>
 					<img
 						src="/media/uploads/brand/logo.webp"
 						alt="Kogaion logo"
@@ -61,18 +59,21 @@
 				>
 					Kogaion Gifted Academy
 				</h2>
-				<p class="mt-2 max-w-sm text-sm leading-relaxed text-white/70" style="font-family: 'Libre Baskerville', Georgia, serif;">
+				<p
+					class="mt-2 max-w-sm text-sm leading-relaxed text-white/70"
+					style="font-family: 'Libre Baskerville', Georgia, serif;"
+				>
 					{m.menu_tagline()}
 				</p>
 				<div class="mt-6 flex flex-wrap items-center gap-2">
-					<SocialLinksEditor socials={socials} {locale} {isEditor} variant="footer" />
+					<SocialLinksEditor {socials} {locale} {isEditor} variant="footer" />
 				</div>
 			</div>
 
 			<!-- Explore -->
 			<div class="lg:col-span-4">
 				<h3
-					class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
+					class="text-[11px] font-semibold tracking-[0.2em] text-white/50 uppercase"
 					style="font-family: var(--font-spectral);"
 				>
 					{m.footer_explore()}
@@ -90,38 +91,23 @@
 			<!-- Contact -->
 			<div class="lg:col-span-3">
 				<h3
-					class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
+					class="text-[11px] font-semibold tracking-[0.2em] text-white/50 uppercase"
 					style="font-family: var(--font-spectral);"
 				>
 					{m.menu_link_contact()}
 				</h3>
 				<div class="mt-5 space-y-4">
-					<a
-						href="tel:+40720529398"
-						class={"flex items-start gap-3 text-sm " + linkHover}
-					>
+					<a href="tel:+40720529398" class={'flex items-start gap-3 text-sm ' + linkHover}>
 						<Phone class="mt-0.5 size-4 shrink-0 text-white/50" aria-hidden="true" />
 						<span>{contactPhone}</span>
 					</a>
-					<a
-						href={'mailto:' + contactEmail}
-						class={"flex items-start gap-3 text-sm " + linkHover}
-					>
+					<a href={'mailto:' + contactEmail} class={'flex items-start gap-3 text-sm ' + linkHover}>
 						<Mail class="mt-0.5 size-4 shrink-0 text-white/50" aria-hidden="true" />
 						<span class="break-all">{contactEmail}</span>
 					</a>
-					<a
-						href={mapsHref}
-						target="_blank"
-						rel="noopener noreferrer"
-						class={"flex items-start gap-3 text-sm " + linkHover}
-					>
-						<MapPin class="mt-0.5 size-4 shrink-0 text-white/50" aria-hidden="true" />
-						<span>{contactAddress}</span>
-					</a>
 					<div class="pt-1">
 						<h3
-							class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
+							class="text-[11px] font-semibold tracking-[0.2em] text-white/50 uppercase"
 							style="font-family: var(--font-spectral);"
 						>
 							Politici
@@ -147,7 +133,7 @@
 					href="https://pazalgroup.com"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="font-medium text-white/70 underline decoration-white/30 underline-offset-2 transition-colors duration-200 hover:text-[var(--brand-green)] hover:decoration-[var(--brand-green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1228]"
+					class="font-medium text-white/70 underline decoration-white/30 underline-offset-2 transition-colors duration-200 hover:text-[var(--brand-green)] hover:decoration-[var(--brand-green)] focus-visible:ring-2 focus-visible:ring-[var(--brand-green)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1228] focus-visible:outline-none"
 				>
 					Pazal Group
 				</a>

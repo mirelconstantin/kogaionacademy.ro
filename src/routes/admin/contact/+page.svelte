@@ -19,11 +19,12 @@
 		{ key: 'facebook', label: 'Facebook' },
 		{ key: 'linkedin', label: 'LinkedIn' },
 		{ key: 'youtube', label: 'YouTube' },
-		{ key: 'twitter', label: 'X (Twitter)' },
 		{ key: 'tiktok', label: 'TikTok' }
 	] as const;
 
-	const socialsMap = $derived(new Map((contact?.socials ?? []).map((s) => [s.name.toLowerCase(), s.url])));
+	const socialsMap = $derived(
+		new Map((contact?.socials ?? []).map((s) => [s.name.toLowerCase(), s.url]))
+	);
 </script>
 
 <div>
@@ -34,15 +35,18 @@
 			Istoric modificări
 		</Button>
 	</div>
-	<p class="mt-1 text-muted-foreground">Email, telefon, adresă și rețele sociale pentru pagina Contact.</p>
+	<p class="mt-1 text-muted-foreground">
+		Email, telefon, adresă (opțională) și rețele sociale pentru pagina Contact.
+	</p>
 
 	<form
 		method="POST"
 		action="?/default"
-		use:enhance={() => async ({ result: r }) => {
-			if (r.type === 'success' || r.type === 'failure') toastFromAction(r.data as ActionData);
-			if (r.type === 'success' && r.data) result = r.data as ActionData;
-		}}
+		use:enhance={() =>
+			async ({ result: r }) => {
+				if (r.type === 'success' || r.type === 'failure') toastFromAction(r.data as ActionData);
+				if (r.type === 'success' && r.data) result = r.data as ActionData;
+			}}
 		class="mt-6 max-w-xl space-y-4"
 	>
 		<input type="hidden" name="locale" value="ro" />
@@ -69,18 +73,20 @@
 			/>
 		</div>
 		<div class="space-y-2">
-			<Label for="address">Adresă</Label>
+			<Label for="address">Adresă (opțional)</Label>
 			<Textarea
 				id="address"
 				name="address"
 				rows={2}
 				value={contact?.address ?? ''}
 				class="rounded-none"
-				required
 			/>
+			<p class="text-xs text-muted-foreground">
+				Adresa oficială pentru corespondența poștală a operatorului. Poate rămâne goală.
+			</p>
 		</div>
 		<div class="space-y-2">
-			<Label for="mapUrl">URL hartă (opțional)</Label>
+			<Label for="mapUrl">URL hartă (opțional, folosit de tabere)</Label>
 			<Input
 				id="mapUrl"
 				name="mapUrl"
@@ -90,10 +96,11 @@
 			/>
 		</div>
 
-		<div class="space-y-3 pt-4 border-t border-border">
+		<div class="space-y-3 border-t border-border pt-4">
 			<h3 class="text-sm font-semibold text-foreground">Rețele sociale</h3>
 			<p class="text-xs text-muted-foreground">
-				Adaugă URL doar pentru rețelele pe care le folosești. Acestea vor apărea în footer și pe pagina Contact.
+				Adaugă URL doar pentru rețelele pe care le folosești. Acestea vor apărea în footer și pe
+				pagina Contact.
 			</p>
 			<div class="grid gap-3 sm:grid-cols-2">
 				{#each SOCIAL_NETWORKS as { key, label }}

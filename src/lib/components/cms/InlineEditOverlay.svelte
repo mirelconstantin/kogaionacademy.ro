@@ -260,13 +260,17 @@
 		return value.map((v) => String(v ?? ''));
 	}
 
-	function getProgramSectionFields(section: string, payload: Record<string, unknown>): ProgramSectionField[] {
+	function getProgramSectionFields(
+		section: string,
+		payload: Record<string, unknown>
+	): ProgramSectionField[] {
 		const fields: ProgramSectionField[] = [];
 		switch (section) {
 			case 'hero_highlights': {
 				const items = getStringArray(payload.items);
 				const count = Math.max(items.length, 1);
-				for (let i = 0; i < count; i++) fields.push({ key: `items.${i}`, label: `Element ${i + 1}` });
+				for (let i = 0; i < count; i++)
+					fields.push({ key: `items.${i}`, label: `Element ${i + 1}` });
 				return fields;
 			}
 			case 'hero_cta': {
@@ -291,7 +295,12 @@
 				const blocks = getObjectArray(payload.blocks);
 				const count = Math.max(blocks.length, 1);
 				for (let i = 0; i < count; i++) {
-					fields.push({ key: `blocks.${i}.body`, label: `Bloc ${i + 1} – text`, kind: 'textarea', rows: 4 });
+					fields.push({
+						key: `blocks.${i}.body`,
+						label: `Bloc ${i + 1} – text`,
+						kind: 'textarea',
+						rows: 4
+					});
 				}
 				fields.push({
 					key: 'videoBetweenBlocks.provider',
@@ -311,7 +320,8 @@
 				fields.push({ key: 'title', label: 'Titlu secțiune' });
 				const areas = getObjectArray(payload.areas);
 				const count = Math.max(areas.length, 1);
-				for (let i = 0; i < count; i++) fields.push({ key: `areas.${i}.title`, label: `Arie ${i + 1}` });
+				for (let i = 0; i < count; i++)
+					fields.push({ key: `areas.${i}.title`, label: `Arie ${i + 1}` });
 				return fields;
 			}
 			case 'packages': {
@@ -351,12 +361,15 @@
 				fields.push({ key: 'title', label: 'Titlu' });
 				const items = getStringArray(payload.items);
 				const count = Math.max(items.length, 1);
-				for (let i = 0; i < count; i++) fields.push({ key: `items.${i}`, label: `Bullet ${i + 1}` });
+				for (let i = 0; i < count; i++)
+					fields.push({ key: `items.${i}`, label: `Bullet ${i + 1}` });
 				fields.push({ key: 'note', label: 'Notă', kind: 'textarea', rows: 3 });
 				fields.push({ key: 'other', label: 'Subtitlu listă secundară' });
 				const otherItems = getStringArray(payload.otherItems);
-				for (let i = 0; i < otherItems.length; i++) fields.push({ key: `otherItems.${i}`, label: `Alt bullet ${i + 1}` });
-				if (section === 'benefits_main') fields.push({ key: 'image', label: 'Imagine secțiune', kind: 'image' });
+				for (let i = 0; i < otherItems.length; i++)
+					fields.push({ key: `otherItems.${i}`, label: `Alt bullet ${i + 1}` });
+				if (section === 'benefits_main')
+					fields.push({ key: 'image', label: 'Imagine secțiune', kind: 'image' });
 				return fields;
 			}
 			case 'transport': {
@@ -377,7 +390,8 @@
 				fields.push({ key: 'body', label: 'Text', kind: 'textarea', rows: 5 });
 				const amenities = getStringArray(payload.amenities);
 				const count = Math.max(amenities.length, 1);
-				for (let i = 0; i < count; i++) fields.push({ key: `amenities.${i}`, label: `Facilitate ${i + 1}` });
+				for (let i = 0; i < count; i++)
+					fields.push({ key: `amenities.${i}`, label: `Facilitate ${i + 1}` });
 				fields.push({ key: 'closing', label: 'Text final', kind: 'textarea', rows: 3 });
 				fields.push({ key: 'image', label: 'Imagine locație', kind: 'image' });
 				const images = getStringArray(payload.images);
@@ -385,7 +399,12 @@
 				for (let i = 0; i < imageCount; i++) {
 					fields.push({ key: `images.${i}`, label: `Imagine grilă ${i + 1}`, kind: 'image' });
 				}
-				fields.push({ key: 'mapEmbedUrl', label: 'Google Maps embed URL', kind: 'textarea', rows: 3 });
+				fields.push({
+					key: 'mapEmbedUrl',
+					label: 'Google Maps embed URL',
+					kind: 'textarea',
+					rows: 3
+				});
 				return fields;
 			}
 			case 'testimonials': {
@@ -459,7 +478,8 @@
 		if (section === 'benefits_main' && key === 'image') {
 			const direct = getAtPath(payload, key);
 			if (direct) return direct;
-			const fromDom = (modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
+			const fromDom =
+				(modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
 			return normalizeAssetUrl(fromDom);
 		}
 		if (section === 'intro' && key === 'imageBetweenBlocks') {
@@ -467,15 +487,19 @@
 			if (direct) return direct;
 			const legacySnakeCase = getAtPath(payload, 'image_between_blocks');
 			if (legacySnakeCase) return legacySnakeCase;
-			const fromDom = (modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
+			const fromDom =
+				(modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
 			return normalizeAssetUrl(fromDom);
 		}
 		if (section === 'intro' && key === 'videoBetweenBlocks.videoId') {
 			const direct = getAtPath(payload, key);
 			if (direct) return direct;
-			const iframeSrc = (modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
+			const iframeSrc =
+				(modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
 			if (!iframeSrc) return '';
-			const youtubeMatch = iframeSrc.match(/(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([^?&/]+)/i);
+			const youtubeMatch = iframeSrc.match(
+				/(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([^?&/]+)/i
+			);
 			if (youtubeMatch?.[1]) return youtubeMatch[1];
 			const vimeoMatch = iframeSrc.match(/vimeo\.com\/video\/(\d+)/i);
 			if (vimeoMatch?.[1]) return vimeoMatch[1];
@@ -484,7 +508,8 @@
 		if (section === 'intro' && key === 'videoBetweenBlocks.provider') {
 			const direct = getAtPath(payload, key);
 			if (direct) return direct;
-			const iframeSrc = (modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
+			const iframeSrc =
+				(modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
 			if (iframeSrc.includes('vimeo.com')) return 'vimeo';
 			return 'youtube';
 		}
@@ -496,13 +521,15 @@
 		if (section === 'location' && key === 'image') {
 			const direct = getAtPath(payload, key);
 			if (direct) return direct;
-			const fromDom = (modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
+			const fromDom =
+				(modalSourceElement?.querySelector('img') as HTMLImageElement | null)?.src ?? '';
 			return normalizeAssetUrl(fromDom);
 		}
 		if (section === 'location' && key === 'mapEmbedUrl') {
 			const direct = getAtPath(payload, key);
 			if (direct) return direct;
-			const fromDom = (modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
+			const fromDom =
+				(modalSourceElement?.querySelector('iframe') as HTMLIFrameElement | null)?.src ?? '';
 			return fromDom;
 		}
 		if (section === 'enrollment' && key.startsWith('buttons.')) {
@@ -540,7 +567,10 @@
 
 	function addEnrollmentStep() {
 		if (modalSection !== 'enrollment') return;
-		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<string, unknown>;
+		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<
+			string,
+			unknown
+		>;
 		const steps = getObjectArray(payload.steps);
 		steps.push({ order: steps.length + 1, label: '' });
 		payload.steps = steps;
@@ -549,7 +579,10 @@
 
 	function removeEnrollmentStep(index: number) {
 		if (modalSection !== 'enrollment') return;
-		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<string, unknown>;
+		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<
+			string,
+			unknown
+		>;
 		const steps = getObjectArray(payload.steps).filter((_, i) => i !== index);
 		payload.steps = steps;
 		syncProgramSectionForm('enrollment', payload);
@@ -557,7 +590,10 @@
 
 	function addEnrollmentButton() {
 		if (modalSection !== 'enrollment') return;
-		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<string, unknown>;
+		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<
+			string,
+			unknown
+		>;
 		const buttons = getObjectArray(payload.buttons);
 		if (!buttons.length) {
 			buttons.push(
@@ -573,7 +609,10 @@
 
 	function removeEnrollmentButton(index: number) {
 		if (modalSection !== 'enrollment') return;
-		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<string, unknown>;
+		const payload = JSON.parse(JSON.stringify(modalProgramSectionPayload ?? {})) as Record<
+			string,
+			unknown
+		>;
 		const buttons = getObjectArray(payload.buttons).filter((_, i) => i !== index);
 		payload.buttons = buttons;
 		syncProgramSectionForm('enrollment', payload);
@@ -599,7 +638,9 @@
 		for (const p of parts) {
 			if (cur == null || (typeof cur !== 'object' && !Array.isArray(cur))) return undefined;
 			const num = parseInt(p, 10);
-			cur = Array.isArray(cur) ? cur[Number.isNaN(num) ? 0 : num] : (cur as Record<string, unknown>)[p];
+			cur = Array.isArray(cur)
+				? cur[Number.isNaN(num) ? 0 : num]
+				: (cur as Record<string, unknown>)[p];
 		}
 		return cur;
 	}
@@ -630,7 +671,10 @@
 				if (cur[arrIndex] == null) cur[arrIndex] = nextIsNum ? [] : {};
 				cur = cur[arrIndex] as Record<string, unknown> | unknown[];
 			} else {
-				if (!(p in (cur as Record<string, unknown>)) || (cur as Record<string, unknown>)[p] == null) {
+				if (
+					!(p in (cur as Record<string, unknown>)) ||
+					(cur as Record<string, unknown>)[p] == null
+				) {
 					(cur as Record<string, unknown>)[p] = nextIsNum ? [] : {};
 				}
 				cur = (cur as Record<string, unknown>)[p] as Record<string, unknown> | unknown[];
@@ -704,9 +748,7 @@
 			'[data-cms-type="section"][data-cms-page][data-cms-section][data-cms-field-group]'
 		);
 		if (sectionWithFieldGroup) return sectionWithFieldGroup;
-		const heroWithFieldGroup = el.closest?.(
-			'[data-cms-type="hero"][data-cms-field-group]'
-		);
+		const heroWithFieldGroup = el.closest?.('[data-cms-type="hero"][data-cms-field-group]');
 		if (heroWithFieldGroup) return heroWithFieldGroup;
 		const heroWithField = el.closest?.('[data-cms-type="hero"][data-cms-field]');
 		if (heroWithField) return heroWithField;
@@ -759,8 +801,14 @@
 	const editButtonStyle = $derived.by((): { left: number; top: number } | null => {
 		if (!hoverTarget || viewportW <= 0 || viewportH <= 0) return null;
 		const r = hoverTarget.rect;
-		const left = Math.max(BUTTON_MARGIN, Math.min(r.right - BUTTON_WIDTH - BUTTON_TOP_OFFSET, viewportW - BUTTON_WIDTH - BUTTON_MARGIN));
-		const top = Math.max(minEditButtonTop, Math.min(r.top + BUTTON_TOP_OFFSET, viewportH - BUTTON_HEIGHT - BUTTON_MARGIN));
+		const left = Math.max(
+			BUTTON_MARGIN,
+			Math.min(r.right - BUTTON_WIDTH - BUTTON_TOP_OFFSET, viewportW - BUTTON_WIDTH - BUTTON_MARGIN)
+		);
+		const top = Math.max(
+			minEditButtonTop,
+			Math.min(r.top + BUTTON_TOP_OFFSET, viewportH - BUTTON_HEIGHT - BUTTON_MARGIN)
+		);
 		return { left, top };
 	});
 
@@ -789,10 +837,15 @@
 		const zoneTop = Math.min(rect.top - pad, btnTop - pad);
 		const zoneRight = Math.max(rect.right + pad, btnLeft + BUTTON_WIDTH + pad);
 		const zoneBottom = Math.max(rect.bottom + pad, btnTop + BUTTON_HEIGHT + pad);
-		return clientX >= zoneLeft && clientX <= zoneRight && clientY >= zoneTop && clientY <= zoneBottom;
+		return (
+			clientX >= zoneLeft && clientX <= zoneRight && clientY >= zoneTop && clientY <= zoneBottom
+		);
 	}
 
-	function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
+	function throttle<A extends unknown[]>(
+		fn: (...args: A) => void,
+		ms: number
+	): (...args: A) => void {
 		let last = 0;
 		return (...args: A) => {
 			const now = Date.now();
@@ -836,7 +889,10 @@
 				const field = target.getAttribute('data-cms-field');
 				const fieldGroupStr = target.getAttribute('data-cms-field-group');
 				const fieldGroup =
-					fieldGroupStr?.split(',').map((k) => k.trim()).filter(Boolean) ?? undefined;
+					fieldGroupStr
+						?.split(',')
+						.map((k) => k.trim())
+						.filter(Boolean) ?? undefined;
 				if (page && section && (field || (fieldGroup && fieldGroup.length > 0))) {
 					if (hoverTarget?.el === target) return;
 					hoverTarget = {
@@ -883,7 +939,10 @@
 			} else if (type === 'hero') {
 				const fieldGroupStr = target.getAttribute('data-cms-field-group');
 				const fieldGroup =
-					fieldGroupStr?.split(',').map((k) => k.trim()).filter(Boolean) ?? undefined;
+					fieldGroupStr
+						?.split(',')
+						.map((k) => k.trim())
+						.filter(Boolean) ?? undefined;
 				const field = target.getAttribute('data-cms-field');
 				const heroLocale = target.getAttribute('data-cms-locale') ?? 'ro';
 				if (fieldGroup?.length) {
@@ -926,7 +985,11 @@
 			}
 		}
 		// Cursor în zona extinsă (secțiune + buton) – păstrăm hoverTarget ca să nu dispară la mișcare
-		if (hoverTarget && (isInButtonZone(e.clientX, e.clientY, hoverTarget.rect) || isInExtendedZone(e.clientX, e.clientY, hoverTarget.rect))) {
+		if (
+			hoverTarget &&
+			(isInButtonZone(e.clientX, e.clientY, hoverTarget.rect) ||
+				isInExtendedZone(e.clientX, e.clientY, hoverTarget.rect))
+		) {
 			hoverTarget = { ...hoverTarget, rect: hoverTarget.el.getBoundingClientRect() };
 			return;
 		}
@@ -1185,7 +1248,13 @@
 					titleRo: data.titleRo ?? '',
 					bioRo: data.bioRo ?? '',
 					image: data.image ?? '',
-					yearJoined: data.yearJoined != null ? String(data.yearJoined) : ''
+					yearJoined: data.yearJoined != null ? String(data.yearJoined) : '',
+					roleRo: data.roleRo ?? '',
+					shortBioRo: data.shortBioRo ?? '',
+					aboutRo: data.aboutRo ?? '',
+					kogaionRo: data.kogaionRo ?? '',
+					voiceQuoteRo: data.voiceQuoteRo ?? '',
+					expertiseRo: Array.isArray(data.expertiseRo) ? data.expertiseRo.join(', ') : ''
 				};
 			} else if (modalType === 'program' && data.program) {
 				programSectionFields = [];
@@ -1218,6 +1287,10 @@
 		try {
 			let payload: Record<string, unknown> = {};
 			if (modalType === 'mentor' && modalId) {
+				const expertise = (formData.expertiseRo ?? '')
+					.split(',')
+					.map((t) => t.trim())
+					.filter(Boolean);
 				payload = {
 					nameRo: formData.nameRo ?? '',
 					nameEn: null,
@@ -1226,7 +1299,13 @@
 					bioRo: formData.bioRo ?? '',
 					bioEn: null,
 					image: formData.image || null,
-					yearJoined: formData.yearJoined !== '' ? Number(formData.yearJoined) : null
+					yearJoined: formData.yearJoined !== '' ? Number(formData.yearJoined) : null,
+					roleRo: formData.roleRo || null,
+					shortBioRo: formData.shortBioRo || null,
+					aboutRo: formData.aboutRo || null,
+					kogaionRo: formData.kogaionRo || null,
+					voiceQuoteRo: formData.voiceQuoteRo || null,
+					expertiseRo: expertise
 				};
 			} else if (modalType === 'program' && modalId) {
 				payload = {
@@ -1257,7 +1336,14 @@
 				for (const f of fields) {
 					const v = formData[f.key] ?? '';
 					if (f.kind === 'stringArray') {
-						setAtPath(payload, f.key, v.split('\n').map((s) => s.trim()).filter(Boolean));
+						setAtPath(
+							payload,
+							f.key,
+							v
+								.split('\n')
+								.map((s) => s.trim())
+								.filter(Boolean)
+						);
 					} else if (f.kind === 'number') {
 						const n = parseInt(v, 10);
 						setAtPath(payload, f.key, Number.isNaN(n) ? 0 : n);
@@ -1309,7 +1395,7 @@
 	}
 
 	const sectionFormFields = $derived(
-		modalPage && modalSection ? SECTION_FIELDS[`${modalPage}_${modalSection}`] ?? [] : []
+		modalPage && modalSection ? (SECTION_FIELDS[`${modalPage}_${modalSection}`] ?? []) : []
 	);
 
 	const inlineFieldTextarea = $derived.by(() => {
@@ -1317,7 +1403,9 @@
 		if (inlineEdit.heroLocale) return false;
 		if (inlineEdit.blogId != null) return inlineEdit.field === 'excerpt';
 		const sectionKey = `${inlineEdit.page}_${inlineEdit.section}`;
-		return (SECTION_FIELDS[sectionKey] ?? []).find((f) => f.key === inlineEdit?.field)?.textarea ?? true;
+		return (
+			(SECTION_FIELDS[sectionKey] ?? []).find((f) => f.key === inlineEdit?.field)?.textarea ?? true
+		);
 	});
 
 	const inlineIsImageField = $derived(
@@ -1339,33 +1427,31 @@
 	});
 </script>
 
-<svelte:window
-	onmousemove={onMouseMoveThrottled}
-	onmouseleave={onMouseLeave}
-/>
+<svelte:window onmousemove={onMouseMoveThrottled} onmouseleave={onMouseLeave} />
 {#if browser && isEditor && !$hideEditIcons}
 	{#if hoverTarget}
 		<!-- Highlight discret pe elementul hover -->
 		<div
 			class="pointer-events-none fixed z-[9997] rounded-sm border-2 border-primary/25 bg-primary/5"
-			style="left: {hoverTarget.rect.left}px; top: {hoverTarget.rect.top}px; width: {hoverTarget.rect.width}px; height: {hoverTarget.rect.height}px;"
+			style="left: {hoverTarget.rect.left}px; top: {hoverTarget.rect.top}px; width: {hoverTarget
+				.rect.width}px; height: {hoverTarget.rect.height}px;"
 			aria-hidden="true"
 		></div>
 		<!-- Buton pe elementul hover – colț dreapta-sus, sub nav, clamped la viewport -->
 		{#if editButtonStyle}
-		<div
-			class="fixed z-[9998] transition-[left,top] duration-75 ease-out"
-			style="left: {editButtonStyle.left}px; top: {editButtonStyle.top}px;"
-		>
-			<button
-				type="button"
-				class="flex size-9 shrink-0 items-center justify-center rounded-none border border-border bg-card shadow-md transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
-				onclick={openModal}
-				aria-label="Edit"
+			<div
+				class="fixed z-[9998] transition-[left,top] duration-75 ease-out"
+				style="left: {editButtonStyle.left}px; top: {editButtonStyle.top}px;"
 			>
-				<Pencil class="size-4" />
-			</button>
-		</div>
+				<button
+					type="button"
+					class="flex size-9 shrink-0 items-center justify-center rounded-none border border-border bg-card shadow-md transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+					onclick={openModal}
+					aria-label="Edit"
+				>
+					<Pencil class="size-4" />
+				</button>
+			</div>
 		{/if}
 	{/if}
 
@@ -1387,12 +1473,16 @@
 					{#each inlineEdit.fieldGroup as key}
 						{@const sectionKey = `${inlineEdit?.page ?? ''}_${inlineEdit?.section ?? ''}`}
 						{@const fieldDef = (SECTION_FIELDS[sectionKey] ?? []).find((f) => f.key === key)}
-						{@const fieldLabel = inlineEdit?.heroLocale ? (HERO_FIELD_LABELS[key] ?? key) : (fieldDef?.label ?? key)}
+						{@const fieldLabel = inlineEdit?.heroLocale
+							? (HERO_FIELD_LABELS[key] ?? key)
+							: (fieldDef?.label ?? key)}
 						{@const useTextarea = fieldDef?.textarea ?? key.includes('.text')}
 						{@const isImageKey = key.endsWith('.image') || key === 'backgroundImage'}
 						{@const inputId = `inline-group-${key.replace(/\./g, '-')}`}
 						<div class="mb-3">
-							<Label for={inputId} class="mb-1 block text-xs font-medium text-muted-foreground">{fieldLabel}</Label>
+							<Label for={inputId} class="mb-1 block text-xs font-medium text-muted-foreground"
+								>{fieldLabel}</Label
+							>
 							{#if isImageKey}
 								<MediaPicker bind:value={inlineGroupValues[key]} label="Selectează din Media" />
 							{:else if useTextarea}
@@ -1401,7 +1491,8 @@
 									class="w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
 									rows="3"
 									value={inlineGroupValues[key] ?? ''}
-									oninput={(e) => (inlineGroupValues = { ...inlineGroupValues, [key]: e.currentTarget.value })}
+									oninput={(e) =>
+										(inlineGroupValues = { ...inlineGroupValues, [key]: e.currentTarget.value })}
 									onkeydown={(e) => e.key === 'Escape' && closeInline()}
 								></textarea>
 							{:else}
@@ -1409,7 +1500,8 @@
 									id={inputId}
 									class="rounded-none"
 									value={inlineGroupValues[key] ?? ''}
-									oninput={(e) => (inlineGroupValues = { ...inlineGroupValues, [key]: e.currentTarget.value })}
+									oninput={(e) =>
+										(inlineGroupValues = { ...inlineGroupValues, [key]: e.currentTarget.value })}
 									onkeydown={(e) => e.key === 'Escape' && closeInline()}
 								/>
 							{/if}
@@ -1441,7 +1533,13 @@
 					<Button size="sm" class="rounded-none" onclick={saveInline} disabled={inlineSaving}>
 						{inlineSaving ? 'Se salvează...' : 'Salvează'}
 					</Button>
-					<Button size="sm" variant="outline" class="rounded-none" onclick={closeInline} disabled={inlineSaving}>
+					<Button
+						size="sm"
+						variant="outline"
+						class="rounded-none"
+						onclick={closeInline}
+						disabled={inlineSaving}
+					>
 						Anulare
 					</Button>
 				</div>
@@ -1460,13 +1558,16 @@
 			use:focusTrap={{ initialFocus: false }}
 			use:dialogBehavior={{ onClose: closeModal, backdrop: true, initialFocus: true }}
 		>
-			<div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-none border border-border bg-background shadow-xl">
+			<div
+				class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-none border border-border bg-background shadow-xl"
+			>
 				<div class="flex items-center justify-between border-b border-border px-4 py-3">
 					<div>
 						<h2 id="cms-edit-title" class="text-lg font-semibold">Editare</h2>
 						{#if modalType === 'section' && modalPage && modalSection}
 							<p class="mt-0.5 text-xs text-muted-foreground">
-								{PAGE_LABELS[modalPage] ?? modalPage} › {SECTION_LABELS[modalSection] ?? modalSection}
+								{PAGE_LABELS[modalPage] ?? modalPage} › {SECTION_LABELS[modalSection] ??
+									modalSection}
 							</p>
 						{:else if modalType === 'program_section' && modalSection}
 							<p class="mt-0.5 text-xs text-muted-foreground">
@@ -1487,7 +1588,7 @@
 					{#if loading}
 						<p class="text-muted-foreground">Se încarcă...</p>
 					{:else if error}
-						<p class="text-destructive text-sm">{error}</p>
+						<p class="text-sm text-destructive">{error}</p>
 					{:else if modalType === 'mentor'}
 						<div class="space-y-4">
 							<div>
@@ -1499,7 +1600,51 @@
 								<Input id="titleRo" class="mt-1" bind:value={formData.titleRo} />
 							</div>
 							<div>
-								<Label for="bioRo">Bio</Label>
+								<Label for="roleRo">Rol / categorie în Kogaion</Label>
+								<Input id="roleRo" class="mt-1" bind:value={formData.roleRo} />
+							</div>
+							<div>
+								<Label for="shortBioRo">Scurtă descriere (card, 25–40 cuvinte)</Label>
+								<textarea
+									id="shortBioRo"
+									class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
+									rows="3"
+									bind:value={formData.shortBioRo}
+								></textarea>
+							</div>
+							<div>
+								<Label for="aboutRo">Despre mentor (80–120 cuvinte)</Label>
+								<textarea
+									id="aboutRo"
+									class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
+									rows="6"
+									bind:value={formData.aboutRo}
+								></textarea>
+							</div>
+							<div>
+								<Label for="kogaionRo">În Kogaion (60–100 cuvinte)</Label>
+								<textarea
+									id="kogaionRo"
+									class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
+									rows="5"
+									bind:value={formData.kogaionRo}
+								></textarea>
+							</div>
+							<div>
+								<Label for="voiceQuoteRo">Vocea mentorului (25–60 cuvinte)</Label>
+								<textarea
+									id="voiceQuoteRo"
+									class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
+									rows="3"
+									bind:value={formData.voiceQuoteRo}
+								></textarea>
+							</div>
+							<div>
+								<Label for="expertiseRo">Domenii de expertiză (3–6, separate prin virgulă)</Label>
+								<Input id="expertiseRo" class="mt-1" bind:value={formData.expertiseRo} />
+							</div>
+							<div>
+								<Label for="bioRo">Bio (biografia completă)</Label>
 								<textarea
 									id="bioRo"
 									class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
@@ -1515,7 +1660,12 @@
 							</div>
 							<div>
 								<Label for="yearJoined">An adăugare</Label>
-								<Input id="yearJoined" type="number" class="mt-1" bind:value={formData.yearJoined} />
+								<Input
+									id="yearJoined"
+									type="number"
+									class="mt-1"
+									bind:value={formData.yearJoined}
+								/>
 							</div>
 						</div>
 					{:else if modalType === 'program'}
@@ -1573,7 +1723,11 @@
 											bind:value={formData[f.key]}
 										></textarea>
 									{:else}
-										<Input id="section-{f.key}" class="mt-1 rounded-none" bind:value={formData[f.key]} />
+										<Input
+											id="section-{f.key}"
+											class="mt-1 rounded-none"
+											bind:value={formData[f.key]}
+										/>
 									{/if}
 								</div>
 							{/each}
@@ -1633,34 +1787,58 @@
 										{:else if f.kind === 'select'}
 											<Select.Root type="single" bind:value={formData[f.key]}>
 												<Select.Trigger id="progsec-{f.key}" class="mt-1 w-full rounded-none">
-													{(f.options ?? []).find((option) => option.value === formData[f.key])?.label ?? 'Selectează'}
+													{(f.options ?? []).find((option) => option.value === formData[f.key])
+														?.label ?? 'Selectează'}
 												</Select.Trigger>
 												<Select.Content>
-													{#each (f.options ?? []) as option (option.value)}
-														<Select.Item value={option.value} label={option.label}>{option.label}</Select.Item>
+													{#each f.options ?? [] as option (option.value)}
+														<Select.Item value={option.value} label={option.label}
+															>{option.label}</Select.Item
+														>
 													{/each}
 												</Select.Content>
 											</Select.Root>
 										{:else if f.kind === 'number'}
-											<Input id="progsec-{f.key}" type="number" class="mt-1 rounded-none" bind:value={formData[f.key]} />
+											<Input
+												id="progsec-{f.key}"
+												type="number"
+												class="mt-1 rounded-none"
+												bind:value={formData[f.key]}
+											/>
 										{:else}
-											<Input id="progsec-{f.key}" class="mt-1 rounded-none" bind:value={formData[f.key]} />
+											<Input
+												id="progsec-{f.key}"
+												class="mt-1 rounded-none"
+												bind:value={formData[f.key]}
+											/>
 										{/if}
 									</div>
 								{/each}
 								{#if modalSection === 'enrollment'}
 									<div class="flex flex-wrap gap-2 border-t border-border pt-3">
-										<Button type="button" variant="outline" class="rounded-none" onclick={addEnrollmentStep}>
+										<Button
+											type="button"
+											variant="outline"
+											class="rounded-none"
+											onclick={addEnrollmentStep}
+										>
 											Adaugă pas
 										</Button>
-										<Button type="button" variant="outline" class="rounded-none" onclick={addEnrollmentButton}>
+										<Button
+											type="button"
+											variant="outline"
+											class="rounded-none"
+											onclick={addEnrollmentButton}
+										>
 											Adaugă buton
 										</Button>
 									</div>
 								{/if}
 							</div>
 						{:else}
-							<p class="text-muted-foreground">Pentru această secțiune folosește panoul de admin.</p>
+							<p class="text-muted-foreground">
+								Pentru această secțiune folosește panoul de admin.
+							</p>
 							<Button
 								variant="outline"
 								class="mt-2 rounded-none"
@@ -1681,7 +1859,9 @@
 				{#if modalType === 'mentor' || modalType === 'program' || modalType === 'section' || modalType === 'program_section'}
 					<div class="flex justify-end gap-2 border-t border-border px-4 py-3">
 						<Button variant="outline" onclick={closeModal} disabled={saving}>Anulare</Button>
-						<Button onclick={save} disabled={saving}>{saving ? 'Se salvează...' : 'Salvează'}</Button>
+						<Button onclick={save} disabled={saving}
+							>{saving ? 'Se salvează...' : 'Salvează'}</Button
+						>
 					</div>
 				{/if}
 			</div>

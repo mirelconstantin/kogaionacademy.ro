@@ -5,6 +5,15 @@ import { db } from '$lib/server/db';
 import { contactSettings } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
+/**
+ * Social networks the site can display. Twitter/X was retired (brief 21/09/2026), so it is
+ * absent. This must stay in sync with SOCIAL_NETWORKS in SocialLinksEditor.svelte,
+ * admin/contact/+page.svelte and admin/pages/[pageKey]/+page.svelte, and with ICON_MAP in
+ * SocialIcons.svelte. Without this filter, the PATCH below is a second persistence path
+ * that would keep a retired network writable even after the UI stopped offering it.
+ */
+const SOCIAL_ALLOWED = new Set(['instagram', 'facebook', 'linkedin', 'youtube', 'tiktok']);
+
 export const GET: RequestHandler = async (event) => {
 	requirePermission(event, 'pages.view');
 	const locale = event.url.searchParams.get('locale') || 'ro';
@@ -35,8 +44,15 @@ export const PATCH: RequestHandler = async (event) => {
 	const raw = body.socials;
 	const socials: { name: string; url: string }[] = Array.isArray(raw)
 		? raw
-			.filter((s) => s && typeof s.name === 'string' && typeof s.url === 'string' && s.url.trim())
-			.map((s) => ({ name: s.name.trim(), url: (s.url as string).trim() }))
+				.filter(
+					(s) =>
+						s &&
+						typeof s.name === 'string' &&
+						typeof s.url === 'string' &&
+						s.url.trim() &&
+						SOCIAL_ALLOWED.has(s.name.trim().toLowerCase())
+				)
+				.map((s) => ({ name: s.name.trim().toLowerCase(), url: (s.url as string).trim() }))
 		: [];
 	const userId = event.locals.user?.id ?? null;
 	const [existing] = await db

@@ -58,10 +58,13 @@ function mergeSectionPayloadWithDefaults(
 	if (page === 'about' && section === 'age_cards') {
 		const defaultCards = (defaults as { cards?: Array<Record<string, unknown>> }).cards ?? [];
 		const payloadCards = (payload as { cards?: Array<Record<string, unknown>> }).cards ?? [];
-		const cards = Array.from({ length: Math.max(defaultCards.length, payloadCards.length, 3) }, (_, i) => ({
-			...(defaultCards[i] ?? {}),
-			...(payloadCards[i] ?? {})
-		}));
+		const cards = Array.from(
+			{ length: Math.max(defaultCards.length, payloadCards.length, 3) },
+			(_, i) => ({
+				...(defaultCards[i] ?? {}),
+				...(payloadCards[i] ?? {})
+			})
+		);
 		return { ...merged, cards };
 	}
 	return merged;
@@ -76,7 +79,8 @@ export const GET: RequestHandler = async (event) => {
 		const programIdParam = event.url.searchParams.get('programId');
 		const sectionKey = event.url.searchParams.get('section');
 		const locale = (event.url.searchParams.get('locale') ?? 'ro') as 'ro' | 'en';
-		if (!programIdParam || !sectionKey) return json({ error: 'programId and section required' }, { status: 400 });
+		if (!programIdParam || !sectionKey)
+			return json({ error: 'programId and section required' }, { status: 400 });
 		const programId = parseInt(programIdParam, 10);
 		if (Number.isNaN(programId)) return json({ error: 'Invalid programId' }, { status: 400 });
 		const [row] = await db
@@ -96,7 +100,15 @@ export const GET: RequestHandler = async (event) => {
 	if (type === 'hero') {
 		const locale = (event.url.searchParams.get('locale') ?? 'ro') as 'ro' | 'en';
 		const hero = await getHeroSettings(locale);
-		if (!hero) return json({ videoUrl: '', posterUrl: null, ctaPrimaryLabel: null, ctaPrimaryLink: null, ctaSecondaryLabel: null, ctaSecondaryLink: null });
+		if (!hero)
+			return json({
+				videoUrl: '',
+				posterUrl: null,
+				ctaPrimaryLabel: null,
+				ctaPrimaryLink: null,
+				ctaSecondaryLabel: null,
+				ctaSecondaryLink: null
+			});
 		return json({
 			videoUrl: hero.videoUrl ?? '',
 			posterUrl: hero.posterUrl ?? null,
@@ -143,10 +155,7 @@ export const GET: RequestHandler = async (event) => {
 	if (type === 'program') {
 		const [p] = await db.select().from(program).where(eq(program.id, id)).limit(1);
 		if (!p) return json({ error: 'Not found' }, { status: 404 });
-		const locales = await db
-			.select()
-			.from(programLocale)
-			.where(eq(programLocale.programId, id));
+		const locales = await db.select().from(programLocale).where(eq(programLocale.programId, id));
 		const sections = await db
 			.select()
 			.from(programSection)
@@ -202,14 +211,32 @@ export const PATCH: RequestHandler = async (event) => {
 		requirePermission(event, 'mentors.edit');
 		const [beforeRow] = await db.select().from(mentor).where(eq(mentor.id, body.id)).limit(1);
 		const allowed = [
-			'nameRo', 'nameEn', 'titleRo', 'titleEn', 'bioRo', 'bioEn',
-			'image', 'yearJoined', 'location', 'status'
+			'nameRo',
+			'nameEn',
+			'titleRo',
+			'titleEn',
+			'bioRo',
+			'bioEn',
+			'image',
+			'yearJoined',
+			'location',
+			'status',
+			// Structured profile shown on the mentors page (migration 0013)
+			'roleRo',
+			'shortBioRo',
+			'aboutRo',
+			'kogaionRo',
+			'voiceQuoteRo',
+			'expertiseRo'
 		];
 		const set: Record<string, unknown> = { updatedAt: new Date(), updatedBy: userId };
 		for (const k of allowed) {
 			if (k in payload) set[k] = payload[k];
 		}
-		await db.update(mentor).set(set as Record<string, unknown>).where(eq(mentor.id, body.id));
+		await db
+			.update(mentor)
+			.set(set as Record<string, unknown>)
+			.where(eq(mentor.id, body.id));
 		const [afterRow] = await db.select().from(mentor).where(eq(mentor.id, body.id)).limit(1);
 		await db.insert(cmsAuditLog).values({
 			entityType: 'mentor',
@@ -226,37 +253,52 @@ export const PATCH: RequestHandler = async (event) => {
 	if (type === 'program' && typeof body.id === 'number') {
 		requirePermission(event, 'programs.edit');
 		const [programBefore] = await db.select().from(program).where(eq(program.id, body.id)).limit(1);
-		const localesBefore = await db.select().from(programLocale).where(eq(programLocale.programId, body.id));
-		const programAllowed = ['slug', 'categoryId', 'image', 'videoUrl', 'badge', 'sortOrder', 'location', 'status'];
+		const localesBefore = await db
+			.select()
+			.from(programLocale)
+			.where(eq(programLocale.programId, body.id));
+		const programAllowed = [
+			'slug',
+			'categoryId',
+			'image',
+			'videoUrl',
+			'badge',
+			'sortOrder',
+			'location',
+			'status'
+		];
 		const set: Record<string, unknown> = { updatedAt: new Date(), updatedBy: userId };
 		for (const k of programAllowed) {
 			if (k in payload) set[k] = payload[k];
 		}
-		await db.update(program).set(set as Record<string, unknown>).where(eq(program.id, body.id));
+		await db
+			.update(program)
+			.set(set as Record<string, unknown>)
+			.where(eq(program.id, body.id));
 		const localePayload = payload.locales as Record<string, Record<string, unknown>> | undefined;
 		if (localePayload && typeof localePayload === 'object') {
 			for (const [locale, fields] of Object.entries(localePayload)) {
 				const row = await db
 					.select()
 					.from(programLocale)
-					.where(
-						and(
-							eq(programLocale.programId, body.id),
-							eq(programLocale.locale, locale)
-						)
-					)
+					.where(and(eq(programLocale.programId, body.id), eq(programLocale.locale, locale)))
 					.limit(1);
-				const allowed = ['title', 'subtitle', 'description', 'ageRange', 'datesText', 'durationText', 'locationText'];
+				const allowed = [
+					'title',
+					'subtitle',
+					'description',
+					'ageRange',
+					'datesText',
+					'durationText',
+					'locationText'
+				];
 				const toSet: Record<string, unknown> = {};
 				for (const k of allowed) {
 					if (fields && k in fields) toSet[k] = fields[k];
 				}
 				if (Object.keys(toSet).length > 0) {
 					if (row[0]) {
-						await db
-							.update(programLocale)
-							.set(toSet)
-							.where(eq(programLocale.id, row[0].id));
+						await db.update(programLocale).set(toSet).where(eq(programLocale.id, row[0].id));
 					} else {
 						await db.insert(programLocale).values({
 							programId: body.id,
@@ -278,17 +320,20 @@ export const PATCH: RequestHandler = async (event) => {
 			.from(programSection)
 			.where(eq(programSection.programId, body.id))
 			.orderBy(asc(programSection.sortOrder));
-		const sectionsPayload = payload.sections as Array<{
-			section: string;
-			locale: string;
-			sortOrder?: number;
-			payload: Record<string, unknown>;
-		}> | undefined;
+		const sectionsPayload = payload.sections as
+			| Array<{
+					section: string;
+					locale: string;
+					sortOrder?: number;
+					payload: Record<string, unknown>;
+			  }>
+			| undefined;
 		if (Array.isArray(sectionsPayload)) {
 			await db.delete(programSection).where(eq(programSection.programId, body.id));
 			for (const s of sectionsPayload) {
 				if (!s || typeof s.section !== 'string' || typeof s.locale !== 'string') continue;
-				const sectionPayload = s.payload && typeof s.payload === 'object' ? (s.payload as Record<string, unknown>) : {};
+				const sectionPayload =
+					s.payload && typeof s.payload === 'object' ? (s.payload as Record<string, unknown>) : {};
 				const validation = validateProgramSectionPayload(s.section, sectionPayload);
 				if (!validation.ok) {
 					return json({ error: `Secțiune ${s.section}: ${validation.error}` }, { status: 400 });
@@ -306,7 +351,9 @@ export const PATCH: RequestHandler = async (event) => {
 		const mentorIdsPayload = payload.mentorIds as number[] | undefined;
 		if (Array.isArray(mentorIdsPayload)) {
 			await db.delete(programMentor).where(eq(programMentor.programId, body.id));
-			const uniqueIds = [...new Set(mentorIdsPayload)].filter((n) => typeof n === 'number' && Number.isInteger(n));
+			const uniqueIds = [...new Set(mentorIdsPayload)].filter(
+				(n) => typeof n === 'number' && Number.isInteger(n)
+			);
 			for (const mentorId of uniqueIds) {
 				await db.insert(programMentor).values({
 					programId: body.id,
@@ -315,7 +362,10 @@ export const PATCH: RequestHandler = async (event) => {
 			}
 		}
 		const [programAfter] = await db.select().from(program).where(eq(program.id, body.id)).limit(1);
-		const localesAfter = await db.select().from(programLocale).where(eq(programLocale.programId, body.id));
+		const localesAfter = await db
+			.select()
+			.from(programLocale)
+			.where(eq(programLocale.programId, body.id));
 		const sectionsAfter = await db
 			.select()
 			.from(programSection)
@@ -394,7 +444,10 @@ export const PATCH: RequestHandler = async (event) => {
 		for (const k of allowed) {
 			if (k in payload && payload[k] !== undefined) set[k] = payload[k];
 		}
-		await db.update(blogPost).set(set as Record<string, unknown>).where(eq(blogPost.id, body.id));
+		await db
+			.update(blogPost)
+			.set(set as Record<string, unknown>)
+			.where(eq(blogPost.id, body.id));
 		const [afterRow] = await db.select().from(blogPost).where(eq(blogPost.id, body.id)).limit(1);
 		await db.insert(cmsAuditLog).values({
 			entityType: 'blog_post',
@@ -455,15 +508,34 @@ export const PATCH: RequestHandler = async (event) => {
 	if (type === 'hero' && body.locale) {
 		requirePermission(event, 'pages.edit');
 		const locale = body.locale as string;
-		const [existing] = await db.select().from(heroSettings).where(eq(heroSettings.locale, locale)).limit(1);
-		const allowed = ['videoUrl', 'posterUrl', 'ctaPrimaryLabel', 'ctaPrimaryLink', 'ctaSecondaryLabel', 'ctaSecondaryLink'] as const;
+		const [existing] = await db
+			.select()
+			.from(heroSettings)
+			.where(eq(heroSettings.locale, locale))
+			.limit(1);
+		const allowed = [
+			'videoUrl',
+			'posterUrl',
+			'ctaPrimaryLabel',
+			'ctaPrimaryLink',
+			'ctaSecondaryLabel',
+			'ctaSecondaryLink'
+		] as const;
 		const merged = {
 			videoUrl: (payload.videoUrl as string | undefined) ?? existing?.videoUrl ?? '',
 			posterUrl: (payload.posterUrl as string | null | undefined) ?? existing?.posterUrl ?? null,
-			ctaPrimaryLabel: (payload.ctaPrimaryLabel as string | null | undefined) ?? existing?.ctaPrimaryLabel ?? null,
-			ctaPrimaryLink: (payload.ctaPrimaryLink as string | null | undefined) ?? existing?.ctaPrimaryLink ?? null,
-			ctaSecondaryLabel: (payload.ctaSecondaryLabel as string | null | undefined) ?? existing?.ctaSecondaryLabel ?? null,
-			ctaSecondaryLink: (payload.ctaSecondaryLink as string | null | undefined) ?? existing?.ctaSecondaryLink ?? null
+			ctaPrimaryLabel:
+				(payload.ctaPrimaryLabel as string | null | undefined) ?? existing?.ctaPrimaryLabel ?? null,
+			ctaPrimaryLink:
+				(payload.ctaPrimaryLink as string | null | undefined) ?? existing?.ctaPrimaryLink ?? null,
+			ctaSecondaryLabel:
+				(payload.ctaSecondaryLabel as string | null | undefined) ??
+				existing?.ctaSecondaryLabel ??
+				null,
+			ctaSecondaryLink:
+				(payload.ctaSecondaryLink as string | null | undefined) ??
+				existing?.ctaSecondaryLink ??
+				null
 		};
 		await db
 			.insert(heroSettings)
@@ -503,4 +575,4 @@ export const PATCH: RequestHandler = async (event) => {
 	}
 
 	return json({ error: 'Missing id or page/section' }, { status: 400 });
-}
+};

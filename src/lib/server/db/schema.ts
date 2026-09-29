@@ -30,6 +30,13 @@ export const mentor = pgTable('mentor', {
 	bioEn: text('bio_en'),
 	image: text('image'),
 	yearJoined: integer('year_joined'),
+	/** Structured profile for the mentors page (card + modal). Romanian source. */
+	roleRo: text('role_ro'),
+	shortBioRo: text('short_bio_ro'),
+	aboutRo: text('about_ro'),
+	kogaionRo: text('kogaion_ro'),
+	voiceQuoteRo: text('voice_quote_ro'),
+	expertiseRo: text('expertise_ro').array().default([]),
 	sortOrder: integer('sort_order').notNull().default(0),
 	location: text('location'),
 	status: text('status').notNull().default('published'),
@@ -93,7 +100,9 @@ export const programSection = pgTable(
 		updatedAt: timestamp('updated_at').defaultNow().notNull(),
 		updatedBy: text('updated_by')
 	},
-	(t) => [uniqueIndex('program_section_program_section_locale_idx').on(t.programId, t.section, t.locale)]
+	(t) => [
+		uniqueIndex('program_section_program_section_locale_idx').on(t.programId, t.section, t.locale)
+	]
 );
 
 /** Many-to-many: which mentors are linked to which program. */
@@ -150,7 +159,8 @@ export const contactSettings = pgTable('contact_settings', {
 	locale: text('locale').notNull().unique(),
 	email: text('email').notNull(),
 	phone: text('phone').notNull(),
-	address: text('address').notNull(),
+	/** Premises address. Nullable since the Bucharest office closed (brief 21/09/2026). */
+	address: text('address'),
 	mapUrl: text('map_url'),
 	socials: jsonb('socials').$type<{ name: string; url: string }[]>().default([]),
 	updatedAt: timestamp('updated_at').defaultNow().notNull(),

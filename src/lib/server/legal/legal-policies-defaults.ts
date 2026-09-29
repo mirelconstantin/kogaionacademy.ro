@@ -29,9 +29,13 @@ export type LegalPoliciesPayload = {
 export function defaultLegalPoliciesPayload(): LegalPoliciesPayload {
 	return {
 		operatorLegalName: 'Kogaion Gifted Academy',
-		operatorAddress: 'Șoseaua Nordului nr. 94F, Sector 1, București',
-		operatorEmail: 'diana@kogaionacademy.ro',
-		dpoEmail: 'diana@kogaionacademy.ro',
+		// Lăsat gol intenționat: adresa poștală înregistrată a operatorului trebuie
+		// furnizată de client (legea românească a protecției datelor cere o adresă
+		// de contact a operatorului pentru notificările ANSPDCP). Așa cum nu mai
+		// avem un sediu, nu inventăm una — nu există fallback implicit.
+		operatorAddress: '',
+		operatorEmail: 'contact@kogaionacademy.ro',
+		dpoEmail: 'contact@kogaionacademy.ro',
 		cookiePolicyMarkdown: DEFAULT_COOKIE_POLICY_MARKDOWN,
 		privacyPolicyMarkdown: DEFAULT_PRIVACY_POLICY_MARKDOWN,
 		termsMarkdown: DEFAULT_TERMS_MARKDOWN,

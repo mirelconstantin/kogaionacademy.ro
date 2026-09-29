@@ -276,6 +276,18 @@ export type MentorForDisplay = {
 	yearJoined: number | null;
 	sortOrder: number;
 	location: string | null;
+	/** "Rol / categorie în Kogaion" — structured profile, Romanian source. */
+	role: string | null;
+	/** Card teaser, ~25-40 words. */
+	shortBio: string | null;
+	/** "Despre [Nume]", ~80-120 words. */
+	about: string | null;
+	/** "În Kogaion", ~60-100 words. */
+	kogaion: string | null;
+	/** "Vocea mentorului", ~25-60 words, first person. */
+	voiceQuote: string | null;
+	/** "Domenii de expertiză", 3-6 tags. */
+	expertise: string[];
 	publishedAt: Date | null;
 	updatedAt: Date;
 };
@@ -314,6 +326,12 @@ export async function getMentors(locale: Locale): Promise<MentorForDisplay[]> {
 			yearJoined: r.yearJoined,
 			sortOrder: r.sortOrder,
 			location: r.location,
+			role: r.roleRo,
+			shortBio: r.shortBioRo,
+			about: r.aboutRo,
+			kogaion: r.kogaionRo,
+			voiceQuote: r.voiceQuoteRo,
+			expertise: r.expertiseRo ?? [],
 			publishedAt: r.publishedAt,
 			updatedAt: r.updatedAt
 		}));
@@ -342,6 +360,12 @@ export async function getMentorBySlug(
 			yearJoined: r.yearJoined,
 			sortOrder: r.sortOrder,
 			location: r.location,
+			role: r.roleRo,
+			shortBio: r.shortBioRo,
+			about: r.aboutRo,
+			kogaion: r.kogaionRo,
+			voiceQuote: r.voiceQuoteRo,
+			expertise: r.expertiseRo ?? [],
 			publishedAt: r.publishedAt,
 			updatedAt: r.updatedAt
 		};

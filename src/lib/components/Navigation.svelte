@@ -15,21 +15,14 @@
 	import Facebook from '@lucide/svelte/icons/facebook';
 	import Linkedin from '@lucide/svelte/icons/linkedin';
 	import Youtube from '@lucide/svelte/icons/youtube';
-	import Twitter from '@lucide/svelte/icons/twitter';
 	import Globe from '@lucide/svelte/icons/globe';
 
 	type SocialEntry = { name: string; url: string };
-	let {
-		adminBarVisible = false,
-		adminBarHeightPx = 0,
-		socials = [] as SocialEntry[]
-	} = $props();
+	let { adminBarVisible = false, adminBarHeightPx = 0, socials = [] as SocialEntry[] } = $props();
 
 	const accentColor = $derived($navAccentColor);
 	/** Offset = înălțimea măsurată a barei admin; până la primul bind folosim 48px ca să nu se suprapună nav-ul */
-	const navTopPx = $derived(
-		adminBarVisible ? (adminBarHeightPx > 0 ? adminBarHeightPx : 48) : 0
-	);
+	const navTopPx = $derived(adminBarVisible ? (adminBarHeightPx > 0 ? adminBarHeightPx : 48) : 0);
 	let menuVisible = $state(false);
 	let menuClosing = $state(false);
 	let scrollY = $state(0);
@@ -117,17 +110,47 @@
 
 	type MenuItemWithPreview = { href: string; label: string; image: string; caption: string };
 	const menuItems: MenuItemWithPreview[] = [
-		{ href: contentHref('home'), label: 'Acasă', image: '/media/uploads/home/hero-poster.webp', caption: m.menu_tagline() },
-		{ href: contentHref('about'), label: 'Despre', image: '/media/uploads/about/age-13-18.webp', caption: 'Despre' },
-		{ href: contentHref('mentors'), label: 'Mentori', image: '/media/uploads/about/age-3-6.webp', caption: 'Mentori' },
-		{ href: contentHref('programs'), label: 'Programe', image: '/media/uploads/about/age-7-12.webp', caption: 'Programe' },
-		{ href: contentHref('blog'), label: 'Blog', image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80', caption: 'Blog' },
-		{ href: contentHref('contact'), label: 'Contact', image: '/media/uploads/home/hero-poster.webp', caption: 'Contact' }
+		{
+			href: contentHref('home'),
+			label: 'Acasă',
+			image: '/media/uploads/home/hero-poster.webp',
+			caption: m.menu_tagline()
+		},
+		{
+			href: contentHref('about'),
+			label: 'Despre',
+			image: '/media/uploads/about/age-13-18.webp',
+			caption: 'Despre'
+		},
+		{
+			href: contentHref('mentors'),
+			label: 'Mentori',
+			image: '/media/uploads/about/age-3-6.webp',
+			caption: 'Mentori'
+		},
+		{
+			href: contentHref('programs'),
+			label: 'Programe',
+			image: '/media/uploads/about/age-7-12.webp',
+			caption: 'Programe'
+		},
+		{
+			href: contentHref('blog'),
+			label: 'Blog',
+			image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
+			caption: 'Blog'
+		},
+		{
+			href: contentHref('contact'),
+			label: 'Contact',
+			image: '/media/uploads/home/hero-poster.webp',
+			caption: 'Contact'
+		}
 	];
 	let hoveredItem = $state<MenuItemWithPreview | null>(null);
 	const displayItem = $derived(hoveredItem ?? menuItems[0]);
 	const isSloganPreview = $derived(displayItem.caption === m.menu_tagline());
-	const socialOrder = ['instagram', 'facebook', 'linkedin', 'youtube', 'twitter', 'x', 'tiktok'];
+	const socialOrder = ['instagram', 'facebook', 'linkedin', 'youtube', 'tiktok'];
 	const normalizedSocials = $derived.by(() => {
 		return socials
 			.filter((s) => s?.name && s?.url)
@@ -167,7 +190,11 @@
 		href={contentHref('home')}
 		class="flex min-h-[4.5rem] min-w-0 shrink items-center gap-2 px-3 py-2.5 transition-colors duration-300 hover:opacity-90 sm:min-h-20 sm:gap-4 sm:px-8 sm:py-4 {navTitleClass}"
 	>
-		<img src="/media/uploads/brand/logo.webp" alt="" class="size-10 shrink-0 object-contain sm:size-14" />
+		<img
+			src="/media/uploads/brand/logo.webp"
+			alt=""
+			class="size-10 shrink-0 object-contain sm:size-14"
+		/>
 		<div class="flex min-w-0 flex-col items-start leading-none">
 			<span
 				class="font-medium whitespace-nowrap transition-colors duration-500 ease-out"
@@ -176,7 +203,7 @@
 				Kogaion Academy
 			</span>
 			<span
-				class="mt-1 whitespace-nowrap text-[0.42rem] leading-tight tracking-[0.07em] uppercase transition-colors duration-500 ease-out sm:mt-2 sm:text-[0.66rem] sm:tracking-[0.13em] {navSloganClass}"
+				class="mt-1 text-[0.42rem] leading-tight tracking-[0.07em] whitespace-nowrap uppercase transition-colors duration-500 ease-out sm:mt-2 sm:text-[0.66rem] sm:tracking-[0.13em] {navSloganClass}"
 				style="font-family: 'Libre Baskerville', Georgia, serif;"
 			>
 				{m.menu_tagline()}
@@ -193,11 +220,16 @@
 	>
 		{#if !PUBLIC_SITE_LOCALE_LOCKED_RO}
 			<!-- Language picker: opens on click, closes on click outside -->
-			<div role="group" aria-label="Language" class="relative h-full min-h-[4.5rem] sm:min-h-20" data-language-select>
+			<div
+				role="group"
+				aria-label="Language"
+				class="relative h-full min-h-[4.5rem] sm:min-h-20"
+				data-language-select
+			>
 				<Select.Root type="single" value={currentLocale} onValueChange={handleLocaleChange}>
 					<Select.Trigger
 						hideChevron
-						class="h-full min-h-[4.5rem] w-full min-w-[3rem] items-center justify-center gap-1.5 rounded-none border-0 bg-transparent px-3 py-0 text-[0.72rem] font-semibold tracking-[0.06em] uppercase shadow-none data-[size=sm]:h-full [font-family:var(--font-sans)] text-white hover:bg-white/10 sm:min-h-20 sm:min-w-[6.5rem] sm:gap-2 sm:px-10 sm:text-[0.9rem] sm:tracking-[0.08em] [&_svg]:text-white/90"
+						class="h-full min-h-[4.5rem] w-full min-w-[3rem] items-center justify-center gap-1.5 rounded-none border-0 bg-transparent px-3 py-0 [font-family:var(--font-sans)] text-[0.72rem] font-semibold tracking-[0.06em] text-white uppercase shadow-none hover:bg-white/10 data-[size=sm]:h-full sm:min-h-20 sm:min-w-[6.5rem] sm:gap-2 sm:px-10 sm:text-[0.9rem] sm:tracking-[0.08em] [&_svg]:text-white/90"
 						size="sm"
 					>
 						<span class="flex items-center gap-2">
@@ -218,7 +250,7 @@
 							<Select.Item
 								value={loc}
 								label={`${localeFlags[loc] ?? ''} ${loc === 'en' ? m.lang_en() : m.lang_ro()}`}
-								class="cursor-pointer gap-2 rounded-none px-4 py-3 text-base [&]:text-inherit text-white data-[highlighted]:bg-white/10 data-[highlighted]:!text-white"
+								class="cursor-pointer gap-2 rounded-none px-4 py-3 text-base text-white data-[highlighted]:bg-white/10 data-[highlighted]:!text-white [&]:text-inherit"
 							>
 								<span class="flex items-center gap-2">
 									<span>{localeFlags[loc] ?? ''}</span>
@@ -236,7 +268,7 @@
 			href={contentHref('contact')}
 			variant="ghost"
 			size="default"
-			class="flex h-full min-h-[4.5rem] min-w-[5.25rem] items-center justify-center rounded-none border-0 bg-transparent px-4 py-0 text-[0.72rem] font-semibold tracking-[0.06em] uppercase [font-family:var(--font-sans)] text-white hover:bg-white/10 hover:text-white sm:min-h-20 sm:min-w-0 sm:px-10 sm:text-[0.9rem] sm:tracking-[0.08em]"
+			class="flex h-full min-h-[4.5rem] min-w-[5.25rem] items-center justify-center rounded-none border-0 bg-transparent px-4 py-0 [font-family:var(--font-sans)] text-[0.72rem] font-semibold tracking-[0.06em] text-white uppercase hover:bg-white/10 hover:text-white sm:min-h-20 sm:min-w-0 sm:px-10 sm:text-[0.9rem] sm:tracking-[0.08em]"
 		>
 			{m.menu_link_contact()}
 		</Button>
@@ -244,7 +276,7 @@
 		<div class="mx-0.5 w-px shrink-0 self-stretch bg-white/30 sm:mx-0" aria-hidden="true"></div>
 		<button
 			type="button"
-			class="flex h-full min-h-[4.5rem] min-w-[3.75rem] items-center justify-center gap-2 rounded-none border-0 bg-transparent px-4 py-0 text-base text-white transition-colors [font-family:var(--font-sans)] hover:bg-white/10 hover:text-white sm:min-h-20 sm:min-w-0 sm:gap-3 sm:px-10"
+			class="flex h-full min-h-[4.5rem] min-w-[3.75rem] items-center justify-center gap-2 rounded-none border-0 bg-transparent px-4 py-0 [font-family:var(--font-sans)] text-base text-white transition-colors hover:bg-white/10 hover:text-white sm:min-h-20 sm:min-w-0 sm:gap-3 sm:px-10"
 			onclick={openMenu}
 			onmouseenter={startMenuHoverTimer}
 			onmouseleave={cancelMenuHoverTimer}
@@ -278,7 +310,11 @@
 				class="flex min-h-[4.5rem] min-w-0 items-center gap-2 px-3 py-2.5 sm:min-h-20 sm:gap-4 sm:px-8 sm:py-0"
 				onclick={closeMenu}
 			>
-				<img src="/media/uploads/brand/logo.webp" alt="" class="size-10 shrink-0 object-contain sm:size-14" />
+				<img
+					src="/media/uploads/brand/logo.webp"
+					alt=""
+					class="size-10 shrink-0 object-contain sm:size-14"
+				/>
 				<div class="flex min-w-0 flex-col items-start leading-none">
 					<span
 						class="block text-[1.2rem] font-medium whitespace-nowrap text-white sm:text-2xl md:text-3xl"
@@ -287,7 +323,7 @@
 						Kogaion Academy
 					</span>
 					<span
-						class="mt-1 whitespace-nowrap text-[0.46rem] leading-tight tracking-[0.08em] uppercase transition-colors duration-500 ease-out sm:mt-2 sm:text-[0.7rem] sm:tracking-[0.14em] {overlaySloganClass}"
+						class="mt-1 text-[0.46rem] leading-tight tracking-[0.08em] whitespace-nowrap uppercase transition-colors duration-500 ease-out sm:mt-2 sm:text-[0.7rem] sm:tracking-[0.14em] {overlaySloganClass}"
 						style="font-family: 'Libre Baskerville', Georgia, serif;"
 					>
 						{m.menu_tagline()}
@@ -297,7 +333,7 @@
 			<div class="flex min-h-[4.5rem] shrink-0 items-stretch sm:min-h-20">
 				<button
 					type="button"
-					class="flex h-full min-h-[4.5rem] items-center justify-center gap-2 rounded-none border-0 bg-transparent px-3 py-0 text-base text-white transition-colors [font-family:var(--font-sans)] hover:bg-white/10 hover:text-white sm:min-h-20 sm:gap-3 sm:px-10"
+					class="flex h-full min-h-[4.5rem] items-center justify-center gap-2 rounded-none border-0 bg-transparent px-3 py-0 [font-family:var(--font-sans)] text-base text-white transition-colors hover:bg-white/10 hover:text-white sm:min-h-20 sm:gap-3 sm:px-10"
 					onclick={closeMenu}
 					aria-label="Close menu"
 				>
@@ -320,7 +356,11 @@
 						onmouseenter={() => (hoveredItem = item)}
 						onmouseleave={() => (hoveredItem = null)}
 					>
-						<span style={item.label === 'Contact' ? "font-family: 'Libre Baskerville', Georgia, serif;" : undefined}>{item.label}</span>
+						<span
+							style={item.label === 'Contact'
+								? "font-family: 'Libre Baskerville', Georgia, serif;"
+								: undefined}>{item.label}</span
+						>
 						<ChevronRight
 							class="size-5 shrink-0 opacity-70 transition-transform group-hover:translate-x-1"
 						/>
@@ -329,8 +369,12 @@
 			</nav>
 
 			<!-- Right: featured image + caption (updates on link hover) -->
-			<div class="flex flex-1 flex-col items-center justify-center gap-6 px-4 md:max-w-md lg:max-w-lg">
-				<div class="w-full overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 shadow-xl ring-1 ring-white/10">
+			<div
+				class="flex flex-1 flex-col items-center justify-center gap-6 px-4 md:max-w-md lg:max-w-lg"
+			>
+				<div
+					class="w-full overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 shadow-xl ring-1 ring-white/10"
+				>
 					<img
 						src={displayItem.image}
 						alt=""
@@ -340,7 +384,9 @@
 				<div class="text-center">
 					<p
 						class="text-lg font-medium text-white md:text-xl"
-						style={isSloganPreview ? "font-family: 'Libre Baskerville', Georgia, serif;" : undefined}
+						style={isSloganPreview
+							? "font-family: 'Libre Baskerville', Georgia, serif;"
+							: undefined}
 					>
 						{displayItem.caption}
 					</p>
@@ -371,11 +417,17 @@
 							<Linkedin class="size-5" />
 						{:else if key === 'youtube'}
 							<Youtube class="size-5" />
-						{:else if key === 'twitter' || key === 'x'}
-							<Twitter class="size-5" />
 						{:else if key === 'tiktok'}
-							<svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-								<path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z" />
+							<svg
+								class="size-5"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z"
+								/>
 							</svg>
 						{:else}
 							<Globe class="size-5" />
