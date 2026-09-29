@@ -43,6 +43,9 @@ export const load: LayoutServerLoad = async (event) => {
 			.where(
 				and(
 					eq(blogPost.slug, slug),
+					// Both blog loaders filter soft-deleted posts; this breadcrumb query must
+					// too, or a deleted article still leaks its title into the page shell.
+					isNull(blogPost.deletedAt),
 					or(
 						and(
 							eq(blogPost.status, 'published'),
