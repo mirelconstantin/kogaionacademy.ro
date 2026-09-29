@@ -1164,14 +1164,26 @@
 									: 'Oameni cu experiență în educație și dezvoltare — prezenți, disponibili, ancorați în practică.'}
 							</p>
 						</div>
-						<div class="mt-10 grid gap-6 md:grid-cols-2">
+						<!--
+							Mentors: a swipeable snap slider on narrow screens, four across from
+							`md` up. No `tabindex` on the scroller — tabbing to any card's button
+							moves focus, which scrolls the container, so the slider is already
+							reachable without a redundant tab stop.
+						-->
+						<div
+							class="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0"
+							role="list"
+							aria-label="Mentorii programului"
+						>
 							{#each mentors as mentor (mentor.id)}
-								<MentorCard
-									{mentor}
-									labels={mentorLabelsRO}
-									expanded={activeMentor?.id === mentor.id}
-									onopen={openMentor}
-								/>
+								<div class="w-[82%] shrink-0 snap-start sm:w-[58%] md:w-auto" role="listitem">
+									<MentorCard
+										{mentor}
+										labels={mentorLabelsRO}
+										expanded={activeMentor?.id === mentor.id}
+										onopen={openMentor}
+									/>
+								</div>
 							{/each}
 						</div>
 					</section>

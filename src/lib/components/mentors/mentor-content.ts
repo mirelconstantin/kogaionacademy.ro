@@ -36,8 +36,6 @@ export type MentorLabels = {
 	readMore: string;
 	/** Primary footer action inside the popup. */
 	readProfile: string;
-	/** Secondary (dismiss) action inside the popup. */
-	readLess: string;
 	/** Accessible label for the popup close button. */
 	close: string;
 	/** Accessible label for the whole-card click target. */
@@ -47,7 +45,6 @@ export type MentorLabels = {
 const RO_LABELS: MentorLabels = {
 	readMore: 'Citește mai mult',
 	readProfile: 'Citește profil',
-	readLess: 'Mai puțin',
 	close: 'Închide',
 	openProfile: (name) => `Vezi profilul complet al lui ${name}`
 };
@@ -55,7 +52,6 @@ const RO_LABELS: MentorLabels = {
 const EN_LABELS: MentorLabels = {
 	readMore: 'Read more',
 	readProfile: 'Read profile',
-	readLess: 'Less',
 	close: 'Close',
 	openProfile: (name) => `View the full profile of ${name}`
 };

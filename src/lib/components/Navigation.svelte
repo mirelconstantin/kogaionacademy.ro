@@ -7,7 +7,9 @@
 	import { PUBLIC_SITE_LOCALE_LOCKED_RO } from '$lib/site-i18n';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
-	import { fly } from 'svelte/transition';
+	import { fade, scale } from 'svelte/transition';
+	import { cubicOut, cubicIn } from 'svelte/easing';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import MenuIcon from '@lucide/svelte/icons/menu';
 	import X from '@lucide/svelte/icons/x';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -29,7 +31,26 @@
 	let menuHoverTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const menuHoverDelayMs = 800;
-	const menuTransitionMs = 380;
+
+	/**
+	 * The overlay opens by scaling up gently from its own centre rather than sliding in
+	 * from above: a directional entrance on a full-bleed surface reads as a "slam", and it
+	 * is the direction the client objected to. Scaling is isotropic, so the motion has no
+	 * bias. The contents then fade in on a short stagger, which is what makes the entrance
+	 * feel deliberate instead of uniform-in-the-worst-way.
+	 *
+	 * `menuCloseMs` is deliberately shorter than the open: a close should feel like
+	 * getting out of the way, not like a second animation to watch.
+	 */
+	const menuOpenMs = 460;
+	const menuStaggerMs = 34;
+	const menuCloseMs = 200;
+	/** Durations collapse to a single frame when the user asks for reduced motion. */
+	const motionOff = $derived(prefersReducedMotion.current);
+	const openMs = $derived(motionOff ? 1 : menuOpenMs);
+	const closeMs = $derived(motionOff ? 1 : menuCloseMs);
+	const staggerMs = $derived(motionOff ? 0 : menuStaggerMs);
+	const itemMs = $derived(motionOff ? 1 : 320);
 
 	function startMenuHoverTimer() {
 		menuHoverTimeout = setTimeout(() => {
@@ -55,7 +76,7 @@
 		menuVisible = false;
 		setTimeout(() => {
 			menuClosing = false;
-		}, menuTransitionMs);
+		}, closeMs);
 	}
 
 	const isAboutPage = $derived(
@@ -289,10 +310,18 @@
 	</div>
 </nav>
 
-{#if menuVisible}
-	<!-- Fullscreen menu overlay - fly in/out from top; sub AdminBar când e vizibilă -->
+{#if menuActive}
+	<!--
+		Fullscreen menu overlay.
+
+		`menuActive` (not `menuVisible`) gates the block: the overlay has to stay mounted
+		for `out:` to run. With `menuVisible` alone, closeMenu() flipped the flag, Svelte
+		removed the node on the next tick and the exit transition never played.
+
+		Gated by the AdminBar when it is visible.
+	-->
 	<div
-		class="fixed inset-x-0 z-[60] flex flex-col"
+		class="fixed inset-x-0 z-[60] flex origin-center flex-col"
 		class:top-0={!adminBarVisible}
 		style="background-color: {currentAccent}; top: {adminBarVisible
 			? `${navTopPx}px`
@@ -300,8 +329,8 @@
 		role="dialog"
 		aria-modal="true"
 		aria-label="Menu"
-		in:fly={{ y: -1200, duration: menuTransitionMs, easing: (t) => 1 - Math.pow(1 - t, 4) }}
-		out:fly={{ y: -1200, duration: menuTransitionMs, easing: (t) => Math.pow(t, 4) }}
+		in:scale={{ start: 0.96, duration: openMs, easing: cubicOut }}
+		out:scale={{ start: 0.96, duration: closeMs, easing: cubicIn }}
 	>
 		<!-- Header: matches nav bar height + logo position -->
 		<header class="flex min-h-[4.5rem] items-stretch justify-between sm:min-h-20">
@@ -348,13 +377,14 @@
 		>
 			<!-- Left: nav links with chevrons -->
 			<nav class="flex flex-1 flex-col gap-1" aria-label="Menu navigation">
-				{#each menuItems as item (item.label)}
+				{#each menuItems as item, index (item.label)}
 					<a
 						href={item.href}
 						class="group flex items-center justify-between gap-4 py-3 text-lg text-white transition-colors hover:text-white/90 md:text-xl"
 						onclick={closeMenu}
 						onmouseenter={() => (hoveredItem = item)}
 						onmouseleave={() => (hoveredItem = null)}
+						in:fade={{ delay: 90 + index * staggerMs, duration: itemMs, easing: cubicOut }}
 					>
 						<span
 							style={item.label === 'Contact'
@@ -371,6 +401,7 @@
 			<!-- Right: featured image + caption (updates on link hover) -->
 			<div
 				class="flex flex-1 flex-col items-center justify-center gap-6 px-4 md:max-w-md lg:max-w-lg"
+				in:fade={{ delay: 150, duration: itemMs + 60, easing: cubicOut }}
 			>
 				<div
 					class="w-full overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 shadow-xl ring-1 ring-white/10"

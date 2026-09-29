@@ -125,7 +125,7 @@
 								{view.aboutHeading}
 							</h3>
 							<p
-								class="mt-3 [font-family:var(--font-sans)] text-[0.9375rem] leading-relaxed text-muted-foreground"
+								class="mt-3 line-clamp-3 [font-family:var(--font-sans)] text-[0.9375rem] leading-relaxed text-muted-foreground"
 							>
 								{view.about}
 							</p>
@@ -141,7 +141,7 @@
 								{MENTOR_SECTION_LABELS.kogaion}
 							</h3>
 							<p
-								class="mt-3 [font-family:var(--font-sans)] text-[0.9375rem] leading-relaxed text-muted-foreground"
+								class="mt-3 line-clamp-3 [font-family:var(--font-sans)] text-[0.9375rem] leading-relaxed text-muted-foreground"
 							>
 								{view.kogaion}
 							</p>
@@ -160,7 +160,7 @@
 								class="mt-3 border-l-4 border-[var(--brand-blue)] bg-[#0b244f]/5 py-4 pr-4 pl-5"
 							>
 								<blockquote
-									class="[font-family:var(--font-spectral)] text-lg leading-relaxed text-[#0c3044] italic"
+									class="line-clamp-3 [font-family:var(--font-spectral)] text-lg leading-relaxed text-[#0c3044] italic"
 								>
 									„{view.voiceQuote}“
 								</blockquote>
@@ -196,13 +196,6 @@
 						>
 							{labels.readProfile}
 							<ArrowRight class="size-4" aria-hidden="true" />
-						</button>
-						<button
-							type="button"
-							class="btn-diagonal inline-flex items-center gap-3 border border-[var(--brand-blue)] px-5 py-3 text-[var(--brand-blue)] transition-colors hover:bg-[var(--brand-blue)]/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand-blue)]"
-							onclick={onclose}
-						>
-							{labels.readLess}
 						</button>
 					</div>
 				</div>
