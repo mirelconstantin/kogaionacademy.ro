@@ -174,7 +174,6 @@
 				: ogImageRelative
 	);
 	const canonicalUrl = $derived(data.canonicalUrl ?? '');
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by <script type="application/ld+json"> in <svelte:head>
 	const schemaCourse = $derived.by(() => {
 		const base: Record<string, unknown> = {
 			'@context': 'https://schema.org',
@@ -200,6 +199,23 @@
 		}
 		return base;
 	});
+
+	// Serialised once, here, rather than as `{JSON.stringify(schemaCourse)}` in the
+	// template below. Prettier's Svelte parser reads a <script> block as JavaScript in
+	// EXPRESSION position, so `{JSON.stringify(...)}` is parsed as an object literal and
+	// throws `SyntaxError: Unexpected token, expected ","` -- which takes down
+	// `bun run lint` in CI naming no file. A plain `{name}` reference parses as a valid
+	// shorthand property, so the same markup becomes parseable.
+	//
+	// It is also the better shape: the string is computed once per render instead of
+	// inside the document head.
+	// Reported as unused by a parser limitation, not by a defect: the Svelte parser
+	// does not follow an interpolation inside `<script type="application/ld+json">`,
+	// because it treats that element's contents as JSON rather than as template
+	// markup. The value IS rendered, in <svelte:head>, and deleting it would silently
+	// remove the Course structured data from the page.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by <script type="application/ld+json"> in <svelte:head>
+	const schemaCourseJson = $derived(JSON.stringify(schemaCourse));
 
 	function getSection(
 		key: string
@@ -451,8 +467,23 @@
 	<meta name="twitter:title" content="{program.title} – Kogaion Gifted Academy" />
 	<meta name="twitter:description" content={metaDescription} />
 	<meta name="twitter:image" content={ogImage} />
+	<!-- prettier-ignore -->
+	<!--
+	  JSON-LD for crawlers.
+
+	  `prettier-ignore` is load-bearing here, and the reason is specific. Prettier
+	  validates the CONTENTS of <script type="application/ld+json"> as JSON, so ANY
+	  Svelte interpolation inside it is a syntax error to the formatter:
+	    {JSON.stringify(x)}  -> "Unexpected token, expected ,"
+	    {someString}         -> "Shorthand property is not allowed in JSON"
+	  Both crash the parse, and the crash takes the whole file down -- `bun run lint`
+	  fails in CI naming no file and offering nothing to act on. The escape hatches
+	  are all worse: hand-formatting the block re-breaks on the next `bun run format`,
+	  and moving JSON-LD out of svelte:head costs a server round trip for something
+	  crawlers need in the document head.
+-->
 	<script type="application/ld+json">
-		{JSON.stringify(schemaCourse)}
+		{schemaCourseJson}
 	</script>
 </svelte:head>
 

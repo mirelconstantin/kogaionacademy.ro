@@ -1,8 +1,7 @@
 # =============================================================================
 # Package managers
 # =============================================================================
-# Generated, enormous, and reformatted on every install. Prettier rewriting these
-# would produce a diff nobody asked for on every single dependency bump.
+# Generated, enormous, and rewritten on every install.
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
@@ -12,6 +11,14 @@ bun.lockb
 # =============================================================================
 # Generated and vendored
 # =============================================================================
+# Compiled by the paraglide Vite plugin in buildStart(), or by
+# `bun run i18n:compile`. Never source, never edited, and never formatted -- a
+# prettier pass here would be reverted by the next compile.
+/src/lib/paraglide/
+
+# project.inlang/.gitignore already ignores everything but settings.json.
+/project.inlang/cache/
+
 # 643 media files. Formatting them is pure noise and they are not source.
 /static/
 
@@ -28,8 +35,8 @@ bun.lockb
 #   1. The markdown is GENERATED from the docx by md_to_docx.ts. Reformatting it
 #      means the next generation step produces a diff against the formatting, forever.
 #   2. It contains fenced code fragments lifted out of application source. Prettier
-#      parses those fragments as if they were standalone files and can crash on them
-#      with a BABEL_PARSER_SYNTAX_ERROR that names a file nobody wrote.
+#      parses those fragments as standalone files and can crash on them with a
+#      BABEL_PARSER_SYNTAX_ERROR that names a file nobody wrote.
 #
 # None of it ships: .dockerignore excludes blogs/ from the build context as well, and
 # the content reaches the site through the database, not the filesystem.
@@ -38,6 +45,6 @@ bun.lockb
 # =============================================================================
 # CI/CD
 # =============================================================================
-# The pipeline formats what it checks, so a rewrite of the workflow file is a
-# change to the pipeline rather than a formatting diff inside it.
+# The pipeline formats what it checks, so a rewrite of the workflow file is a change
+# to the pipeline rather than a formatting diff inside it.
 /.github/

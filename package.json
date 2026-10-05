@@ -9,6 +9,7 @@
 		"start": "bun ./build/index.js",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
+		"i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy baseLocale",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
