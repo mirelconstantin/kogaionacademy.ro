@@ -12,6 +12,16 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
+	{
+		// The blog authoring pipeline: .docx sources, machine-generated markdown and the
+		// reference JSON, plus the scripts that turn one into the other.
+		//
+		// It is excluded from prettier for two documented reasons (see .prettierignore), and
+		// linting it here while prettier skips it would mean two formatters disagreeing
+		// about the same tree. Nothing in src/ imports any of it, and .dockerignore keeps
+		// it out of the build context.
+		ignores: ['blogs/**']
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
