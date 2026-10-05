@@ -75,23 +75,65 @@ Dacă vezi **ECONNREFUSED**, înseamnă că **PostgreSQL nu rulează** sau nu e 
 2. Setează `DATABASE_URL` în `.env`.
 3. Rulează din nou: `bun run db:migrate`.
 
-## Build & deployment (Docker / Easypanel)
+## Build & deployment (Docker / GHCR / Coolify)
 
-Build-ul **nu trebuie să aibă** secrete de producție. `bun run build` rulează cu
-`NODE_ENV=production` (setat în builder stage), iar Better Auth aruncă *„You are using the
-default secret"* dacă `BETTER_AUTH_SECRET` lipsește — pentru că SvelteKit importă
-`hooks.server.ts` necondiționat în faza de postbuild (`core/postbuild/prerender.js` apelează
-`get_hooks()` chiar dacă nicio rută nu e prerendered).
+Pipeline-ul complet este în [`docs/ghcr-coolify/`](ghcr-coolify/README.md). Acest
+document rămâne ghidul operațional: baza de date, seed-uri, contul de admin. Nu
+descrie traseul imaginii — acolo totul este un singur workflow, `.github/workflows/ci.yml`,
+și serverul de producție **nu construiește nimic**.
 
-De aceea `getAuth()` din `src/lib/server/auth.ts` este **lazy**: build-ul nu construiește
-instanța. Toate `ARG`-urile din `Dockerfile` au și valoare implicită, deci build-ul trece chiar
-dacă platforma transmite doar `--build-arg GIT_SHA=...`.
+### Ce s-a schimbat
 
-**Obligatoriu pe container (nu ca build args):**
-`DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
-La pornire, hook-ul `init` din `src/hooks.server.ts` le verifică și aruncă o eroare care le
-numește explicit pe cele lipsă — altfel `DATABASE_URL` lipsă cădea în tăcere pe
+| | înainte | acum |
+| --- | --- | --- |
+| Platformă | Easypanel (build de pe server) | Coolify, resursă **Docker Image** care doar *trage* |
+| Build args | `DATABASE_URL`, `ORIGIN`, `PUBLIC_SITE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GIT_SHA` | doar `GIT_SHA` și `IMAGE_CREATED` (label-uri OCI) |
+| Runtime | `bun run start` (`bun`, proces copil) | `bun ./build/index.js` în formă exec, ca serverul să fie PID 1 și să primească SIGTERM |
+| Secret în imagine | `BETTER_AUTH_SECRET` și `GOOGLE_CLIENT_SECRET` treceau prin `ARG` + `ENV` în builder — `docker build` avertiza `SecretsUsedInArgOrEnv` | **niciun secret nu mai este `ARG`** |
+| Imagine | ~1.6 GB (toate devDependencies copiate în runner) | ~350–400 MB (stadiu `prod-deps` cu `bun install --production`) |
+| Utilizator | root | `1001:1001` |
+| Health check | absent | `HEALTHCHECK` în imagine, pe `/api/health`, cu `bun -e` |
+
+### De ce build-ul nu are nevoie de secrete
+
+Proiectul folosește exclusiv `$env/dynamic/private` (5 importuri, zero `$env/static/*`),
+deci orice valoare e citită din `process.env` **la runtime**. `getAuth()` din
+`src/lib/server/auth.ts` este **lazy**, iar `initAuth()` începe cu `if (building) return;`.
+Rezultatul: `bun run build` trece fără niciun secret, fără rețea și fără bază de date —
+verificat pe un checkout curat.
+
+În `Dockerfile` a rămas un singur `ENV` fictiv, `DATABASE_URL=postgres://localhost:5432/kogaion`.
+E o plasă de siguranță, nu o cerință: la `vite build` sunt evaluate ~35 module de rute,
+iar `src/lib/server/db/index.ts` cade **în tăcere** pe `localhost` când variabila lipsește.
+
+### Obligatoriu pe container — toate **Runtime**, niciuna build arg
+
+`DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET` (min. 32 caractere), `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`. Recomandat: `PUBLIC_SITE_URL`. Opțional: `SEED_ADMIN_SECRET`,
+`GA4_MEASUREMENT_ID`, `GA4_API_SECRET`.
+
+La pornire, `init` din `src/hooks.server.ts` le verifică și aruncă o eroare care le numește
+explicit pe cele lipsă — altfel `DATABASE_URL` lipsă cădea în tăcere pe
 `postgres://localhost:5432/kogaion` și site-ul ar arăta gol, fără nicio eroare.
+
+**`ORIGIN` merită atenție specială.** Fără el, adapter-node deduce origin-ul din headerele
+cererii cu protocolul hardcodat `https` — deci în spatele unui proxy HTTP toate POST-urile
+și form action-urile cad cu `403 Cross-site POST form submissions are forbidden`, fără
+nicio eroare la pornire. Cu `initAuth()` în cale, simptomul real e mai brutal: procesul moare
+cu `exit 1` la pornire, numind varianta lipsă. Crash-loop cu un mesaj care spune cauza e
+comportamentul dorit; un origin greșit care doar rupe POST-urile nu e.
+
+**Nu seta `NODE_ENV=development` în Coolify.** Dockerfile-ul pune deja
+`NODE_ENV=production` în stadiul runner; forțat la `development`, `/api/seed-admin` sare
+verificarea de secret și devine un endpoint deschis de escaladare de rol.
+
+### Migrările nu rulează în pipeline
+
+Dezintenționat, prin decizie. Un commit care adaugă o coloană ajunge live înainte ca baza să
+o aibă, și eșuează ca o eroare Postgres la runtime — de obicei pe un cod pe care nimeni nu
+l-a exersat. Pipeline-ul **verifică** migrările (`drizzle-kit check`), nu le aplică.
+Migrarea rămâne un pas operator, de mai jos, cu `DATABASE_URL`.
+
 
 ## Cont admin (doar Google)
 

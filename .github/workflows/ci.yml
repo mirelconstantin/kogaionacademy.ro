@@ -1,0 +1,628 @@
+## one workflow, one path
+##
+## GitHub Actions builds the image; Coolify pulls it. The server never compiles
+## anything -- see docs/ghcr-coolify/01-arhitectura.md. There is no flag anywhere in
+## this file that turns the build back on there: a missing condition must STOP the
+## deploy, not silently relocate the build to production.
+##
+## Job graph:
+##
+##   check  lint  schema      independent, run in parallel
+##        \                /
+##         \---- build ----/        the only job that runs vite build outside Docker
+##              |
+##              +---- image        push only. A pull request never writes to GHCR.
+##                    |
+##                    +---- deploy  manual, digest-pinned.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Publish the image and deploy it to Coolify (production)'
+        type: boolean
+        required: false
+        default: false
+
+## A pull request run has no side effects, so superseding one is pure saving. A push
+## run may be halfway through `docker push`; cancelling it there can leave the moving
+## tag pointing at a manifest no run ever finished publishing -- a silent rollback with
+## a green pipeline. Pushes queue instead.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Must match the bun version in the Dockerfile. Two bun versions across the build and
+  # the shipped image is a class of bug that only shows up in production.
+  BUN_VERSION: '1.3.14'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: svelte-check
+        run: bun run check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: prettier + eslint
+        run: bun run lint
+  schema:
+    name: Migrations are consistent
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      # `check` validates the committed migration files against each other and against
+      # drizzle/meta/_journal.json. It needs no DATABASE_URL and no database.
+      #
+      # Both flags are mandatory, and the reason is a trap: drizzle.config.ts declares no
+      # `out` key, so drizzle-kit check without --out dies with a message that names an
+      # AWS Data API driver this project does not use, and sends you looking in the wrong
+      # place entirely.
+      - name: drizzle-kit check
+        run: bunx drizzle-kit check --out ./drizzle --dialect postgresql
+
+      # NOT `drizzle-kit generate` as a drift gate. On this repository it currently emits
+      # a migration that CREATE TABLEs eight forms_* tables that already exist and
+      # re-ALTERs columns that 0008/0009/0010/0013 already applied: the snapshot chain and
+      # the SQL files have drifted apart. A drift gate built on `generate` would fail on a
+      # correct commit, and fix it by handing the operator a migration that cannot run.
+      # Read docs/DB_AND_ADMIN.md before changing this.
+  build:
+    needs: [check, lint, schema]
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      # NODE_ENV=production is load-bearing here for the same reason it is in the
+      # Dockerfile: paraglide only THROWS on a broken message file when NODE_ENV is
+      # production. Elsewhere it logs, and the build succeeds with missing translations.
+      - name: vite build
+        env:
+          NODE_ENV: production
+        run: bun run build
+      # The contract between vite build and the Dockerfile. Without these files the image
+      # builds perfectly and the container does not start, minutes after a fully green
+      # pipeline -- or starts and 404s every asset. Nothing downstream says so.
+      #
+      # build/server/index.js is 514 bytes of re-exports pulling in twelve chunks, which
+      # is why the whole build/ tree is asserted rather than a single entry file.
+      - name: Assert the artifact contract
+        run: |
+          set -euo pipefail
+          for f in build/index.js build/handler.js build/env.js build/shims.js build/server/index.js build/server/manifest.js build/server/chunks build/client; do
+            if [ ! -e "$f" ]; then
+              echo "::error::the build produced no $f"
+              exit 1
+            fi
+          done
+          echo 'artifact contract satisfied'
+
+      # Proves the route was compiled into the server, not merely present in src/. A
+      # health endpoint that silently vanished from the manifest would leave the image
+      # HEALTHCHECK failing at runtime with nothing to point at.
+      - name: Assert the health route is compiled in
+        run: |
+          set -euo pipefail
+          if ! grep -q 'api/health' build/server/manifest.js; then
+            echo '::error::api/health is not in the built route manifest'
+            exit 1
+          fi
+          echo 'api/health present in the route manifest'
+
+      # The runner stage installs `dependencies` only. That is safe because Vite
+      # externalises only `dependencies` into build/server, so everything imported from
+      # src/ out of devDependencies (drizzle-orm, postgres, better-auth, bits-ui,
+      # sveltekit-superforms, @lucide/svelte) is bundled into the server chunks instead.
+      #
+      # That is an assumption about a build, so it is re-derived on every run instead of
+      # being trusted. Move `marked` from `dependencies` to `devDependencies` and this
+      # fails here, naming the package, instead of the container reaching production and
+      # dying on ERR_MODULE_NOT_FOUND at the first request that needs it.
+      - name: Assert the runtime dependency contract
+        run: |
+          set -euo pipefail
+          cat > /tmp/dep-contract.cjs <<'EOF'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { builtinModules } = require('node:module');
+
+          const builtins = new Set(builtinModules.map((m) => m.replace(/^node:/, '')));
+          const specs = new Set();
+
+          /**
+           * Rollup emits every ESM import of a chunk as its own line, at the very top,
+           * before any code -- so the header region is exactly the set of real imports.
+           * Scanning whole files instead matches `from '...'` inside template literals and
+           * inside the JSDoc @import examples that bundled dependencies carry, which is how
+           * pg, mysql2 and kysely come to look like runtime dependencies of this app.
+           */
+          function headerOf(source) {
+            const header = [];
+            for (const line of source.split('\n')) {
+              const t = line.trim();
+              if (t === '' || t.startsWith('//')) { header.push(''); continue; }
+              if (!/^(import|export)\b/.test(t)) break;
+              header.push(line);
+            }
+            return header.join('\n');
+          }
+
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const file = path.join(dir, entry.name);
+              if (entry.isDirectory()) { walk(file); continue; }
+              if (!file.endsWith('.js')) continue;
+              const header = headerOf(fs.readFileSync(file, 'utf8'));
+              for (const m of header.matchAll(/\bfrom\s+['\"]([^'\"]+)['\"]/g)) specs.add(m[1]);
+              for (const m of header.matchAll(/\bimport\s+['\"]([^'\"]+)['\"]/g)) specs.add(m[1]);
+            }
+          }
+          walk('build/server');
+
+          const externals = [...specs]
+            .filter((s) => !s.startsWith('.') && !s.startsWith('/') && !s.startsWith('node:'))
+            .filter((s) => !builtins.has(s.split('/')[0]))
+            .sort();
+
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const declared = new Set(Object.keys(pkg.dependencies ?? {}));
+          const pkgName = (s) => (s.startsWith('@') ? s.split('/').slice(0, 2).join('/') : s.split('/')[0]);
+          const missing = externals.filter((s) => !declared.has(pkgName(s)));
+
+          console.log('external specifiers in the server bundle:');
+          for (const s of externals) console.log('  ' + s);
+          console.log('');
+          if (missing.length) {
+            console.log('MISSING from dependencies:');
+            for (const s of missing) console.log('  ' + s);
+            process.exit(1);
+          }
+          console.log('OK: every external specifier is a direct entry in dependencies');
+          EOF
+          bun /tmp/dep-contract.cjs
+
+      # Recorded, not enforced. static/ is ~235 MB of media and every kilobyte of it has
+      # to be pulled by the deploy host, so a sudden jump belongs in the run summary
+      # rather than in a slow deploy nobody understands.
+      - name: Report the artifact size
+        run: |
+          set -euo pipefail
+          total=$(du -sh build | cut -f1)
+          client=$(du -sh build/client | cut -f1)
+          server=$(du -sh build/server | cut -f1)
+          {
+            echo '### Build artifact'
+            echo
+            printf -- '- build/: %s\n' "$total"
+            printf -- '- build/client (static assets): %s\n' "$client"
+            printf -- '- build/server (compiled routes): %s\n' "$server"
+          } >> "$GITHUB_STEP_SUMMARY"
+          du -sh build build/client build/server
+
+  image:
+    name: Image (GHCR)
+    needs: [build]
+    # Runs on push AND on a manual dispatch -- and the second half is not optional.
+    # `deploy` requires `needs.image.result == 'success'`, while `github.event_name` is only
+    # ever one value, so gating `image` on `push` alone makes `deploy` unreachable dead code:
+    # on a dispatch the image job is skipped, on a push the deploy gate is false.
+    #
+    # A pull request still never runs it. A PR has no business writing to the registry, and
+    # letting it would mean a fork's workflow could push under this repository's name.
+    #
+    # A dispatch with `deploy` unchecked therefore means 'build and publish only', which is
+    # how you prepare a release without shipping it.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.ref.outputs.image }}
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # github.repository keeps its capitalisation and the OCI name must be lowercase, so
+      # pushing ghcr.io/mirelconstantin/KogaionAcademy.ro fails with 'repository name must
+      # be lowercase'. Normalised once, here, and used everywhere after that.
+      - name: Resolve the image reference
+        id: ref
+        run: |
+          set -euo pipefail
+          repo=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/${repo}" >> "$GITHUB_OUTPUT"
+          echo "GHCR image: ghcr.io/${repo}"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # A LABEL cannot run a command, so the timestamp has to be computed here.
+      - name: Stamp the build
+        id: stamp
+        run: echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Declared explicitly and singly. An image the deploy host cannot run fails at
+          # pull, in production, which is the worst possible place. linux/arm64 here would
+          # mean a QEMU-emulated build several times slower, for a platform this server
+          # never runs.
+          platforms: linux/amd64
+          tags: |
+            ${{ steps.ref.outputs.image }}:sha-${{ github.sha }}
+            ${{ steps.ref.outputs.image }}:${{ github.ref_name }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            IMAGE_CREATED=${{ steps.stamp.outputs.created }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.stamp.outputs.created }}
+          # `scope` is not optional: without it the literal default 'buildkit' is shared
+          # across every workflow and every branch in the repository. The dependency layer
+          # is byte-identical on every branch, so per-branch scopes would only duplicate
+          # it, and mode=max exports the whole .next-equivalent tree -- here build/, which
+          # is ~250 MB -- all of it drawing on the same 10 GB of repository quota. GitHub
+          # already limits cache access to the current and default branch, so the isolation
+          # a second scope would buy already exists.
+          #
+          # ignore-error is there because GitHub issues a read-only cache token for
+          # untrusted triggers, and the write fails AFTER the image is already published,
+          # with 'error writing layer blob'. A stale cache costs a slow build; a failed
+          # push costs the deploy.
+          cache-from: type=gha,scope=kogaion-image
+          cache-to: type=gha,mode=max,scope=kogaion-image,ignore-error=true
+          # The published digest is then the index digest rather than a single platform
+          # manifest. That is exactly what Coolify is pinned to and what docker inspect
+          # RepoDigests reports on the host, so the two are directly comparable.
+          provenance: mode=max
+      # This is the value a rollback targets and the value the deploy job compares
+      # against. It is written here to be READ LATER, not to be admired: without it
+      # recorded somewhere outside the log, 'what is running now?' has no answer.
+      - name: Record what was published
+        run: |
+          set -euo pipefail
+          {
+            echo '### Image published'
+            echo
+            echo '- repository: ${{ steps.ref.outputs.image }}'
+            echo '- sha: ${{ github.sha }}'
+            echo '- digest: ${{ steps.push.outputs.digest }}'
+            echo '- built: ${{ steps.stamp.outputs.created }}'
+            echo '- moving tag: ${{ steps.ref.outputs.image }}:${{ github.ref_name }}'
+            echo '- immutable tag: ${{ steps.ref.outputs.image }}:sha-${{ github.sha }}'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "published ${{ steps.push.outputs.digest }}"
+
+  deploy:
+    name: Deploy (Coolify)
+    needs: [build, image]
+    # `always()` here is the explicit form, and it matters: a job with `needs` gets an
+    # implicit success() condition ONLY when its `if` names no status function at all.
+    # Naming always() suppresses that implicit gate, so the explicit result checks below
+    # are what actually decide. Without the explicit checks a failed or cancelled need
+    # would simply skip the job silently instead of being reported.
+    #
+    # The explicit result checks are what make this correct in both directions. A
+    # superseded run must not deploy, and `cancelled` and `failure` both mean do not
+    # deploy, so a superseded run can never pull a tag nobody finished publishing.
+    #
+    # Production is delivered deliberately. A push to main builds and publishes; it does
+    # not ship. Reversing that on purpose is a decision, not a default.
+    if: >-
+      always() &&
+      needs.build.result == 'success' &&
+      needs.image.result == 'success' &&
+      github.event_name == 'workflow_dispatch' &&
+      inputs.deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    permissions:
+      contents: read
+    steps:
+      # Every step below repeats its own `env:` block. `env:` does not propagate from one
+      # step to the next, so a step that reads a variable set on an earlier one dies with
+      # an unbound-variable error under `set -u`, and the error names the variable rather
+      # than the mistake.
+      #
+      # Two secrets, and no repository variable at all:
+      #
+      #   KOGAION_DEPLOY_WEBHOOK  the copied URL from Configuration > Webhooks, which is
+      #                            already https://<panel>/api/v1/deploy?uuid=<uuid>&force=false
+      #   KOGAION_COOLIFY_TOKEN   an API token with read + write + deploy
+      #
+      # The panel root and the resource uuid are both derived from that one URL, so the
+      # uuid lives in exactly one place -- the link you copied out of the panel -- instead
+      # of in a link AND a variable that can drift apart.
+      #
+      # The token is NOT part of the URL, and cannot be. Coolify authenticates the deploy
+      # with an `Authorization: Bearer` header; the query string only identifies the target.
+      # A token in the URL would not authenticate, and it would leak into the run log, the
+      # panel's access log and anything that scrapes a URL. The panel's own docs are
+      # explicit: "The URL identifies the deployment target, but the Bearer token
+      # authorizes the action."
+      - name: Resolve the deploy target from the webhook URL
+        id: app
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.KOGAION_DEPLOY_WEBHOOK }}
+          COOLIFY_TOKEN: ${{ secrets.KOGAION_COOLIFY_TOKEN }}
+          IMAGE: ${{ needs.image.outputs.image }}
+          DIGEST: ${{ needs.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+
+          missing=""
+          [ -n "${DEPLOY_WEBHOOK:-}" ] || missing="${missing}KOGAION_DEPLOY_WEBHOOK (secret of the production environment) "
+          [ -n "${COOLIFY_TOKEN:-}" ]  || missing="${missing}KOGAION_COOLIFY_TOKEN (secret of the production environment) "
+          if [ -n "$missing" ]; then
+            echo "::error::missing: $missing"
+            exit 1
+          fi
+
+          # Pull the panel root and the uuid back out of the URL. Both patterns are anchored
+          # on the whole string, so a value that does not have the expected shape leaves the
+          # variable empty and is caught by the checks below -- rather than quietly
+          # producing a request to some other host.
+          COOLIFY_URL="$(printf '%s' "$DEPLOY_WEBHOOK" | sed -nE 's#^(https?://[^/]+)/api/v1/deploy\b.*#\1#p')"
+          APP_UUID="$(printf '%s' "$DEPLOY_WEBHOOK" | sed -nE 's#.*[?&]uuid=([A-Za-z0-9-]+).*#\1#p')"
+
+          if [ -z "$COOLIFY_URL" ]; then
+            echo "::error::KOGAION_DEPLOY_WEBHOOK is not a Coolify deploy URL"
+            echo "::error::expected https://<panel>/api/v1/deploy?uuid=<uuid>&force=false"
+            echo "::error::copy it again from the panel: Configuration > Webhooks > Deploy Webhook (auth required)"
+            exit 1
+          fi
+          # Coolify public ids are SHORT LOWERCASE ALPHANUMERIC strings (~26 characters,
+          # e.g. 319uac7occnbhmn7eui9h0wt) -- not the 36-character hex-with-dashes form of
+          # a UUIDv4. A length check copied from a UUID habit would reject every real id,
+          # so the shape is checked by character class and a generous upper bound instead.
+          if ! printf '%s' "$APP_UUID" | grep -qE '^[a-z0-9]{8,40}$'; then
+            echo "::error::the webhook URL carries no usable uuid: '$APP_UUID'"
+            echo "::error::expected the lowercase alphanumeric id Coolify puts in its own URLs, copied whole from the panel"
+            exit 1
+          fi
+
+          if ! printf '%s' "$DIGEST" | grep -qE '^sha256:[0-9a-f]{64}$'; then
+            echo "::error::the image job did not publish a well-formed digest: $DIGEST"
+            echo "::error::refusing to deploy an unidentifiable artifact"
+            exit 1
+          fi
+
+          echo "panel      $COOLIFY_URL"
+          echo "uuid       $APP_UUID"
+          echo "image      $IMAGE"
+          echo "digest     $DIGEST"
+
+          # Confirm the two secrets agree with each other BEFORE anything is written: the
+          # uuid comes from one secret and the token from the other, and a token that
+          # cannot see the resource is a 404 that reads exactly like a typo in the uuid.
+          # The diagnostics below tell those two apart.
+          code=$(curl -sS -o app.json -D headers.txt -w '%{http_code}' \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H 'Accept: application/json' \
+            "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" || true)
+
+          if [ "$code" != "200" ]; then
+            echo "::error::Coolify answered $code for GET /api/v1/applications/${APP_UUID}"
+            if grep -qi cf-mitigated headers.txt && grep -qi 'just a moment' app.json 2>/dev/null; then
+              echo "::error::Cloudflare intercepted the request; the token was never seen by Coolify"
+              echo "::error::a test from a laptop proves nothing here -- residential IPs pass and datacenter IPs do not"
+            elif [ "$code" = "401" ]; then
+              echo "::error::401 means KOGAION_COOLIFY_TOKEN is missing, wrong, expired or revoked"
+            elif [ "$code" = "403" ]; then
+              echo "::error::403 means API Access is OFF at Settings > Configuration > Advanced, or the runner IP is not in Allowed IPs for API Access (GitHub runner egress IPs are dynamic -- leave that field EMPTY)"
+            elif [ "$code" = "404" ]; then
+              echo "::error::404 means the token cannot see that resource. Check that the webhook URL was copied from THIS panel and that the token belongs to the same team"
+            elif [ "$code" = "000" ]; then
+              echo "::error::no HTTP response at all: TLS failure, DNS failure, or the panel has no certificate on this hostname yet"
+            fi
+            head -c 400 app.json 2>/dev/null; echo
+            exit 1
+          fi
+
+          # Print what it acted on. A deploy log that never names its target is a deploy log
+          # that cannot answer "what did this change?" six months later.
+          echo "-> $(jq -r '.name // "(unnamed)"' app.json)  $(jq -r '.fqdn // "(no domain)"' app.json)"
+          echo "currently pinned to: $(jq -r '.docker_registry_image_tag // "(none)"' app.json 2>/dev/null || echo '(unknown)')"
+
+          echo "APP_UUID=$APP_UUID" >> "$GITHUB_OUTPUT"
+          echo "COOLIFY_URL=$COOLIFY_URL" >> "$GITHUB_OUTPUT"
+
+      # Pin the resource to the DIGEST, not the moving tag.
+      #
+      # Coolify does run `docker compose pull` before every dockerimage deployment, so a
+      # tag would be re-resolved and usually correct. The failure it opens, though, is one
+      # the panel reports as SUCCESS: the registry CDN has not finished propagating the tag
+      # you just published, the pull resolves to the PREVIOUS manifest, the new container
+      # starts, the health check passes, and the old code is live. No red job, no red
+      # deployment. A digest cannot be stale -- there is nothing left to resolve. It costs
+      # one API call and removes the only silent path through this pipeline.
+      - name: Pin the resource to this build digest
+        env:
+          COOLIFY_URL: ${{ steps.app.outputs.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.KOGAION_COOLIFY_TOKEN }}
+          IMAGE: ${{ needs.image.outputs.image }}
+          DIGEST: ${{ needs.image.outputs.digest }}
+          APP_UUID: ${{ steps.app.outputs.APP_UUID }}
+        run: |
+          set -euo pipefail
+
+          # Coolify stores a digest as sha256-<64 hex> -- HYPHEN, no colon. generate_image_names()
+          # then turns it into image@sha256:<hex> in the compose file it writes. The registry
+          # reports the colon form; the panel stores the hyphen form. Confusing the two wastes
+          # an afternoon, so the conversion is done once, here.
+          hex=${DIGEST#sha256:}
+          pinned="sha256-${hex}"
+
+          # Only these two fields. `instant_deploy: true` would start the deployment from
+          # inside the PATCH and answer with just {uuid}, with no deployment_uuid to poll --
+          # the handle to the run would be gone. `build_pack` is not sent because its
+          # documented enum does not include dockerimage and validation may reject it.
+          payload=$(jq -nc --arg name "$IMAGE" --arg tag "$pinned" \
+            '{docker_registry_image_name: $name, docker_registry_image_tag: $tag}')
+
+          code=$(curl -sS -o patch.json -w '%{http_code}' -X PATCH \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            -d "$payload" \
+            "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" || true)
+
+          if [ "$code" != "200" ] && [ "$code" != "204" ]; then
+            echo "::error::the panel refused the PATCH (HTTP $code)"
+            head -c 400 patch.json; echo
+            echo "::error::nothing was pinned and no deployment was started; the resource is unchanged"
+            exit 1
+          fi
+          # Read back what the panel stored rather than trusting the 200. A silently
+          # ignored field name would leave the resource pinned to the previous digest
+          # forever, and every deploy would still look perfect. Stopping HERE means
+          # production is untouched; stopping after the deploy would not.
+          stored=$(curl -sS -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
+            | jq -r '.docker_registry_image_tag // ""')
+          echo "stored: $stored"
+          if [ "$stored" != "$pinned" ]; then
+            echo "::error::Coolify stored $stored after the PATCH, expected $pinned"
+            echo "::error::the write did not land. NO DEPLOYMENT WAS STARTED, so the resource is still serving what it served before"
+            echo "::error::check Configuration > General > Docker Registry in the panel, and whether a pipeline is reasserting its own tag"
+            exit 1
+          fi
+          echo "pinned to $pinned"
+      - name: Start the deployment and wait for it
+        env:
+          COOLIFY_URL: ${{ steps.app.outputs.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.KOGAION_COOLIFY_TOKEN }}
+          APP_UUID: ${{ steps.app.outputs.APP_UUID }}
+          DEPLOY_WEBHOOK: ${{ secrets.KOGAION_DEPLOY_WEBHOOK }}
+        run: |
+          set -euo pipefail
+
+          # The webhook URL is sent EXACTLY as copied, query string and all -- uuid and
+          # force=false included. Rebuilding it here would mean a second place where the
+          # target is written down, and the one thing a deploy link must not have is a
+          # second source of truth.
+          #
+          # force stays false, and that is not a choice: a deployment already in flight is
+          # queued behind rather than torn down and restarted. There is nothing being built
+          # here -- the image is already published -- so force would only add a way to
+          # interrupt a healthy container.
+          code=$(curl -sS -o deploy.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H 'Accept: application/json' \
+            "${DEPLOY_WEBHOOK}" || true)
+
+          if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+            echo "::error::the deploy endpoint answered $code"
+            head -c 400 deploy.json; echo
+            echo "::error::the pin DID land; only the deploy did not start, so nothing has changed yet"
+            exit 1
+          fi
+
+          # A 2xx here means ACCEPTED, not started, and not done. The panel answers 200
+          # with a message and no deployment at all -- which reads exactly like success.
+          # The uuid is NESTED, at deployments[0].deployment_uuid; reading it from the top
+          # level yields null and the wait below would have nothing to poll.
+          dep=$(jq -r '(.deployments // [])[0].deployment_uuid // empty' deploy.json 2>/dev/null || true)
+          if [ -z "$dep" ]; then
+            echo "::error::the panel accepted the deploy request but created no deployment"
+            echo "::error::do NOT re-run this job: a second run queues a second deployment"
+            echo "::error::check the Deployments tab in the panel for a run that started a moment ago"
+            head -c 400 deploy.json; echo
+            exit 1
+          fi
+          echo "deployment $dep"
+          # Wait, because a deployment that reports success and then fails during the
+          # pull is the worst outcome available: everyone has already been told the new
+          # build is live.
+          #
+          # The endpoint is /deployments/{uuid}, plural. The singular spelling 404s.
+          #
+          # Terminal states are exactly finished, failed and cancelled-by-user. There is
+          # no 'successful' and no 'cancelled' in this enum, and a poller waiting for
+          # 'successful' never exits -- it burns the whole timeout and reports a failure
+          # for a deployment that finished correctly. Anything unrecognised keeps polling
+          # until the timeout rather than being optimistically read as either outcome.
+          url="${COOLIFY_URL}/api/v1/deployments/${dep}"
+          deadline=$(( $(date +%s) + 900 ))
+          final=''
+          while :; do
+            body=$(curl -sS -H "Authorization: Bearer ${COOLIFY_TOKEN}" "$url" || echo '{}')
+            status=$(printf '%s' "$body" | jq -r '.status // "(no status field)"')
+            echo "t+$(( $(date +%s) - (deadline - 900) ))s  $status"
+
+            case "$status" in
+              finished)
+                final=finished
+                break
+                ;;
+              failed|cancelled-by-user)
+                final="$status"
+                break
+                ;;
+            esac
+
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              final=timed-out
+              break
+            fi
+            sleep 10
+          done
+
+          if [ "$final" != "finished" ]; then
+            echo "::error::the deployment ended with status $final"
+            echo "::error::the pin DID land, so the resource is configured for this build even though it may not be running from it"
+            echo "::error::read the deployment log in the panel: the failure of an image pull appears there and nowhere else"
+            echo "::error::an image-pull or build failure is visible in the Deployments log, not in the application logs"
+            exit 1
+          fi
+
+          echo "deployment finished"
+          echo "::notice::A finished deployment proves the panel ran, not what is answering requests. Confirm the digest with docs/ghcr-coolify/scripts/verify-deploy.sh"
