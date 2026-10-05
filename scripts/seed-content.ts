@@ -77,10 +77,10 @@ async function seed() {
 
 		const titleEn = msg(en, item.titleKey) || titleRo;
 		const ageEn = msg(en, item.ageKey) || ageRo;
-		const descEn = item.descriptionKey ? (msg(en, item.descriptionKey) || descRo) : null;
+		const descEn = item.descriptionKey ? msg(en, item.descriptionKey) || descRo : null;
 		const locationEn = msg(en, item.locationKey) || locationRo;
 		const datesEn = msg(en, item.datesKey) || datesRo;
-		const durationEn = item.durationKey ? (msg(en, item.durationKey) || durationRo) : null;
+		const durationEn = item.durationKey ? msg(en, item.durationKey) || durationRo : null;
 
 		await db
 			.insert(programLocale)

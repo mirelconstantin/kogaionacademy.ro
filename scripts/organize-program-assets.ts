@@ -21,7 +21,6 @@ const databaseUrl =
 const STATIC_DIR = join(process.cwd(), 'static');
 const PROGRAMS_BASE = '/media/uploads/programe';
 
-type ProgramRow = typeof program.$inferSelect;
 type ProgramSectionRow = typeof programSection.$inferSelect;
 
 type ProgramUrlRole =
@@ -80,7 +79,8 @@ function rewritePayloadUrls(value: unknown, urlMap: Map<string, string>): unknow
 
 function filenameForRole(folder: string, role: ProgramUrlRole): string {
 	if (role.kind === 'cover') return `${folder}-cover.webp`;
-	if (role.kind === 'gallery') return `${folder}-gallery-${String(role.index).padStart(2, '0')}.webp`;
+	if (role.kind === 'gallery')
+		return `${folder}-gallery-${String(role.index).padStart(2, '0')}.webp`;
 	return `${folder}-${sanitizeToken(role.section)}-${String(role.order).padStart(2, '0')}.webp`;
 }
 
@@ -221,4 +221,3 @@ main().catch((e) => {
 	console.error(e);
 	process.exit(1);
 });
-

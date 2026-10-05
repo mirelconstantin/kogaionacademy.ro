@@ -37,7 +37,11 @@
 
 	const initialContent = $derived(toEditorHtml(value));
 	const html = $derived.by(() => {
-		toolbarTick;
+		// `toolbarTick` is read for its side effect only: it is the reactive dependency
+		// that makes this derived recompute when the toolbar changes. `void` says that on
+		// purpose -- without it the line reads as dead code to every reviewer and to eslint,
+		// and deleting it silently breaks the recompute.
+		void toolbarTick;
 		return editor ? editor.getHTML() : initialContent;
 	});
 
@@ -52,11 +56,11 @@
 
 {#if browser}
 	<div class={`edra-form-field-shell ${mirrorClass}`} data-rich-editor="edra-default">
-		<input type="hidden" name={name} value={html} />
+		<input type="hidden" {name} value={html} />
 		{#if editor}
 			<EdraToolBar
-				editor={editor}
-				class="edra-toolbar edra-toolbar--shell flex w-full min-w-0 max-w-full flex-nowrap items-center gap-0 border-b border-border/70 bg-gradient-to-b from-muted/25 to-muted/40 px-2 py-2"
+				{editor}
+				class="edra-toolbar edra-toolbar--shell flex w-full max-w-full min-w-0 flex-nowrap items-center gap-0 border-b border-border/70 bg-gradient-to-b from-muted/25 to-muted/40 px-2 py-2"
 			/>
 		{/if}
 		<div class="min-h-[300px] px-4 py-4 sm:px-6 sm:py-5">
@@ -70,10 +74,10 @@
 	</div>
 {:else}
 	<textarea
-		name={name}
+		{name}
 		class="min-h-[280px] w-full rounded-xl border border-border bg-card px-3 py-2 text-sm shadow-sm"
 		readonly
-		placeholder="Editorul se încarcă..."
-	>{value || _placeholder}</textarea>
-	<input type="hidden" name={name} value={value} />
+		placeholder="Editorul se încarcă...">{value || _placeholder}</textarea
+	>
+	<input type="hidden" {name} {value} />
 {/if}

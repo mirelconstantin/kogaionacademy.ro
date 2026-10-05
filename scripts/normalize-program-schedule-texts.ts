@@ -85,7 +85,7 @@ function normalizeSchedule(
 	const baseDates = normalizeText(rawDatesText);
 	const baseDuration = normalizeText(rawDurationText);
 	const extracted = extractTrailingDuration(baseDates, baseDuration);
-	let dates = splitDateEntries(extracted.dates);
+	const dates = splitDateEntries(extracted.dates);
 	let durations = splitValues(extracted.duration);
 
 	if (dates.length > 1 && durations.length === 1) {
@@ -165,4 +165,3 @@ main().catch((error) => {
 	console.error(error);
 	process.exit(1);
 });
-

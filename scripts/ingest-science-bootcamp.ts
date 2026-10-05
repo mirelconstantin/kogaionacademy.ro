@@ -9,7 +9,13 @@ import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import sharp from 'sharp';
-import { mentor, program, programLocale, programMentor, programSection } from '../src/lib/server/db/schema';
+import {
+	mentor,
+	program,
+	programLocale,
+	programMentor,
+	programSection
+} from '../src/lib/server/db/schema';
 
 const databaseUrl =
 	process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('host:port')
@@ -292,9 +298,11 @@ function buildSectionPayloads(
 			sortOrder: 10,
 			payload: {
 				title: 'Înscriere',
-				intro: 'Înscrierea în tabăra Kogaion Science Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită pentru copilul dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine copilului dvs.\n\nOferte personalizate pentru grupuri de minim 5 copii.',
+				intro:
+					'Înscrierea în tabăra Kogaion Science Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită pentru copilul dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine copilului dvs.\n\nOferte personalizate pentru grupuri de minim 5 copii.',
 				steps: [],
-				contactNote: 'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci - consultant educațional)',
+				contactNote:
+					'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci - consultant educațional)',
 				buttons: [
 					{ label: 'Sună', type: 'tel', value: '0720529398' },
 					{ label: 'Cere detalii', type: 'link', href: '/contact' },

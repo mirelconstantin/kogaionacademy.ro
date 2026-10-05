@@ -17,13 +17,20 @@ async function main() {
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(body)
 	});
-	const data = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string; error?: string };
+	const data = (await res.json().catch(() => ({}))) as {
+		ok?: boolean;
+		message?: string;
+		error?: string;
+	};
 	if (!res.ok) {
 		console.error('Seed failed:', data.error ?? res.statusText);
 		process.exit(1);
 	}
 	if (data.ok === false) {
-		console.error(data.message ?? 'User not found. Log in with Google (pazalgroup@gmail.com) first, then run this again.');
+		console.error(
+			data.message ??
+				'User not found. Log in with Google (pazalgroup@gmail.com) first, then run this again.'
+		);
 		process.exit(1);
 	}
 	console.log(data.message ?? 'Admin seed OK.');

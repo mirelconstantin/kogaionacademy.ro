@@ -23,7 +23,11 @@ export const load: LayoutServerLoad = async (event) => {
 	if (blogMatch) {
 		const id = parseInt(blogMatch[1], 10);
 		if (!Number.isNaN(id)) {
-			const [post] = await db.select({ slug: blogPost.slug }).from(blogPost).where(eq(blogPost.id, id)).limit(1);
+			const [post] = await db
+				.select({ slug: blogPost.slug })
+				.from(blogPost)
+				.where(eq(blogPost.id, id))
+				.limit(1);
 			if (post) {
 				const base = contentHref('blog');
 				out.viewOnSite = { url: `${base}/${post.slug}`, label: 'Vezi articolul' };
@@ -32,7 +36,11 @@ export const load: LayoutServerLoad = async (event) => {
 	} else if (programMatch) {
 		const id = parseInt(programMatch[1], 10);
 		if (!Number.isNaN(id)) {
-			const [p] = await db.select({ slug: program.slug }).from(program).where(eq(program.id, id)).limit(1);
+			const [p] = await db
+				.select({ slug: program.slug })
+				.from(program)
+				.where(eq(program.id, id))
+				.limit(1);
 			if (p) {
 				const base = contentHref('programs');
 				out.viewOnSite = { url: `${base}/${p.slug}`, label: 'Vezi programul' };

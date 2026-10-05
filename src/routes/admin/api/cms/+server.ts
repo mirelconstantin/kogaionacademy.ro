@@ -513,14 +513,6 @@ export const PATCH: RequestHandler = async (event) => {
 			.from(heroSettings)
 			.where(eq(heroSettings.locale, locale))
 			.limit(1);
-		const allowed = [
-			'videoUrl',
-			'posterUrl',
-			'ctaPrimaryLabel',
-			'ctaPrimaryLink',
-			'ctaSecondaryLabel',
-			'ctaSecondaryLink'
-		] as const;
 		const merged = {
 			videoUrl: (payload.videoUrl as string | undefined) ?? existing?.videoUrl ?? '',
 			posterUrl: (payload.posterUrl as string | null | undefined) ?? existing?.posterUrl ?? null,

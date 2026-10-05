@@ -126,23 +126,36 @@
 <div class="space-y-6">
 	<div class="flex flex-wrap items-start justify-between gap-4">
 		<div>
-			<p class="text-xs font-medium uppercase text-muted-foreground">Formular</p>
+			<p class="text-xs font-medium text-muted-foreground uppercase">Formular</p>
 			<h1 class="text-2xl font-semibold tracking-tight">
 				{data.definition.title ?? data.definition.key}
 				<span class="ml-2 font-mono text-sm font-normal text-muted-foreground">
-					{data.definition.key} / {data.definition.locale} · v{data.definition.version} · {data.definition.status}
+					{data.definition.key} / {data.definition.locale} · v{data.definition.version} · {data
+						.definition.status}
 				</span>
 			</h1>
 		</div>
 		<div class="flex flex-wrap gap-2">
 			{#if canExport}
-				<Button variant="outline" class="rounded-none" href="/admin/forms/{data.definition.id}/export?format=csv">
+				<Button
+					variant="outline"
+					class="rounded-none"
+					href="/admin/forms/{data.definition.id}/export?format=csv"
+				>
 					Export CSV
 				</Button>
-				<Button variant="outline" class="rounded-none" href="/admin/forms/{data.definition.id}/export?format=xlsx">
+				<Button
+					variant="outline"
+					class="rounded-none"
+					href="/admin/forms/{data.definition.id}/export?format=xlsx"
+				>
 					Export XLSX
 				</Button>
-				<Button variant="outline" class="rounded-none" href="/admin/forms/{data.definition.id}/export?format=csv&mask=1">
+				<Button
+					variant="outline"
+					class="rounded-none"
+					href="/admin/forms/{data.definition.id}/export?format=csv&mask=1"
+				>
 					CSV mascat
 				</Button>
 			{/if}
@@ -203,9 +216,12 @@
 				<table class="w-max min-w-full border-collapse text-left text-sm">
 					<thead class="sticky top-0 z-10 bg-muted/90 backdrop-blur">
 						<tr>
-							<th class="border-b border-border px-3 py-2 font-medium whitespace-nowrap">Detalii</th>
+							<th class="border-b border-border px-3 py-2 font-medium whitespace-nowrap">Detalii</th
+							>
 							{#each dataCols as col (col)}
-								<th class="border-b border-border px-3 py-2 font-medium whitespace-nowrap">{colLabel(col)}</th>
+								<th class="border-b border-border px-3 py-2 font-medium whitespace-nowrap"
+									>{colLabel(col)}</th
+								>
 							{/each}
 						</tr>
 					</thead>
@@ -216,7 +232,9 @@
 								<td class="max-w-[18rem] px-3 py-2 align-top">
 									{#if d}
 										<details class="text-xs">
-											<summary class="cursor-pointer font-medium text-primary">Context trimitere</summary>
+											<summary class="cursor-pointer font-medium text-primary"
+												>Context trimitere</summary
+											>
 											<dl class="mt-2 space-y-2 text-muted-foreground">
 												<div>
 													<dt class="font-medium text-foreground">Pagină</dt>
@@ -232,7 +250,9 @@
 												</div>
 												<div>
 													<dt class="font-medium text-foreground">User-Agent (complet)</dt>
-													<dd class="max-h-24 overflow-auto break-all font-mono text-[10px]">{d.userAgentRaw}</dd>
+													<dd class="max-h-24 overflow-auto font-mono text-[10px] break-all">
+														{d.userAgentRaw}
+													</dd>
 												</div>
 												<div>
 													<dt class="font-medium text-foreground">UTM</dt>
@@ -246,14 +266,17 @@
 													<div>
 														<dt class="font-medium text-foreground">Consimțământ (detaliu JSON)</dt>
 														<dd>
-															<pre class="max-h-32 overflow-auto rounded border border-border bg-muted/40 p-2 font-mono text-[10px]">{d.consentJson}</pre>
+															<pre
+																class="max-h-32 overflow-auto rounded border border-border bg-muted/40 p-2 font-mono text-[10px]">{d.consentJson}</pre>
 														</dd>
 													</div>
 												{/if}
 												<div>
 													<dt class="font-medium text-foreground">Sesiune (amprentă)</dt>
 													<dd class="font-mono text-[10px]">{d.sessionShort}</dd>
-													<dd class="mt-1 break-all font-mono text-[10px] text-muted-foreground">{d.sessionFull}</dd>
+													<dd class="mt-1 font-mono text-[10px] break-all text-muted-foreground">
+														{d.sessionFull}
+													</dd>
 												</div>
 												<div>
 													<dt class="font-medium text-foreground">Utilizator autentificat</dt>
@@ -261,7 +284,7 @@
 												</div>
 												<div>
 													<dt class="font-medium text-foreground">Cheie idempotență</dt>
-													<dd class="break-all font-mono text-[10px]">{d.idempotencyKey}</dd>
+													<dd class="font-mono text-[10px] break-all">{d.idempotencyKey}</dd>
 												</div>
 											</dl>
 										</details>
@@ -286,7 +309,7 @@
 	{:else if tab === 'analytics'}
 		<div class="grid gap-6 lg:grid-cols-3">
 			<div class="border border-border bg-card p-4 lg:col-span-1">
-				<p class="text-xs font-medium uppercase text-muted-foreground">30 zile</p>
+				<p class="text-xs font-medium text-muted-foreground uppercase">30 zile</p>
 				<p class="mt-2 text-3xl font-semibold">{data.kpi.views}</p>
 				<p class="text-sm text-muted-foreground">Vizualizări formular (evenimente)</p>
 				<p class="mt-4 text-3xl font-semibold">{data.kpi.submits}</p>
@@ -345,11 +368,14 @@
 		</div>
 	{:else if tab === 'design'}
 		<p class="text-sm text-muted-foreground">
-			Stânga: builder (drag & drop). Dreapta: previzualizare ca pe site (fără trimitere, fără tracking). Modificările
-			nesalvate apar imediat în preview.
+			Stânga: builder (drag & drop). Dreapta: previzualizare ca pe site (fără trimitere, fără
+			tracking). Modificările nesalvate apar imediat în preview.
 			{#if data.definition.key === 'contact'}
-				<a class="ml-1 font-medium text-foreground underline" href="/contact" target="_blank" rel="noreferrer"
-					>Pagina publică Contact</a
+				<a
+					class="ml-1 font-medium text-foreground underline"
+					href="/contact"
+					target="_blank"
+					rel="noreferrer">Pagina publică Contact</a
 				>
 			{/if}
 		</p>
@@ -363,11 +389,15 @@
 
 			<div class="grid gap-8 lg:grid-cols-2 lg:items-start">
 				<div class="min-w-0 space-y-4">
-					<h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Structură câmpuri</h2>
-					<FormBuilder bind:schema={workingSchema} serverSyncKey={serverSyncKey} />
+					<h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+						Structură câmpuri
+					</h2>
+					<FormBuilder bind:schema={workingSchema} {serverSyncKey} />
 				</div>
 				<div class="min-w-0 space-y-4 lg:sticky lg:top-24">
-					<h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Previzualizare</h2>
+					<h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+						Previzualizare
+					</h2>
 					<div class="border border-border bg-card p-4 shadow-sm">
 						<FormRenderer
 							mode="preview"
@@ -390,8 +420,8 @@
 		<div class="mt-8 space-y-3 border-t border-border pt-6">
 			<p class="text-sm font-medium">Istoric salvări (ultimele {data.revisions.length})</p>
 			<p class="text-xs text-muted-foreground">
-				La fiecare salvare se păstrează un snapshot; poți restaura o versiune anterioară (se creează și un nou punct în
-				istoric).
+				La fiecare salvare se păstrează un snapshot; poți restaura o versiune anterioară (se creează
+				și un nou punct în istoric).
 			</p>
 			{#if data.revisions.length === 0}
 				<p class="text-sm text-muted-foreground">Nu există încă revizii.</p>
@@ -418,7 +448,9 @@
 								}}
 							>
 								<input type="hidden" name="revisionId" value={rev.id} />
-								<Button type="submit" variant="outline" size="sm" class="rounded-none">Restaurează</Button>
+								<Button type="submit" variant="outline" size="sm" class="rounded-none"
+									>Restaurează</Button
+								>
 							</form>
 						</li>
 					{/each}
@@ -426,11 +458,19 @@
 			{/if}
 		</div>
 
-		<form method="POST" action="?/publish" use:enhance class="mt-6 border border-dashed border-border p-4">
+		<form
+			method="POST"
+			action="?/publish"
+			use:enhance
+			class="mt-6 border border-dashed border-border p-4"
+		>
 			<p class="text-sm text-muted-foreground">
-				Publică o nouă versiune: arhivează vechiul „publicat”, incrementează versiunea pentru acest rând.
+				Publică o nouă versiune: arhivează vechiul „publicat”, incrementează versiunea pentru acest
+				rând.
 			</p>
-			<Button type="submit" class="mt-3 rounded-none" variant="secondary">Publică versiune nouă</Button>
+			<Button type="submit" class="mt-3 rounded-none" variant="secondary"
+				>Publică versiune nouă</Button
+			>
 		</form>
 	{/if}
 </div>

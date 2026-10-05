@@ -2,7 +2,9 @@ import type { FormSchemaV1 } from '$lib/forms/types';
 
 const KEY_RE = /^[a-z][a-z0-9_]*$/;
 
-export function validateFormSchemaFields(schema: FormSchemaV1): { ok: true } | { ok: false; message: string } {
+export function validateFormSchemaFields(
+	schema: FormSchemaV1
+): { ok: true } | { ok: false; message: string } {
 	if (!schema.fields?.length) {
 		return { ok: false, message: 'Adaugă cel puțin un câmp.' };
 	}

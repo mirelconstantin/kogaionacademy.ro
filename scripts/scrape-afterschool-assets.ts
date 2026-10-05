@@ -19,17 +19,18 @@ async function main() {
 
 	// Extract gallery slideshow images: section between "Galerie foto" / "galerie" and "Transport"
 	const gallerySection =
-		html.match(
-			/Galerie foto[\s\S]*?<\/h2>([\s\S]*?)(?=<h2[^>]*>Transport|<section|$)/i
-		)?.[1] ?? '';
+		html.match(/Galerie foto[\s\S]*?<\/h2>([\s\S]*?)(?=<h2[^>]*>Transport|<section|$)/i)?.[1] ?? '';
 	const galleryImageUrls: string[] = [];
-	const galleryImgRe = /(?:href|src|data-src)=["'](https?:\/\/[^"']*wp-content\/uploads[^"']+)["']/gi;
+	const galleryImgRe =
+		/(?:href|src|data-src)=["'](https?:\/\/[^"']*wp-content\/uploads[^"']+)["']/gi;
 	while ((m = galleryImgRe.exec(gallerySection)) !== null) {
 		const url = m[1].replace(/-\d+x\d+\./, '.').replace(/\?.*$/, '');
-		if (!galleryImageUrls.includes(url) && !url.includes('cropped-icon')) galleryImageUrls.push(url);
+		if (!galleryImageUrls.includes(url) && !url.includes('cropped-icon'))
+			galleryImageUrls.push(url);
 	}
 	// Fallback: use all non-mentor images if gallery extraction yields few
-	const mentorPattern = /(Poza-Diana|Rodica-Bealcu|Iulian-Glita|Andreea-Draghici|Gabriel-Esanu|Andreea-Faur|Anca-Muicu|Vladimir-Stefanescu|Dumitru-Badila|Nicolae-Cruceru|Constantin-Caprioreanu|Christopher-Hermann|Flavian-Glont|Carlos-Catana)/i;
+	const mentorPattern =
+		/(Poza-Diana|Rodica-Bealcu|Iulian-Glita|Andreea-Draghici|Gabriel-Esanu|Andreea-Faur|Anca-Muicu|Vladimir-Stefanescu|Dumitru-Badila|Nicolae-Cruceru|Constantin-Caprioreanu|Christopher-Hermann|Flavian-Glont|Carlos-Catana)/i;
 	const slideshowImages =
 		galleryImageUrls.length >= 20
 			? galleryImageUrls

@@ -17,9 +17,7 @@ async function main() {
 	}
 	fs.mkdirSync(destDir, { recursive: true });
 
-	await sharp(srcPath)
-		.webp({ alphaQuality: 100, lossless: false, quality: 90 })
-		.toFile(destPath);
+	await sharp(srcPath).webp({ alphaQuality: 100, lossless: false, quality: 90 }).toFile(destPath);
 
 	console.log('Logo convertit cu succes:', destPath);
 }

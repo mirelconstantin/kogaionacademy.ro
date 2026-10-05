@@ -60,7 +60,8 @@ export function formatConsentSnapshot(snapshot: unknown): { line: string; json: 
 	const parts: string[] = [];
 	if (typeof o.analytics === 'boolean') parts.push(`analiză: ${o.analytics ? 'da' : 'nu'}`);
 	if (typeof o.marketing === 'boolean') parts.push(`marketing: ${o.marketing ? 'da' : 'nu'}`);
-	if (typeof o.personalization === 'boolean') parts.push(`personalizare: ${o.personalization ? 'da' : 'nu'}`);
+	if (typeof o.personalization === 'boolean')
+		parts.push(`personalizare: ${o.personalization ? 'da' : 'nu'}`);
 	if (typeof o.updatedAt === 'string' && o.updatedAt) {
 		try {
 			parts.push(`actualizat: ${new Date(o.updatedAt).toLocaleString('ro-RO')}`);

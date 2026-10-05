@@ -11,7 +11,9 @@
 	const ALL_USERS_VALUE = '__all__';
 	let expandedId = $state<number | null>(null);
 	let selectedUser = $state<string>(INITIAL_USER_VALUE);
-	const effectiveUser = $derived(selectedUser === INITIAL_USER_VALUE ? (data.filters.userName ?? '') : selectedUser);
+	const effectiveUser = $derived(
+		selectedUser === INITIAL_USER_VALUE ? (data.filters.userName ?? '') : selectedUser
+	);
 	const selectValue = $derived(effectiveUser || ALL_USERS_VALUE);
 
 	const PAGE_LABELS: Record<string, string> = {
@@ -86,14 +88,14 @@
 
 	function humanTitle(entry: Entry): string {
 		const label = data.entityLabels[entry.entityType] ?? entry.entityType;
-	const specificSummary = explainAdminAction(entry);
-	if (specificSummary) return specificSummary;
+		const specificSummary = explainAdminAction(entry);
+		if (specificSummary) return specificSummary;
 		if (entry.entityType === 'admin_action') return `Acțiune administrativă: ${entry.entityId}`;
 		if (entry.entityType === 'cms') return `Acțiune CMS: ${entry.entityId}`;
 		if (entry.entityType === 'media') return `Acțiune media: ${entry.entityId}`;
 		if (entry.entityType === 'media_metadata') return `Metadate media: ${entry.entityId}`;
 		if (entry.entityType === 'site_section') {
-			const [page, section, locale] = entry.entityId.split(':');
+			const [page, section] = entry.entityId.split(':');
 			const pageName = PAGE_LABELS[page] ?? page;
 			return `Secțiunea „${section ?? '—'}” a paginii ${pageName}`;
 		}
@@ -114,238 +116,250 @@
 	}
 
 	function toDisplayStr(v: unknown): string {
-	if (v == null) return '—';
-	if (typeof v === 'boolean') return v ? 'Da' : 'Nu';
-	if (typeof v === 'number' || typeof v === 'bigint') return String(v);
-	if (typeof v === 'string') {
-		const trimmed = v.trim();
-		if (!trimmed) return '—';
-		if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(trimmed)) {
-			const dt = new Date(trimmed);
-			if (!Number.isNaN(dt.getTime())) return formatDate(dt);
+		if (v == null) return '—';
+		if (typeof v === 'boolean') return v ? 'Da' : 'Nu';
+		if (typeof v === 'number' || typeof v === 'bigint') return String(v);
+		if (typeof v === 'string') {
+			const trimmed = v.trim();
+			if (!trimmed) return '—';
+			if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(trimmed)) {
+				const dt = new Date(trimmed);
+				if (!Number.isNaN(dt.getTime())) return formatDate(dt);
+			}
+			return trimmed;
 		}
-		return trimmed;
-	}
-	if (Array.isArray(v)) {
-		if (v.length === 0) return '—';
-		if (v.every((item) => item == null || ['string', 'number', 'boolean'].includes(typeof item))) {
-			return v.map((item) => toDisplayStr(item)).join(', ');
+		if (Array.isArray(v)) {
+			if (v.length === 0) return '—';
+			if (
+				v.every((item) => item == null || ['string', 'number', 'boolean'].includes(typeof item))
+			) {
+				return v.map((item) => toDisplayStr(item)).join(', ');
+			}
+			return `[${v.length} elemente]`;
 		}
-		return `[${v.length} elemente]`;
-	}
-	return '[obiect]';
+		return '[obiect]';
 	}
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
+	function isPlainObject(value: unknown): value is Record<string, unknown> {
+		return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+	}
 
-function equalValue(a: unknown, b: unknown): boolean {
-	if (a === b) return true;
-	if (typeof a === 'string' && typeof b === 'string') return a.trim() === b.trim();
-	return false;
-}
+	function equalValue(a: unknown, b: unknown): boolean {
+		if (a === b) return true;
+		if (typeof a === 'string' && typeof b === 'string') return a.trim() === b.trim();
+		return false;
+	}
 
-function flattenDiff(before: unknown, after: unknown, prefix = ''): DiffRow[] {
+	function flattenDiff(before: unknown, after: unknown, prefix = ''): DiffRow[] {
 		const rows: DiffRow[] = [];
 
-	if (isPlainObject(before) || isPlainObject(after)) {
-		const beforeObj = isPlainObject(before) ? before : {};
-		const afterObj = isPlainObject(after) ? after : {};
-		const keys = new Set([...Object.keys(beforeObj), ...Object.keys(afterObj)]);
-		for (const key of keys) {
-			const nextPrefix = prefix ? `${prefix}.${key}` : key;
-			rows.push(...flattenDiff(beforeObj[key], afterObj[key], nextPrefix));
-		}
-		return rows;
-	}
-
-	if (Array.isArray(before) || Array.isArray(after)) {
-		const beforeArr = Array.isArray(before) ? before : [];
-		const afterArr = Array.isArray(after) ? after : [];
-		const primitiveOnly = [...beforeArr, ...afterArr].every(
-			(item) => item == null || ['string', 'number', 'boolean'].includes(typeof item)
-		);
-		if (primitiveOnly) {
-			const beforeText = toDisplayStr(beforeArr);
-			const afterText = toDisplayStr(afterArr);
-			if (beforeText !== afterText) {
-				rows.push({ field: prefix || 'valoare', before: beforeText, after: afterText });
+		if (isPlainObject(before) || isPlainObject(after)) {
+			const beforeObj = isPlainObject(before) ? before : {};
+			const afterObj = isPlainObject(after) ? after : {};
+			const keys = new Set([...Object.keys(beforeObj), ...Object.keys(afterObj)]);
+			for (const key of keys) {
+				const nextPrefix = prefix ? `${prefix}.${key}` : key;
+				rows.push(...flattenDiff(beforeObj[key], afterObj[key], nextPrefix));
 			}
 			return rows;
 		}
-		if (beforeArr.length !== afterArr.length) {
-			rows.push({
-				field: prefix || 'valoare',
-				before: `${beforeArr.length} elemente`,
-				after: `${afterArr.length} elemente`
-			});
+
+		if (Array.isArray(before) || Array.isArray(after)) {
+			const beforeArr = Array.isArray(before) ? before : [];
+			const afterArr = Array.isArray(after) ? after : [];
+			const primitiveOnly = [...beforeArr, ...afterArr].every(
+				(item) => item == null || ['string', 'number', 'boolean'].includes(typeof item)
+			);
+			if (primitiveOnly) {
+				const beforeText = toDisplayStr(beforeArr);
+				const afterText = toDisplayStr(afterArr);
+				if (beforeText !== afterText) {
+					rows.push({ field: prefix || 'valoare', before: beforeText, after: afterText });
+				}
+				return rows;
+			}
+			if (beforeArr.length !== afterArr.length) {
+				rows.push({
+					field: prefix || 'valoare',
+					before: `${beforeArr.length} elemente`,
+					after: `${afterArr.length} elemente`
+				});
+			}
+			const maxLen = Math.max(beforeArr.length, afterArr.length);
+			for (let i = 0; i < maxLen; i += 1) {
+				const nextPrefix = `${prefix}[${i + 1}]`;
+				rows.push(...flattenDiff(beforeArr[i], afterArr[i], nextPrefix));
+			}
+			return rows;
 		}
-		const maxLen = Math.max(beforeArr.length, afterArr.length);
-		for (let i = 0; i < maxLen; i += 1) {
-			const nextPrefix = `${prefix}[${i + 1}]`;
-			rows.push(...flattenDiff(beforeArr[i], afterArr[i], nextPrefix));
-		}
+
+		if (equalValue(before, after)) return rows;
+		rows.push({
+			field: prefix || 'valoare',
+			before: toDisplayStr(before),
+			after: toDisplayStr(after)
+		});
 		return rows;
 	}
 
-	if (equalValue(before, after)) return rows;
-	rows.push({
-		field: prefix || 'valoare',
-		before: toDisplayStr(before),
-		after: toDisplayStr(after)
-	});
-	return rows;
-}
+	function fieldDiff(entry: Entry): DiffRow[] {
+		const before = entry.payloadBefore as unknown;
+		const after = entry.payloadAfter as unknown;
+		const rows = flattenDiff(before, after);
+		return rows.filter((row) => row.before !== row.after);
+	}
 
-function fieldDiff(entry: Entry): DiffRow[] {
-	const before = entry.payloadBefore as unknown;
-	const after = entry.payloadAfter as unknown;
-	const rows = flattenDiff(before, after);
-	return rows.filter((row) => row.before !== row.after);
-}
-
-function formatDiffField(fieldPath: string): string {
-	const parts = fieldPath.split('.');
-	const pretty = parts.map((part) => {
-		const [base, indexPart] = part.split('[');
-		const label = fieldLabel(base);
-		if (!indexPart) return label;
-		return `${label} [${indexPart}`;
-	});
-	return pretty.join(' → ');
-}
+	function formatDiffField(fieldPath: string): string {
+		const parts = fieldPath.split('.');
+		const pretty = parts.map((part) => {
+			const [base, indexPart] = part.split('[');
+			const label = fieldLabel(base);
+			if (!indexPart) return label;
+			return `${label} [${indexPart}`;
+		});
+		return pretty.join(' → ');
+	}
 
 	function getActionPayload(entry: Entry): ActionPayload | null {
 		if (!entry.payloadAfter || typeof entry.payloadAfter !== 'object') return null;
 		const payload = entry.payloadAfter as Record<string, unknown>;
-		if (!('summary' in payload) && !('method' in payload) && !('pathname' in payload) && !('status' in payload)) return null;
+		if (
+			!('summary' in payload) &&
+			!('method' in payload) &&
+			!('pathname' in payload) &&
+			!('status' in payload)
+		)
+			return null;
 		return payload as ActionPayload;
 	}
 
-function getPathPart(pathname: string, index: number): string | null {
-	const parts = pathname.split('/').filter(Boolean);
-	return parts[index] ?? null;
-}
+	function getPathPart(pathname: string, index: number): string | null {
+		const parts = pathname.split('/').filter(Boolean);
+		return parts[index] ?? null;
+	}
 
-function getSearchParam(actionPayload: ActionPayload | null, key: string): string | null {
-	if (!actionPayload?.searchParams) return null;
-	const value = actionPayload.searchParams[key];
-	return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
-}
+	function getSearchParam(actionPayload: ActionPayload | null, key: string): string | null {
+		if (!actionPayload?.searchParams) return null;
+		const value = actionPayload.searchParams[key];
+		return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+	}
 
-function localeLabel(locale: string | null): string {
-	if (locale === 'ro') return 'RO';
-	if (locale === 'en') return 'EN';
-	return '—';
-}
+	function localeLabel(locale: string | null): string {
+		if (locale === 'ro') return 'RO';
+		if (locale === 'en') return 'EN';
+		return '—';
+	}
 
-function shortMediaName(url: string): string {
-	const clean = url.split('?')[0] ?? url;
-	const file = clean.split('/').filter(Boolean).at(-1) ?? clean;
-	return decodeURIComponent(file);
-}
+	function shortMediaName(url: string): string {
+		const clean = url.split('?')[0] ?? url;
+		const file = clean.split('/').filter(Boolean).at(-1) ?? clean;
+		return decodeURIComponent(file);
+	}
 
-function explainCmsApiAction(actionPayload: ActionPayload): string | null {
-	if (actionPayload.pathname !== '/admin/api/cms') return null;
-	const type = getSearchParam(actionPayload, 'type');
-	if (type === 'section') {
-		const page = getSearchParam(actionPayload, 'page');
-		const section = getSearchParam(actionPayload, 'section');
-		const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
-		const pageName = page ? (PAGE_LABELS[page] ?? page) : 'pagina';
-		return `A salvat secțiunea „${section ?? '—'}” din pagina ${pageName} (${locale})`;
-	}
-	if (type === 'program_section') {
-		const programId = getSearchParam(actionPayload, 'programId');
-		const section = getSearchParam(actionPayload, 'section');
-		const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
-		return `A salvat secțiunea „${section ?? '—'}” pentru programul #${programId ?? '—'} (${locale})`;
-	}
-	if (type === 'program') {
-		const id = getSearchParam(actionPayload, 'id');
-		return `A salvat detaliile programului #${id ?? '—'}`;
-	}
-	if (type === 'mentor') {
-		const id = getSearchParam(actionPayload, 'id');
-		return `A salvat detaliile mentorului #${id ?? '—'}`;
-	}
-	if (type === 'hero') {
-		const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
-		return `A salvat setările Hero (${locale})`;
-	}
-	if (type === 'blog') {
-		const id = getSearchParam(actionPayload, 'id');
-		return `A salvat articolul de blog #${id ?? '—'}`;
-	}
-	return 'A salvat modificări în CMS';
-}
-
-function explainAdminAction(entry: Entry): string | null {
-	const actionPayload = getActionPayload(entry);
-	if (!actionPayload) return null;
-	const pathname = actionPayload.pathname ?? '';
-	const actionKey = actionPayload.actionKey ?? null;
-
-	if (pathname.startsWith('/admin/api/media/delete')) {
-		const url = getSearchParam(actionPayload, 'url');
-		if (url) return `A șters fișierul media „${shortMediaName(url)}”`;
-		return 'A șters un fișier media';
-	}
-	if (pathname.startsWith('/admin/api/media/replace')) {
-		const url = getSearchParam(actionPayload, 'url');
-		if (url) return `A înlocuit fișierul media „${shortMediaName(url)}”`;
-		return 'A înlocuit un fișier media';
-	}
-	if (pathname.startsWith('/admin/api/media/metadata')) {
-		const url = getSearchParam(actionPayload, 'url');
-		if (url) return `A actualizat metadatele pentru „${shortMediaName(url)}”`;
-		return 'A actualizat metadate media';
-	}
-	if (pathname.startsWith('/admin/api/media/upload')) {
-		return 'A încărcat un fișier media nou';
-	}
-	if (pathname.startsWith('/admin/api/contact/socials')) {
-		const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
-		return `A actualizat linkurile sociale pentru limba ${locale}`;
-	}
-	if (pathname === '/admin/settings') {
-		if (actionKey === 'updateProfile') return 'A actualizat profilul contului';
-		if (actionKey === 'revokeSession') return 'A revocat o sesiune activă';
-		if (actionKey === 'revokeOtherSessions') return 'A revocat toate celelalte sesiuni';
-	}
-	if (pathname === '/admin/login' || pathname === '/login') {
-		if (actionKey === 'signOut') return 'S-a deconectat';
-	}
-	if (pathname.startsWith('/admin/blog/new') && actionKey === 'create') {
-		return 'A creat un articol nou pe blog';
-	}
-	if (pathname.startsWith('/admin/blog/')) {
-		const blogId = getPathPart(pathname, 2);
-		const articleTitle = blogId ? data.blogTitles?.[blogId] : null;
-		if (actionKey === 'delete') {
-			if (articleTitle) return `A șters articolul „${articleTitle}”`;
-			return `A șters articolul de blog #${blogId ?? '—'}`;
+	function explainCmsApiAction(actionPayload: ActionPayload): string | null {
+		if (actionPayload.pathname !== '/admin/api/cms') return null;
+		const type = getSearchParam(actionPayload, 'type');
+		if (type === 'section') {
+			const page = getSearchParam(actionPayload, 'page');
+			const section = getSearchParam(actionPayload, 'section');
+			const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
+			const pageName = page ? (PAGE_LABELS[page] ?? page) : 'pagina';
+			return `A salvat secțiunea „${section ?? '—'}” din pagina ${pageName} (${locale})`;
 		}
-		if (actionKey === 'save') {
-			if (articleTitle) return `A actualizat articolul „${articleTitle}”`;
-			return `A actualizat articolul de blog #${blogId ?? '—'}`;
+		if (type === 'program_section') {
+			const programId = getSearchParam(actionPayload, 'programId');
+			const section = getSearchParam(actionPayload, 'section');
+			const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
+			return `A salvat secțiunea „${section ?? '—'}” pentru programul #${programId ?? '—'} (${locale})`;
 		}
+		if (type === 'program') {
+			const id = getSearchParam(actionPayload, 'id');
+			return `A salvat detaliile programului #${id ?? '—'}`;
+		}
+		if (type === 'mentor') {
+			const id = getSearchParam(actionPayload, 'id');
+			return `A salvat detaliile mentorului #${id ?? '—'}`;
+		}
+		if (type === 'hero') {
+			const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
+			return `A salvat setările Hero (${locale})`;
+		}
+		if (type === 'blog') {
+			const id = getSearchParam(actionPayload, 'id');
+			return `A salvat articolul de blog #${id ?? '—'}`;
+		}
+		return 'A salvat modificări în CMS';
 	}
-	const cmsMessage = explainCmsApiAction(actionPayload);
-	if (cmsMessage) return cmsMessage;
 
-	if (actionPayload.summary) return actionPayload.summary;
-	return null;
-}
+	function explainAdminAction(entry: Entry): string | null {
+		const actionPayload = getActionPayload(entry);
+		if (!actionPayload) return null;
+		const pathname = actionPayload.pathname ?? '';
+		const actionKey = actionPayload.actionKey ?? null;
 
-function isExplicitActionText(text: string): boolean {
-	return /^(A |S-a )/.test(text.trim());
-}
+		if (pathname.startsWith('/admin/api/media/delete')) {
+			const url = getSearchParam(actionPayload, 'url');
+			if (url) return `A șters fișierul media „${shortMediaName(url)}”`;
+			return 'A șters un fișier media';
+		}
+		if (pathname.startsWith('/admin/api/media/replace')) {
+			const url = getSearchParam(actionPayload, 'url');
+			if (url) return `A înlocuit fișierul media „${shortMediaName(url)}”`;
+			return 'A înlocuit un fișier media';
+		}
+		if (pathname.startsWith('/admin/api/media/metadata')) {
+			const url = getSearchParam(actionPayload, 'url');
+			if (url) return `A actualizat metadatele pentru „${shortMediaName(url)}”`;
+			return 'A actualizat metadate media';
+		}
+		if (pathname.startsWith('/admin/api/media/upload')) {
+			return 'A încărcat un fișier media nou';
+		}
+		if (pathname.startsWith('/admin/api/contact/socials')) {
+			const locale = localeLabel(getSearchParam(actionPayload, 'locale'));
+			return `A actualizat linkurile sociale pentru limba ${locale}`;
+		}
+		if (pathname === '/admin/settings') {
+			if (actionKey === 'updateProfile') return 'A actualizat profilul contului';
+			if (actionKey === 'revokeSession') return 'A revocat o sesiune activă';
+			if (actionKey === 'revokeOtherSessions') return 'A revocat toate celelalte sesiuni';
+		}
+		if (pathname === '/admin/login' || pathname === '/login') {
+			if (actionKey === 'signOut') return 'S-a deconectat';
+		}
+		if (pathname.startsWith('/admin/blog/new') && actionKey === 'create') {
+			return 'A creat un articol nou pe blog';
+		}
+		if (pathname.startsWith('/admin/blog/')) {
+			const blogId = getPathPart(pathname, 2);
+			const articleTitle = blogId ? data.blogTitles?.[blogId] : null;
+			if (actionKey === 'delete') {
+				if (articleTitle) return `A șters articolul „${articleTitle}”`;
+				return `A șters articolul de blog #${blogId ?? '—'}`;
+			}
+			if (actionKey === 'save') {
+				if (articleTitle) return `A actualizat articolul „${articleTitle}”`;
+				return `A actualizat articolul de blog #${blogId ?? '—'}`;
+			}
+		}
+		const cmsMessage = explainCmsApiAction(actionPayload);
+		if (cmsMessage) return cmsMessage;
+
+		if (actionPayload.summary) return actionPayload.summary;
+		return null;
+	}
+
+	function isExplicitActionText(text: string): boolean {
+		return /^(A |S-a )/.test(text.trim());
+	}
 
 	function queryString(overrides: { page?: number; user?: string } = {}): string {
 		const p = overrides.page ?? data.page;
 		const u = overrides.user !== undefined ? overrides.user : data.filters.userName;
+		// Not reactive state: this is built, filled and stringified inside one
+		// synchronous call. SvelteURLSearchParams would add a reactive proxy for
+		// a value nobody observes as state.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const params = new URLSearchParams();
 		if (p > 1) params.set('page', String(p));
 		if (u) params.set('user', u);
@@ -355,16 +369,24 @@ function isExplicitActionText(text: string): boolean {
 
 <div>
 	<h2 class="text-2xl font-semibold text-foreground">Istoric acțiuni și modificări</h2>
-	<p class="mt-1 text-muted-foreground">Lista completă a acțiunilor administrative și a modificărilor de conținut. Poți filtra după contul care a efectuat acțiunea.</p>
+	<p class="mt-1 text-muted-foreground">
+		Lista completă a acțiunilor administrative și a modificărilor de conținut. Poți filtra după
+		contul care a efectuat acțiunea.
+	</p>
 
-	<form method="get" action="/admin/history" class="mt-6 flex flex-wrap items-end gap-4 rounded-none border border-border bg-card p-4">
+	<form
+		method="get"
+		action="/admin/history"
+		class="mt-6 flex flex-wrap items-end gap-4 rounded-none border border-border bg-card p-4"
+	>
 		<input type="hidden" name="user" value={effectiveUser} />
-		<div class="space-y-2 min-w-[220px]">
+		<div class="min-w-[220px] space-y-2">
 			<Label for="user-select">Cine a editat</Label>
 			<Select.Root
 				type="single"
 				value={selectValue}
-				onValueChange={(v: string | undefined) => (selectedUser = v === ALL_USERS_VALUE ? '' : (v ?? ''))}
+				onValueChange={(v: string | undefined) =>
+					(selectedUser = v === ALL_USERS_VALUE ? '' : (v ?? ''))}
 			>
 				<Select.Trigger id="user-select" class="w-full rounded-none">
 					{effectiveUser
@@ -382,15 +404,21 @@ function isExplicitActionText(text: string): boolean {
 		<Button type="submit" class="rounded-none">Filtrează</Button>
 	</form>
 
-	<p class="mt-4 text-sm font-medium text-foreground">Toate acțiunile (cele mai recente mai întâi)</p>
+	<p class="mt-4 text-sm font-medium text-foreground">
+		Toate acțiunile (cele mai recente mai întâi)
+	</p>
 	<div class="mt-2 space-y-2">
 		{#if data.entries.length === 0}
-			<p class="rounded-none border border-dashed border-border bg-muted/10 py-12 text-center text-muted-foreground">Nicio modificare găsită.</p>
+			<p
+				class="rounded-none border border-dashed border-border bg-muted/10 py-12 text-center text-muted-foreground"
+			>
+				Nicio modificare găsită.
+			</p>
 		{:else}
 			<ul class="space-y-2">
 				{#each data.entries as entry (entry.id)}
 					{@const actionPayload = getActionPayload(entry)}
-					<li class="rounded-none border border-border bg-card overflow-hidden">
+					<li class="overflow-hidden rounded-none border border-border bg-card">
 						<button
 							type="button"
 							class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
@@ -401,16 +429,19 @@ function isExplicitActionText(text: string): boolean {
 							{:else}
 								<ChevronRight class="size-4 shrink-0 text-muted-foreground" />
 							{/if}
-							<span
-								class="rounded px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground"
-							>
+							<span class="rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
 								{data.entityLabels[entry.entityType] ?? entry.entityType}
 							</span>
-							<span class="min-w-0 flex-1 truncate font-medium text-foreground">{humanTitle(entry)}</span>
+							<span class="min-w-0 flex-1 truncate font-medium text-foreground"
+								>{humanTitle(entry)}</span
+							>
 							<span class="shrink-0 text-sm text-muted-foreground">
 								{entry.userName ?? '—'} · {formatDate(entry.changedAt)}
 							</span>
-							<span class="shrink-0 rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{actionLabel(entry.action)}</span>
+							<span
+								class="shrink-0 rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+								>{actionLabel(entry.action)}</span
+							>
 						</button>
 						{#if expandedId === entry.id}
 							{@const diff = fieldDiff(entry)}
@@ -418,7 +449,9 @@ function isExplicitActionText(text: string): boolean {
 								{#if actionPayload}
 									{@const title = humanTitle(entry)}
 									<p class="mb-3 text-sm font-semibold text-foreground">Ce s-a întâmplat</p>
-									<div class="space-y-3 rounded-none border border-border bg-background p-3 text-sm">
+									<div
+										class="space-y-3 rounded-none border border-border bg-background p-3 text-sm"
+									>
 										<p>{title}</p>
 										{#if !isExplicitActionText(title)}
 											<p>
@@ -431,7 +464,9 @@ function isExplicitActionText(text: string): boolean {
 											</p>
 										{/if}
 										<details class="rounded-none border border-border bg-muted/20">
-											<summary class="cursor-pointer px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+											<summary
+												class="cursor-pointer px-3 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase"
+											>
 												Detalii tehnice
 											</summary>
 											<div class="space-y-2 border-t border-border px-3 py-3">
@@ -441,7 +476,9 @@ function isExplicitActionText(text: string): boolean {
 												{#if actionPayload.searchParams && Object.keys(actionPayload.searchParams).length > 0}
 													<div>
 														<p><strong>Parametri:</strong></p>
-														<div class="mt-1 max-h-40 overflow-auto rounded-none border border-border bg-muted/30 p-2 text-xs">
+														<div
+															class="mt-1 max-h-40 overflow-auto rounded-none border border-border bg-muted/30 p-2 text-xs"
+														>
 															{#each Object.entries(actionPayload.searchParams) as [key, value] (key)}
 																<p><strong>{key}:</strong> {value}</p>
 															{/each}
@@ -456,22 +493,29 @@ function isExplicitActionText(text: string): boolean {
 									<div class="space-y-5">
 										{#each diff as row (row.field)}
 											<div class="rounded-none border border-border bg-background">
-												<p class="border-b border-border px-3 py-2 text-sm font-medium text-foreground">
+												<p
+													class="border-b border-border px-3 py-2 text-sm font-medium text-foreground"
+												>
 													{formatDiffField(row.field)}
 												</p>
 												<div class="grid gap-4 p-3 md:grid-cols-2">
 													<div>
-														<p class="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">Înainte</p>
-														<pre
-															class="max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-none border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground"
-														>{row.before}</pre
+														<p
+															class="mb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase"
 														>
+															Înainte
+														</p>
+														<pre
+															class="max-h-48 overflow-auto rounded-none border border-border bg-muted/30 p-3 text-xs leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">{row.before}</pre>
 													</div>
 													<div>
-														<p class="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">După</p>
+														<p
+															class="mb-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase"
+														>
+															După
+														</p>
 														<pre
-															class="max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-none border border-border bg-muted/30 p-3 text-xs leading-relaxed text-foreground"
-														>{row.after}</pre>
+															class="max-h-48 overflow-auto rounded-none border border-border bg-muted/30 p-3 text-xs leading-relaxed break-words whitespace-pre-wrap text-foreground">{row.after}</pre>
 													</div>
 												</div>
 											</div>

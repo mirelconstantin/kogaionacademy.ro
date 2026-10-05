@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { toastFromAction } from '$lib/client';
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
@@ -21,12 +22,12 @@
 		{ value: 'draft', label: 'Ciornă' }
 	] as const;
 
-const CATEGORY_OPTIONS = [
-	{ value: 'enrichment', label: 'Enrichment' },
-	{ value: 'family', label: 'Family' },
-	{ value: 'children', label: 'Children' },
-	{ value: 'teens', label: 'Teens' }
-] as const;
+	const CATEGORY_OPTIONS = [
+		{ value: 'enrichment', label: 'Enrichment' },
+		{ value: 'family', label: 'Family' },
+		{ value: 'children', label: 'Children' },
+		{ value: 'teens', label: 'Teens' }
+	] as const;
 
 	/** Etichete în română pentru secțiunile afișate pe pagina publică (fără ordine). */
 	const SECTION_LABELS: Record<string, string> = {
@@ -64,7 +65,12 @@ const CATEGORY_OPTIONS = [
 		durationText: '',
 		locationText: ''
 	});
-	type SectionRow = { section: string; locale: string; sortOrder: number; payload: Record<string, unknown> };
+	type SectionRow = {
+		section: string;
+		locale: string;
+		sortOrder: number;
+		payload: Record<string, unknown>;
+	};
 	let sections = $state<SectionRow[]>([]);
 	/** Structured payloads per section index; used by typed editors (no raw JSON). */
 	let sectionPayloads = $state<Record<string, unknown>[]>([]);
@@ -73,7 +79,10 @@ const CATEGORY_OPTIONS = [
 	let loadedId = $state<number | null>(null);
 	let sectionJsonError = $state<string | null>(null);
 	/** Friendly editors: synced from section JSON on load, merged back on submit. */
-	let galleryPayload = $state<{ title?: string; images: { url: string; alt?: string }[] }>({ title: '', images: [] });
+	let galleryPayload = $state<{ title?: string; images: { url: string; alt?: string }[] }>({
+		title: '',
+		images: []
+	});
 	let introPayload = $state<{
 		blocks: { title?: string; body: string }[];
 		imageBetweenBlocks?: string;
@@ -96,7 +105,7 @@ const CATEGORY_OPTIONS = [
 	/** Indici ai secțiunilor care apar pe pagina publică (până la enrollment inclusiv). */
 	const visibleSectionIndices = $derived.by(() => {
 		const idx = enrollmentSectionIndex;
-		const set = new Set<number>();
+		const set = new SvelteSet<number>();
 		for (let i = 0; i < sections.length; i++) {
 			if (idx < 0 || i <= idx) set.add(i);
 		}
@@ -136,13 +145,23 @@ const CATEGORY_OPTIONS = [
 			locationText: d.ro?.locationText ?? ''
 		};
 		sections = Array.isArray(d.sections) ? d.sections : [];
-		sectionPayloads = sections.map((s) => JSON.parse(JSON.stringify(s.payload)) as Record<string, unknown>);
+		sectionPayloads = sections.map(
+			(s) => JSON.parse(JSON.stringify(s.payload)) as Record<string, unknown>
+		);
 		mentorIds = Array.isArray(d.mentorIds) ? [...d.mentorIds] : [];
 		gallerySectionIndex = sections.findIndex((s) => s.section === 'gallery');
 		introSectionIndex = sections.findIndex((s) => s.section === 'intro');
 		if (gallerySectionIndex >= 0) {
-			const p = sections[gallerySectionIndex].payload as { title?: string; images?: { url: string; alt?: string }[] };
-			galleryPayload = { title: p.title ?? '', images: Array.isArray(p.images) ? p.images.map((i) => ({ url: i.url ?? '', alt: i.alt })) : [] };
+			const p = sections[gallerySectionIndex].payload as {
+				title?: string;
+				images?: { url: string; alt?: string }[];
+			};
+			galleryPayload = {
+				title: p.title ?? '',
+				images: Array.isArray(p.images)
+					? p.images.map((i) => ({ url: i.url ?? '', alt: i.alt }))
+					: []
+			};
 		}
 		if (introSectionIndex >= 0) {
 			const p = sections[introSectionIndex].payload as {
@@ -151,7 +170,9 @@ const CATEGORY_OPTIONS = [
 				videoBetweenBlocks?: { provider?: 'youtube' | 'vimeo'; videoId?: string; title?: string };
 			};
 			introPayload = {
-				blocks: Array.isArray(p.blocks) ? p.blocks.map((b) => ({ title: b.title, body: b.body ?? '' })) : [],
+				blocks: Array.isArray(p.blocks)
+					? p.blocks.map((b) => ({ title: b.title, body: b.body ?? '' }))
+					: [],
 				imageBetweenBlocks: p.imageBetweenBlocks ?? '',
 				videoBetweenBlocks: {
 					provider: p.videoBetweenBlocks?.provider ?? 'youtube',
@@ -255,7 +276,8 @@ const CATEGORY_OPTIONS = [
 
 	function deleteSelectedImages() {
 		if (gallerySelectedIndexes.length === 0) return;
-		if (!confirm(`Sigur vrei să ștergi ${gallerySelectedIndexes.length} imagini selectate?`)) return;
+		if (!confirm(`Sigur vrei să ștergi ${gallerySelectedIndexes.length} imagini selectate?`))
+			return;
 		const selectedSet = new Set(gallerySelectedIndexes);
 		galleryPayload = {
 			...galleryPayload,
@@ -289,9 +311,7 @@ const CATEGORY_OPTIONS = [
 			...galleryPayload,
 			images: [
 				...galleryPayload.images,
-				...bulkInsertValues
-					.filter((url) => Boolean(url))
-					.map((url) => ({ url, alt: undefined }))
+				...bulkInsertValues.filter((url) => Boolean(url)).map((url) => ({ url, alt: undefined }))
 			]
 		};
 		bulkInsertValues = [];
@@ -375,7 +395,8 @@ const CATEGORY_OPTIONS = [
 					<Label for="categoryId">Categorie</Label>
 					<Select.Root type="single" bind:value={categoryId}>
 						<Select.Trigger id="categoryId" class="w-full rounded-none">
-							{CATEGORY_OPTIONS.find((o) => o.value === categoryId)?.label ?? 'Selectează categoria'}
+							{CATEGORY_OPTIONS.find((o) => o.value === categoryId)?.label ??
+								'Selectează categoria'}
 						</Select.Trigger>
 						<Select.Content>
 							{#each CATEGORY_OPTIONS as opt (opt.value)}
@@ -473,7 +494,8 @@ const CATEGORY_OPTIONS = [
 		<div class="rounded-none border border-border bg-card p-6">
 			<h3 class="font-medium text-foreground">Mentori</h3>
 			<p class="mt-2 text-sm text-muted-foreground">
-				Selectează mentorii afișați pe pagina acestui program. Ordinea de mai jos este cea de afișare.
+				Selectează mentorii afișați pe pagina acestui program. Ordinea de mai jos este cea de
+				afișare.
 			</p>
 			<div class="mt-3">
 				<Input
@@ -483,7 +505,9 @@ const CATEGORY_OPTIONS = [
 					bind:value={mentorSearch}
 				/>
 			</div>
-			<div class="mt-2 max-h-80 overflow-y-auto rounded-none border border-border bg-muted/20 p-3 space-y-2">
+			<div
+				class="mt-2 max-h-80 space-y-2 overflow-y-auto rounded-none border border-border bg-muted/20 p-3"
+			>
 				{#each mentorFiltered as m (m.id)}
 					<label
 						class="flex cursor-pointer items-center gap-4 rounded-none border border-border bg-card p-3 transition-colors hover:bg-muted/30 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
@@ -500,7 +524,7 @@ const CATEGORY_OPTIONS = [
 						/>
 						<Avatar src={m.image} alt={m.nameRo ?? ''} size="lg" class="shrink-0 rounded-none" />
 						<div class="min-w-0 flex-1">
-							<span class="font-medium text-foreground block">{m.nameRo}</span>
+							<span class="block font-medium text-foreground">{m.nameRo}</span>
 							{#if m.titleRo}
 								<span class="text-sm text-muted-foreground">{m.titleRo}</span>
 							{/if}
@@ -522,10 +546,12 @@ const CATEGORY_OPTIONS = [
 			<div class="mt-4 space-y-4">
 				{#if gallerySectionIndex >= 0 && (enrollmentSectionIndex < 0 || gallerySectionIndex <= enrollmentSectionIndex)}
 					<details id="sec-gallery" class="rounded-none border border-border bg-muted/10" open>
-						<summary class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20">
+						<summary
+							class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20"
+						>
 							Galerie foto
 						</summary>
-						<div class="border-t border-border p-4 space-y-4">
+						<div class="space-y-4 border-t border-border p-4">
 							<div class="space-y-2">
 								<Label>Titlu galerie</Label>
 								<Input class="rounded-none" bind:value={galleryPayload.title} />
@@ -562,19 +588,27 @@ const CATEGORY_OPTIONS = [
 								{/if}
 								{#each galleryPayload.images as img, imgIdx (imgIdx)}
 									<div class="rounded-none border border-border bg-card p-3">
-										<div class="flex gap-3 flex-wrap items-center">
+										<div class="flex flex-wrap items-center gap-3">
 											<div
-												class="h-20 w-28 shrink-0 overflow-hidden rounded-none border border-border bg-muted/20 flex items-center justify-center"
+												class="flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden rounded-none border border-border bg-muted/20"
 											>
 												{#if img.url}
-													<img src={img.url} alt={img.alt || `Galerie ${imgIdx + 1}`} class="h-full w-full object-cover" />
+													<img
+														src={img.url}
+														alt={img.alt || `Galerie ${imgIdx + 1}`}
+														class="h-full w-full object-cover"
+													/>
 												{:else}
-													<span class="px-2 text-center text-xs text-muted-foreground">Neselectată</span>
+													<span class="px-2 text-center text-xs text-muted-foreground"
+														>Neselectată</span
+													>
 												{/if}
 											</div>
 											<div class="min-w-[220px] flex-1">
 												<p class="text-sm font-medium text-foreground">Imagine {imgIdx + 1}</p>
-												<p class="text-xs text-muted-foreground truncate">{getMediaName(img.url)}</p>
+												<p class="truncate text-xs text-muted-foreground">
+													{getMediaName(img.url)}
+												</p>
 											</div>
 											<div class="flex gap-2">
 												<label class="inline-flex items-center gap-2 text-xs text-muted-foreground">
@@ -582,14 +616,17 @@ const CATEGORY_OPTIONS = [
 														type="checkbox"
 														checked={gallerySelectedIndexes.includes(imgIdx)}
 														onchange={(e) =>
-															toggleGallerySelection(imgIdx, (e.currentTarget as HTMLInputElement).checked)}
+															toggleGallerySelection(
+																imgIdx,
+																(e.currentTarget as HTMLInputElement).checked
+															)}
 													/>
 													Selectează
 												</label>
 												<Button
 													type="button"
 													variant="outline"
-													class="rounded-none shrink-0"
+													class="shrink-0 rounded-none"
 													onclick={() => openGalleryImagePicker(imgIdx)}
 												>
 													Schimbă
@@ -597,7 +634,7 @@ const CATEGORY_OPTIONS = [
 												<Button
 													type="button"
 													variant="outline"
-													class="rounded-none shrink-0"
+													class="shrink-0 rounded-none"
 													onclick={() => deleteSingleImage(imgIdx)}
 												>
 													Șterge
@@ -605,7 +642,11 @@ const CATEGORY_OPTIONS = [
 											</div>
 										</div>
 										<div class="mt-3">
-											<Input class="rounded-none" placeholder="Alt (opțional)" bind:value={img.alt} />
+											<Input
+												class="rounded-none"
+												placeholder="Alt (opțional)"
+												bind:value={img.alt}
+											/>
 										</div>
 									</div>
 								{/each}
@@ -628,15 +669,20 @@ const CATEGORY_OPTIONS = [
 				{/if}
 				{#if introSectionIndex >= 0 && (enrollmentSectionIndex < 0 || introSectionIndex <= enrollmentSectionIndex)}
 					<details id="sec-intro" class="rounded-none border border-border bg-muted/10" open>
-						<summary class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20">
+						<summary
+							class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20"
+						>
 							Intro (blocuri text)
 						</summary>
-						<div class="border-t border-border p-4 space-y-4">
+						<div class="space-y-4 border-t border-border p-4">
 							<div class="space-y-2">
 								<Label>Imagine între blocuri (după primul bloc)</Label>
-								<MediaPicker bind:value={introPayload.imageBetweenBlocks} label="Selectează imagine" />
+								<MediaPicker
+									bind:value={introPayload.imageBetweenBlocks}
+									label="Selectează imagine"
+								/>
 							</div>
-							<div class="rounded-none border border-border p-3 bg-card space-y-2">
+							<div class="space-y-2 rounded-none border border-border bg-card p-3">
 								<Label>Video între blocuri (după primul bloc)</Label>
 								<p class="text-xs text-muted-foreground">
 									Se folosește dacă există Video ID. Exemplu YouTube: `fFiueIdMwPM`
@@ -699,9 +745,9 @@ const CATEGORY_OPTIONS = [
 								/>
 							</div>
 							{#each introPayload.blocks as block, bi (bi)}
-								<div class="space-y-2 rounded-none border border-border p-3 bg-card">
+								<div class="space-y-2 rounded-none border border-border bg-card p-3">
 									<Label>Bloc {bi + 1} — Text</Label>
-									<Textarea class="rounded-none min-h-[80px]" bind:value={block.body} rows={3} />
+									<Textarea class="min-h-[80px] rounded-none" bind:value={block.body} rows={3} />
 								</div>
 							{/each}
 						</div>
@@ -710,15 +756,20 @@ const CATEGORY_OPTIONS = [
 				{#each sections as section, i (`${section.section}-${section.locale}-${i}`)}
 					{#if section.section !== 'gallery' && section.section !== 'intro' && visibleSectionIndices.has(i)}
 						{@const p = sectionPayloads[i] ?? {}}
-						<details id="sec-{section.section}" class="rounded-none border border-border bg-muted/10">
-							<summary class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20">
+						<details
+							id="sec-{section.section}"
+							class="rounded-none border border-border bg-muted/10"
+						>
+							<summary
+								class="cursor-pointer list-none px-3 py-2 font-medium text-foreground hover:bg-muted/20"
+							>
 								{SECTION_LABELS[section.section] ?? section.section}
 							</summary>
-							<div class="border-t border-border p-4 space-y-4">
+							<div class="space-y-4 border-t border-border p-4">
 								{#if section.section === 'hero_highlights'}
 									{@const payload = p as { items?: string[] }}
 									<Label>Elemente hero</Label>
-									{#each (payload.items ?? []) as _, j}
+									{#each payload.items ?? [] as _, j (j)}
 										<Input
 											class="rounded-none"
 											value={payload.items?.[j] ?? ''}
@@ -734,21 +785,32 @@ const CATEGORY_OPTIONS = [
 										type="button"
 										variant="outline"
 										class="rounded-none"
-										onclick={() => updateSectionPayload(i, { ...payload, items: [...(payload.items ?? []), ''] })}
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												items: [...(payload.items ?? []), '']
+											})}
 									>
 										Adaugă element
 									</Button>
 								{:else if section.section === 'hero_cta'}
-									{@const payload = p as { buttons?: { label: string; type: string; value?: string; href?: string }[] }}
+									{@const payload = p as {
+										buttons?: { label: string; type: string; value?: string; href?: string }[];
+									}}
 									<Label>Butoane CTA</Label>
-									{#each (payload.buttons ?? []) as btn, bi}
-										<div class="rounded-none border border-border p-3 space-y-2">
-											<Input class="rounded-none" placeholder="Label" value={btn.label} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const buttons = [...(payload.buttons ?? [])];
-												buttons[bi] = { ...buttons[bi], label: v };
-												updateSectionPayload(i, { ...payload, buttons });
-											}} />
+									{#each payload.buttons ?? [] as btn, bi (bi)}
+										<div class="space-y-2 rounded-none border border-border p-3">
+											<Input
+												class="rounded-none"
+												placeholder="Label"
+												value={btn.label}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const buttons = [...(payload.buttons ?? [])];
+													buttons[bi] = { ...buttons[bi], label: v };
+													updateSectionPayload(i, { ...payload, buttons });
+												}}
+											/>
 											<Select.Root
 												type="single"
 												value={btn.type}
@@ -767,108 +829,267 @@ const CATEGORY_OPTIONS = [
 												</Select.Content>
 											</Select.Root>
 											{#if btn.type === 'tel'}
-												<Input class="rounded-none" placeholder="Număr (value)" value={btn.value ?? ''} oninput={(e) => {
-													const v = (e.currentTarget as HTMLInputElement).value;
-													const buttons = [...(payload.buttons ?? [])];
-													buttons[bi] = { ...buttons[bi], value: v };
-													updateSectionPayload(i, { ...payload, buttons });
-												}} />
+												<Input
+													class="rounded-none"
+													placeholder="Număr (value)"
+													value={btn.value ?? ''}
+													oninput={(e) => {
+														const v = (e.currentTarget as HTMLInputElement).value;
+														const buttons = [...(payload.buttons ?? [])];
+														buttons[bi] = { ...buttons[bi], value: v };
+														updateSectionPayload(i, { ...payload, buttons });
+													}}
+												/>
 											{:else}
-												<Input class="rounded-none" placeholder="Href" value={btn.href ?? ''} oninput={(e) => {
-													const v = (e.currentTarget as HTMLInputElement).value;
-													const buttons = [...(payload.buttons ?? [])];
-													buttons[bi] = { ...buttons[bi], href: v };
-													updateSectionPayload(i, { ...payload, buttons });
-												}} />
+												<Input
+													class="rounded-none"
+													placeholder="Href"
+													value={btn.href ?? ''}
+													oninput={(e) => {
+														const v = (e.currentTarget as HTMLInputElement).value;
+														const buttons = [...(payload.buttons ?? [])];
+														buttons[bi] = { ...buttons[bi], href: v };
+														updateSectionPayload(i, { ...payload, buttons });
+													}}
+												/>
 											{/if}
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, buttons: [...(payload.buttons ?? []), { label: '', type: 'link', href: '/contact' }] }) }>Adaugă buton</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												buttons: [
+													...(payload.buttons ?? []),
+													{ label: '', type: 'link', href: '/contact' }
+												]
+											})}>Adaugă buton</Button
+									>
 								{:else if section.section === 'curriculum_areas'}
 									{@const payload = p as { title?: string; areas?: { title: string }[] }}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Arii</Label>
-									{#each (payload.areas ?? []) as area, ai}
-										<Input class="rounded-none" value={area.title} oninput={(e) => {
-											const v = (e.currentTarget as HTMLInputElement).value;
-											const areas = [...(payload.areas ?? [])];
-											areas[ai] = { title: v };
-											updateSectionPayload(i, { ...payload, areas });
-										}} placeholder="Titlu arie" />
+									{#each payload.areas ?? [] as area, ai (ai)}
+										<Input
+											class="rounded-none"
+											value={area.title}
+											oninput={(e) => {
+												const v = (e.currentTarget as HTMLInputElement).value;
+												const areas = [...(payload.areas ?? [])];
+												areas[ai] = { title: v };
+												updateSectionPayload(i, { ...payload, areas });
+											}}
+											placeholder="Titlu arie"
+										/>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, areas: [...(payload.areas ?? []), { title: '' }] }) }>Adaugă arie</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												areas: [...(payload.areas ?? []), { title: '' }]
+											})}>Adaugă arie</Button
+									>
 								{:else if section.section === 'packages'}
-									{@const payload = p as { title?: string; packages?: { title: string; items: string[] }[]; note?: string }}
+									{@const payload = p as {
+										title?: string;
+										packages?: { title: string; items: string[] }[];
+										note?: string;
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Notă</Label>
-									<Input class="rounded-none" value={payload.note ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, note: (e.currentTarget as HTMLInputElement).value })} />
-									{#each (payload.packages ?? []) as pkg, pi}
-										<div class="rounded-none border border-border p-3 space-y-2">
+									<Input
+										class="rounded-none"
+										value={payload.note ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												note: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
+									{#each payload.packages ?? [] as pkg, pi (pi)}
+										<div class="space-y-2 rounded-none border border-border p-3">
 											<Label>Pachet {pi + 1} — titlu</Label>
-											<Input class="rounded-none" value={pkg.title} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const packages = [...(payload.packages ?? [])];
-												packages[pi] = { ...packages[pi], title: v };
-												updateSectionPayload(i, { ...payload, packages });
-											}} />
+											<Input
+												class="rounded-none"
+												value={pkg.title}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const packages = [...(payload.packages ?? [])];
+													packages[pi] = { ...packages[pi], title: v };
+													updateSectionPayload(i, { ...payload, packages });
+												}}
+											/>
 											<Label>Elemente (câte unul per linie)</Label>
-											<Textarea class="rounded-none min-h-[80px]" value={(pkg.items ?? []).join('\n')} oninput={(e) => {
-												const v = (e.currentTarget as HTMLTextAreaElement).value;
-												const items = v.split('\n').map((s) => s.trim()).filter(Boolean);
-												const packages = [...(payload.packages ?? [])];
-												packages[pi] = { ...packages[pi], items };
-												updateSectionPayload(i, { ...payload, packages });
-											}} />
+											<Textarea
+												class="min-h-[80px] rounded-none"
+												value={(pkg.items ?? []).join('\n')}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLTextAreaElement).value;
+													const items = v
+														.split('\n')
+														.map((s) => s.trim())
+														.filter(Boolean);
+													const packages = [...(payload.packages ?? [])];
+													packages[pi] = { ...packages[pi], items };
+													updateSectionPayload(i, { ...payload, packages });
+												}}
+											/>
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, packages: [...(payload.packages ?? []), { title: '', items: [] }] }) }>Adaugă pachet</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												packages: [...(payload.packages ?? []), { title: '', items: [] }]
+											})}>Adaugă pachet</Button
+									>
 								{:else if section.section === 'extracurricular'}
-									{@const payload = p as { title?: string; groups?: { title: string; subtitle?: string; items: string[] }[]; methods?: string }}
+									{@const payload = p as {
+										title?: string;
+										groups?: { title: string; subtitle?: string; items: string[] }[];
+										methods?: string;
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Metode</Label>
-									<Textarea class="rounded-none" value={payload.methods ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, methods: (e.currentTarget as HTMLTextAreaElement).value })} />
-									{#each (payload.groups ?? []) as grp, gi}
-										<div class="rounded-none border border-border p-3 space-y-2">
+									<Textarea
+										class="rounded-none"
+										value={payload.methods ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												methods: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
+									{#each payload.groups ?? [] as grp, gi (gi)}
+										<div class="space-y-2 rounded-none border border-border p-3">
 											<Label>Grup {gi + 1}</Label>
-											<Input class="rounded-none" placeholder="Titlu" value={grp.title} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const groups = [...(payload.groups ?? [])];
-												groups[gi] = { ...groups[gi], title: v };
-												updateSectionPayload(i, { ...payload, groups });
-											}} />
-											<Input class="rounded-none" placeholder="Subtitlu" value={grp.subtitle ?? ''} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const groups = [...(payload.groups ?? [])];
-												groups[gi] = { ...groups[gi], subtitle: v };
-												updateSectionPayload(i, { ...payload, groups });
-											}} />
-											<Textarea class="rounded-none min-h-[60px]" placeholder="Elemente, câte unul per linie" value={(grp.items ?? []).join('\n')} oninput={(e) => {
-												const v = (e.currentTarget as HTMLTextAreaElement).value;
-												const items = v.split('\n').map((s) => s.trim()).filter(Boolean);
-												const groups = [...(payload.groups ?? [])];
-												groups[gi] = { ...groups[gi], items };
-												updateSectionPayload(i, { ...payload, groups });
-											}} />
+											<Input
+												class="rounded-none"
+												placeholder="Titlu"
+												value={grp.title}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const groups = [...(payload.groups ?? [])];
+													groups[gi] = { ...groups[gi], title: v };
+													updateSectionPayload(i, { ...payload, groups });
+												}}
+											/>
+											<Input
+												class="rounded-none"
+												placeholder="Subtitlu"
+												value={grp.subtitle ?? ''}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const groups = [...(payload.groups ?? [])];
+													groups[gi] = { ...groups[gi], subtitle: v };
+													updateSectionPayload(i, { ...payload, groups });
+												}}
+											/>
+											<Textarea
+												class="min-h-[60px] rounded-none"
+												placeholder="Elemente, câte unul per linie"
+												value={(grp.items ?? []).join('\n')}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLTextAreaElement).value;
+													const items = v
+														.split('\n')
+														.map((s) => s.trim())
+														.filter(Boolean);
+													const groups = [...(payload.groups ?? [])];
+													groups[gi] = { ...groups[gi], items };
+													updateSectionPayload(i, { ...payload, groups });
+												}}
+											/>
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, groups: [...(payload.groups ?? []), { title: '', items: [] }] }) }>Adaugă grup</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												groups: [...(payload.groups ?? []), { title: '', items: [] }]
+											})}>Adaugă grup</Button
+									>
 								{:else if section.section === 'benefits_family' || section.section === 'benefits_main' || section.section === 'benefits_secondary'}
-									{@const payload = p as { title?: string; items?: string[]; note?: string; other?: string; otherItems?: string[]; image?: string } }
+									{@const payload = p as {
+										title?: string;
+										items?: string[];
+										note?: string;
+										other?: string;
+										otherItems?: string[];
+										image?: string;
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Elemente</Label>
-									{#each (payload.items ?? []) as _, j}
-										<Input class="rounded-none" value={payload.items?.[j] ?? ''} oninput={(e) => {
-											const v = (e.currentTarget as HTMLInputElement).value;
-											const items = [...(payload.items ?? [])];
-											items[j] = v;
-											updateSectionPayload(i, { ...payload, items });
-										}} />
+									{#each payload.items ?? [] as _, j (j)}
+										<Input
+											class="rounded-none"
+											value={payload.items?.[j] ?? ''}
+											oninput={(e) => {
+												const v = (e.currentTarget as HTMLInputElement).value;
+												const items = [...(payload.items ?? [])];
+												items[j] = v;
+												updateSectionPayload(i, { ...payload, items });
+											}}
+										/>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, items: [...(payload.items ?? []), ''] }) }>Adaugă</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												items: [...(payload.items ?? []), '']
+											})}>Adaugă</Button
+									>
 									{#if section.section === 'benefits_main'}
 										<Label>Imagine (opțional)</Label>
 										<MediaPicker
@@ -883,49 +1104,144 @@ const CATEGORY_OPTIONS = [
 									{/if}
 									{#if section.section === 'benefits_family'}
 										<Label>Notă</Label>
-										<Input class="rounded-none" value={payload.note ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, note: (e.currentTarget as HTMLInputElement).value })} />
+										<Input
+											class="rounded-none"
+											value={payload.note ?? ''}
+											oninput={(e) =>
+												updateSectionPayload(i, {
+													...payload,
+													note: (e.currentTarget as HTMLInputElement).value
+												})}
+										/>
 										<Label>Alte (titlu)</Label>
-										<Input class="rounded-none" value={payload.other ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, other: (e.currentTarget as HTMLInputElement).value })} />
+										<Input
+											class="rounded-none"
+											value={payload.other ?? ''}
+											oninput={(e) =>
+												updateSectionPayload(i, {
+													...payload,
+													other: (e.currentTarget as HTMLInputElement).value
+												})}
+										/>
 										<Label>Alte elemente</Label>
-										{#each (payload.otherItems ?? []) as _, oj}
-											<Input class="rounded-none" value={payload.otherItems?.[oj] ?? ''} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const otherItems = [...(payload.otherItems ?? [])];
-												otherItems[oj] = v;
-												updateSectionPayload(i, { ...payload, otherItems });
-											}} />
+										{#each payload.otherItems ?? [] as _, oj (oj)}
+											<Input
+												class="rounded-none"
+												value={payload.otherItems?.[oj] ?? ''}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const otherItems = [...(payload.otherItems ?? [])];
+													otherItems[oj] = v;
+													updateSectionPayload(i, { ...payload, otherItems });
+												}}
+											/>
 										{/each}
-										<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, otherItems: [...(payload.otherItems ?? []), ''] }) }>Adaugă</Button>
+										<Button
+											type="button"
+											variant="outline"
+											class="rounded-none"
+											onclick={() =>
+												updateSectionPayload(i, {
+													...payload,
+													otherItems: [...(payload.otherItems ?? []), '']
+												})}>Adaugă</Button
+										>
 									{/if}
 								{:else if section.section === 'transport'}
 									{@const payload = p as { title?: string; body?: string; contact?: string }}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Text</Label>
-									<Textarea class="rounded-none min-h-[100px]" value={payload.body ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, body: (e.currentTarget as HTMLTextAreaElement).value })} />
+									<Textarea
+										class="min-h-[100px] rounded-none"
+										value={payload.body ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												body: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
 									<Label>Contact</Label>
-									<Input class="rounded-none" value={payload.contact ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, contact: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.contact ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												contact: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 								{:else if section.section === 'menu'}
 									{@const payload = p as { title?: string; body?: string; note?: string }}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Text</Label>
-									<Textarea class="rounded-none min-h-[100px]" value={payload.body ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, body: (e.currentTarget as HTMLTextAreaElement).value })} />
+									<Textarea
+										class="min-h-[100px] rounded-none"
+										value={payload.body ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												body: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
 									<Label>Notă</Label>
-									<Input class="rounded-none" value={payload.note ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, note: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.note ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												note: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 								{:else if section.section === 'location'}
-									{@const payload = p as { title?: string; subtitle?: string; body?: string; amenities?: string[]; closing?: string; image?: string; images?: string[]; mapEmbedUrl?: string } }
+									{@const payload = p as {
+										title?: string;
+										subtitle?: string;
+										body?: string;
+										amenities?: string[];
+										closing?: string;
+										image?: string;
+										images?: string[];
+										mapEmbedUrl?: string;
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Imagine principală</Label>
 									<MediaPicker
 										value={payload.image ?? ''}
 										label="Selectează imagine principală"
-										onSelect={(value) => updateSectionPayload(i, { ...payload, image: value || undefined })}
+										onSelect={(value) =>
+											updateSectionPayload(i, { ...payload, image: value || undefined })}
 									/>
 									<Label>Imagini grilă (3 pe rând, opțional)</Label>
-									{#each (payload.images ?? []) as imgUrl, imgIdx}
-										<div class="flex gap-2 items-center">
+									{#each payload.images ?? [] as imgUrl, imgIdx (imgIdx)}
+										<div class="flex items-center gap-2">
 											<MediaPicker
 												value={imgUrl}
 												label={`Imagine grilă ${imgIdx + 1}`}
@@ -938,7 +1254,7 @@ const CATEGORY_OPTIONS = [
 											<Button
 												type="button"
 												variant="outline"
-												class="rounded-none shrink-0"
+												class="shrink-0 rounded-none"
 												onclick={() => {
 													const images = (payload.images ?? []).filter((_, k) => k !== imgIdx);
 													updateSectionPayload(i, { ...payload, images });
@@ -956,8 +1272,7 @@ const CATEGORY_OPTIONS = [
 											updateSectionPayload(i, {
 												...payload,
 												images: [...(payload.images ?? []), '']
-											})
-										}
+											})}
 									>
 										Adaugă imagine grilă
 									</Button>
@@ -970,38 +1285,96 @@ const CATEGORY_OPTIONS = [
 											updateSectionPayload(i, {
 												...payload,
 												mapEmbedUrl: (e.currentTarget as HTMLInputElement).value.trim() || undefined
-											})
-										}
+											})}
 									/>
 									<Label>Subtitlu</Label>
-									<Input class="rounded-none" value={payload.subtitle ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, subtitle: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.subtitle ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												subtitle: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Text</Label>
-									<Textarea class="rounded-none min-h-[80px]" value={payload.body ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, body: (e.currentTarget as HTMLTextAreaElement).value })} />
+									<Textarea
+										class="min-h-[80px] rounded-none"
+										value={payload.body ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												body: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
 									<Label>Facilități</Label>
-									{#each (payload.amenities ?? []) as _, aj}
-										<Input class="rounded-none" value={payload.amenities?.[aj] ?? ''} oninput={(e) => {
-											const v = (e.currentTarget as HTMLInputElement).value;
-											const amenities = [...(payload.amenities ?? [])];
-											amenities[aj] = v;
-											updateSectionPayload(i, { ...payload, amenities });
-										}} />
-									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, amenities: [...(payload.amenities ?? []), ''] }) }>Adaugă</Button>
-									<Label>Încheiere</Label>
-									<Textarea class="rounded-none" value={payload.closing ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, closing: (e.currentTarget as HTMLTextAreaElement).value })} />
-								{:else if section.section === 'testimonials'}
-									{@const payload = p as { title?: string; items?: { videoId?: string; provider?: string; title?: string; quote?: string; author?: string }[] }}
-									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
-									{#each (payload.items ?? []) as item, ti}
-										<div class="rounded-none border border-border p-3 space-y-2">
-											<Label>Testimonial {ti + 1}</Label>
-											<Input class="rounded-none" placeholder="Video ID" value={item.videoId ?? ''} oninput={(e) => {
+									{#each payload.amenities ?? [] as _, aj (aj)}
+										<Input
+											class="rounded-none"
+											value={payload.amenities?.[aj] ?? ''}
+											oninput={(e) => {
 												const v = (e.currentTarget as HTMLInputElement).value;
-												const items = [...(payload.items ?? [])];
-												items[ti] = { ...items[ti], videoId: v };
-												updateSectionPayload(i, { ...payload, items });
-											}} />
+												const amenities = [...(payload.amenities ?? [])];
+												amenities[aj] = v;
+												updateSectionPayload(i, { ...payload, amenities });
+											}}
+										/>
+									{/each}
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												amenities: [...(payload.amenities ?? []), '']
+											})}>Adaugă</Button
+									>
+									<Label>Încheiere</Label>
+									<Textarea
+										class="rounded-none"
+										value={payload.closing ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												closing: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
+								{:else if section.section === 'testimonials'}
+									{@const payload = p as {
+										title?: string;
+										items?: {
+											videoId?: string;
+											provider?: string;
+											title?: string;
+											quote?: string;
+											author?: string;
+										}[];
+									}}
+									<Label>Titlu</Label>
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
+									{#each payload.items ?? [] as item, ti (ti)}
+										<div class="space-y-2 rounded-none border border-border p-3">
+											<Label>Testimonial {ti + 1}</Label>
+											<Input
+												class="rounded-none"
+												placeholder="Video ID"
+												value={item.videoId ?? ''}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const items = [...(payload.items ?? [])];
+													items[ti] = { ...items[ti], videoId: v };
+													updateSectionPayload(i, { ...payload, items });
+												}}
+											/>
 											<Select.Root
 												type="single"
 												value={item.provider ?? 'youtube'}
@@ -1019,50 +1392,121 @@ const CATEGORY_OPTIONS = [
 													<Select.Item value="vimeo" label="Vimeo">Vimeo</Select.Item>
 												</Select.Content>
 											</Select.Root>
-											<Input class="rounded-none" placeholder="Titlu" value={item.title ?? ''} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const items = [...(payload.items ?? [])];
-												items[ti] = { ...items[ti], title: v };
-												updateSectionPayload(i, { ...payload, items });
-											}} />
+											<Input
+												class="rounded-none"
+												placeholder="Titlu"
+												value={item.title ?? ''}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const items = [...(payload.items ?? [])];
+													items[ti] = { ...items[ti], title: v };
+													updateSectionPayload(i, { ...payload, items });
+												}}
+											/>
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, items: [...(payload.items ?? []), { provider: 'youtube' }] }) }>Adaugă</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												items: [...(payload.items ?? []), { provider: 'youtube' }]
+											})}>Adaugă</Button
+									>
 								{:else if section.section === 'enrollment'}
-									{@const payload = p as { title?: string; intro?: string; steps?: { order: number; label: string }[]; contactNote?: string; buttons?: { label: string; type: string; value?: string; href?: string }[] }}
+									{@const payload = p as {
+										title?: string;
+										intro?: string;
+										steps?: { order: number; label: string }[];
+										contactNote?: string;
+										buttons?: { label: string; type: string; value?: string; href?: string }[];
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Intro</Label>
-									<Textarea class="rounded-none" value={payload.intro ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, intro: (e.currentTarget as HTMLTextAreaElement).value })} />
+									<Textarea
+										class="rounded-none"
+										value={payload.intro ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												intro: (e.currentTarget as HTMLTextAreaElement).value
+											})}
+									/>
 									<Label>Pași</Label>
-									{#each (payload.steps ?? []) as step, si}
+									{#each payload.steps ?? [] as step, si (si)}
 										<div class="flex gap-2">
-											<Input type="number" class="rounded-none w-16" value={step.order} oninput={(e) => {
-												const v = parseInt((e.currentTarget as HTMLInputElement).value, 10) || 0;
-												const steps = [...(payload.steps ?? [])];
-												steps[si] = { ...steps[si], order: v };
-												updateSectionPayload(i, { ...payload, steps });
-											}} />
-											<Input class="rounded-none flex-1" value={step.label} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const steps = [...(payload.steps ?? [])];
-												steps[si] = { ...steps[si], label: v };
-												updateSectionPayload(i, { ...payload, steps });
-											}} placeholder="Label" />
+											<Input
+												type="number"
+												class="w-16 rounded-none"
+												value={step.order}
+												oninput={(e) => {
+													const v = parseInt((e.currentTarget as HTMLInputElement).value, 10) || 0;
+													const steps = [...(payload.steps ?? [])];
+													steps[si] = { ...steps[si], order: v };
+													updateSectionPayload(i, { ...payload, steps });
+												}}
+											/>
+											<Input
+												class="flex-1 rounded-none"
+												value={step.label}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const steps = [...(payload.steps ?? [])];
+													steps[si] = { ...steps[si], label: v };
+													updateSectionPayload(i, { ...payload, steps });
+												}}
+												placeholder="Label"
+											/>
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, steps: [...(payload.steps ?? []), { order: (payload.steps?.length ?? 0) + 1, label: '' }] }) }>Adaugă pas</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												steps: [
+													...(payload.steps ?? []),
+													{ order: (payload.steps?.length ?? 0) + 1, label: '' }
+												]
+											})}>Adaugă pas</Button
+									>
 									<Label>Notă contact</Label>
-									<Input class="rounded-none" value={payload.contactNote ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, contactNote: (e.currentTarget as HTMLInputElement).value })} />
+									<Input
+										class="rounded-none"
+										value={payload.contactNote ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												contactNote: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
 									<Label>Butoane</Label>
-									{#each (payload.buttons ?? []) as btn, bi}
-										<div class="rounded-none border border-border p-2 space-y-1">
-											<Input class="rounded-none" placeholder="Label" value={btn.label} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const buttons = [...(payload.buttons ?? [])];
-												buttons[bi] = { ...buttons[bi], label: v };
-												updateSectionPayload(i, { ...payload, buttons });
-											}} />
+									{#each payload.buttons ?? [] as btn, bi (bi)}
+										<div class="space-y-1 rounded-none border border-border p-2">
+											<Input
+												class="rounded-none"
+												placeholder="Label"
+												value={btn.label}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const buttons = [...(payload.buttons ?? [])];
+													buttons[bi] = { ...buttons[bi], label: v };
+													updateSectionPayload(i, { ...payload, buttons });
+												}}
+											/>
 											<Select.Root
 												type="single"
 												value={btn.type}
@@ -1081,44 +1525,96 @@ const CATEGORY_OPTIONS = [
 												</Select.Content>
 											</Select.Root>
 											{#if btn.type === 'tel'}
-												<Input class="rounded-none" placeholder="Număr" value={btn.value ?? ''} oninput={(e) => {
-													const v = (e.currentTarget as HTMLInputElement).value;
-													const buttons = [...(payload.buttons ?? [])];
-													buttons[bi] = { ...buttons[bi], value: v };
-													updateSectionPayload(i, { ...payload, buttons });
-												}} />
+												<Input
+													class="rounded-none"
+													placeholder="Număr"
+													value={btn.value ?? ''}
+													oninput={(e) => {
+														const v = (e.currentTarget as HTMLInputElement).value;
+														const buttons = [...(payload.buttons ?? [])];
+														buttons[bi] = { ...buttons[bi], value: v };
+														updateSectionPayload(i, { ...payload, buttons });
+													}}
+												/>
 											{:else}
-												<Input class="rounded-none" placeholder="Href" value={btn.href ?? ''} oninput={(e) => {
-													const v = (e.currentTarget as HTMLInputElement).value;
-													const buttons = [...(payload.buttons ?? [])];
-													buttons[bi] = { ...buttons[bi], href: v };
-													updateSectionPayload(i, { ...payload, buttons });
-												}} />
+												<Input
+													class="rounded-none"
+													placeholder="Href"
+													value={btn.href ?? ''}
+													oninput={(e) => {
+														const v = (e.currentTarget as HTMLInputElement).value;
+														const buttons = [...(payload.buttons ?? [])];
+														buttons[bi] = { ...buttons[bi], href: v };
+														updateSectionPayload(i, { ...payload, buttons });
+													}}
+												/>
 											{/if}
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, buttons: [...(payload.buttons ?? []), { label: '', type: 'link', href: '/contact' }] }) }>Adaugă buton</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												buttons: [
+													...(payload.buttons ?? []),
+													{ label: '', type: 'link', href: '/contact' }
+												]
+											})}>Adaugă buton</Button
+									>
 								{:else if section.section === 'video_links'}
-									{@const payload = p as { title?: string; links?: { label: string; url: string }[] }}
+									{@const payload = p as {
+										title?: string;
+										links?: { label: string; url: string }[];
+									}}
 									<Label>Titlu</Label>
-									<Input class="rounded-none" value={payload.title ?? ''} oninput={(e) => updateSectionPayload(i, { ...payload, title: (e.currentTarget as HTMLInputElement).value })} />
-									{#each (payload.links ?? []) as link, li}
+									<Input
+										class="rounded-none"
+										value={payload.title ?? ''}
+										oninput={(e) =>
+											updateSectionPayload(i, {
+												...payload,
+												title: (e.currentTarget as HTMLInputElement).value
+											})}
+									/>
+									{#each payload.links ?? [] as link, li (li)}
 										<div class="flex gap-2">
-											<Input class="rounded-none" placeholder="Label" value={link.label} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const links = [...(payload.links ?? [])];
-												links[li] = { ...links[li], label: v };
-												updateSectionPayload(i, { ...payload, links });
-											}} />
-											<Input class="rounded-none flex-1" placeholder="URL" value={link.url} oninput={(e) => {
-												const v = (e.currentTarget as HTMLInputElement).value;
-												const links = [...(payload.links ?? [])];
-												links[li] = { ...links[li], url: v };
-												updateSectionPayload(i, { ...payload, links });
-											}} />
+											<Input
+												class="rounded-none"
+												placeholder="Label"
+												value={link.label}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const links = [...(payload.links ?? [])];
+													links[li] = { ...links[li], label: v };
+													updateSectionPayload(i, { ...payload, links });
+												}}
+											/>
+											<Input
+												class="flex-1 rounded-none"
+												placeholder="URL"
+												value={link.url}
+												oninput={(e) => {
+													const v = (e.currentTarget as HTMLInputElement).value;
+													const links = [...(payload.links ?? [])];
+													links[li] = { ...links[li], url: v };
+													updateSectionPayload(i, { ...payload, links });
+												}}
+											/>
 										</div>
 									{/each}
-									<Button type="button" variant="outline" class="rounded-none" onclick={() => updateSectionPayload(i, { ...payload, links: [...(payload.links ?? []), { label: '', url: '' }] }) }>Adaugă link</Button>
+									<Button
+										type="button"
+										variant="outline"
+										class="rounded-none"
+										onclick={() =>
+											updateSectionPayload(i, {
+												...payload,
+												links: [...(payload.links ?? []), { label: '', url: '' }]
+											})}>Adaugă link</Button
+									>
 								{:else}
 									<p class="text-sm text-muted-foreground">Secțiune fără editor dedicat.</p>
 								{/if}
@@ -1128,9 +1624,15 @@ const CATEGORY_OPTIONS = [
 				{/each}
 			</div>
 			{#if mediaPickerForImageIndex !== null}
-				<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true">
-					<div class="rounded-none border border-border bg-card p-4 max-w-lg w-full mx-4">
-						<p class="font-medium mb-2">Selectează imagine pentru poziția {mediaPickerForImageIndex + 1}</p>
+				<div
+					class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+					role="dialog"
+					aria-modal="true"
+				>
+					<div class="mx-4 w-full max-w-lg rounded-none border border-border bg-card p-4">
+						<p class="mb-2 font-medium">
+							Selectează imagine pentru poziția {mediaPickerForImageIndex + 1}
+						</p>
 						<MediaPicker bind:value={mediaPickerValue} label="Selectează din Media" />
 						<div class="mt-4 flex gap-2">
 							<Button type="button" class="rounded-none" onclick={applyGalleryPickedImage}>

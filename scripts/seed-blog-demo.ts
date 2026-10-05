@@ -88,7 +88,11 @@ async function seed() {
 	console.log('Seeding demo blog posts...');
 
 	for (const post of DEMO_POSTS) {
-		const existing = await db.select({ id: blogPost.id }).from(blogPost).where(eq(blogPost.slug, post.slug)).limit(1);
+		const existing = await db
+			.select({ id: blogPost.id })
+			.from(blogPost)
+			.where(eq(blogPost.slug, post.slug))
+			.limit(1);
 
 		const values = {
 			title: post.title,
@@ -104,7 +108,10 @@ async function seed() {
 		};
 
 		if (existing.length > 0) {
-			await db.update(blogPost).set({ ...values, updatedAt: now }).where(eq(blogPost.id, existing[0].id));
+			await db
+				.update(blogPost)
+				.set({ ...values, updatedAt: now })
+				.where(eq(blogPost.id, existing[0].id));
 			console.log('  Updated:', post.slug);
 		} else {
 			await db.insert(blogPost).values(values);

@@ -9,7 +9,21 @@
 	import History from '@lucide/svelte/icons/history';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
-	let { data }: { data: { posts: { id: number; slug: string; title: string; status: string; publishedAt: Date | null; scheduledFor: Date | null; createdAt: Date }[] } } = $props();
+	let {
+		data
+	}: {
+		data: {
+			posts: {
+				id: number;
+				slug: string;
+				title: string;
+				status: string;
+				publishedAt: Date | null;
+				scheduledFor: Date | null;
+				createdAt: Date;
+			}[];
+		};
+	} = $props();
 
 	const base = $derived(page.url.pathname);
 
@@ -74,7 +88,9 @@
 								<div class="flex flex-wrap items-center gap-2">
 									<p class="font-medium text-foreground">{post.title}</p>
 									<span
-										class="inline-flex shrink-0 items-center rounded border px-2 py-0.5 text-xs font-medium {statusClass(post.status)}"
+										class="inline-flex shrink-0 items-center rounded border px-2 py-0.5 text-xs font-medium {statusClass(
+											post.status
+										)}"
 									>
 										{statusLabel(post.status)}
 									</span>
@@ -92,7 +108,7 @@
 							<div class="flex shrink-0 items-center gap-1">
 								{#if canViewOnSite(post.status)}
 									<a
-										href={"/blog/" + encodeURIComponent(post.slug)}
+										href={'/blog/' + encodeURIComponent(post.slug)}
 										target="_blank"
 										rel="noopener noreferrer"
 										class="inline-flex items-center gap-1 rounded-none border border-border bg-muted/40 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -114,7 +130,10 @@
 									method="POST"
 									action="{base}/{post.id}?/delete"
 									use:enhance={({ cancel }) => {
-										if (!confirm('Ștergi articolul „' + post.title + '”? Nu va mai apărea pe site.')) cancel();
+										if (
+											!confirm('Ștergi articolul „' + post.title + '”? Nu va mai apărea pe site.')
+										)
+											cancel();
 									}}
 									class="inline"
 								>

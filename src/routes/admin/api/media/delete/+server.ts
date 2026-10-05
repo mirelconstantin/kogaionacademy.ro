@@ -22,12 +22,17 @@ export const DELETE: RequestHandler = async (event) => {
 	if (!url || !validateMediaUrl(url)) {
 		return json({ error: 'URL invalid. Trebuie să fie din /media/uploads/' }, { status: 400 });
 	}
-	const force = event.url.searchParams.get('force') === '1' || event.url.searchParams.get('force') === 'true';
+	const force =
+		event.url.searchParams.get('force') === '1' || event.url.searchParams.get('force') === 'true';
 	if (!force) {
 		const { used, locations } = await getMediaUsage(url);
 		if (used) {
 			return json(
-				{ error: 'Asset-ul este folosit și nu poate fi șters fără confirmare.', used: true, locations },
+				{
+					error: 'Asset-ul este folosit și nu poate fi șters fără confirmare.',
+					used: true,
+					locations
+				},
 				{ status: 403 }
 			);
 		}

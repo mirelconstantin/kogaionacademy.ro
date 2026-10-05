@@ -40,7 +40,8 @@ const INTRO_IMAGE_URL =
 	'https://kogaionacademy.ro/wp-content/uploads/2021/12/RDCL0031-2048x1365.jpg';
 const BENEFITS_MAIN_IMAGE_URL =
 	'https://kogaionacademy.ro/wp-content/uploads/2021/12/RDCL2471-2048x1366.jpg';
-const COVER_IMAGE_URL = 'https://kogaionacademy.ro/wp-content/uploads/2023/02/family-7-12-1024x576.jpg';
+const COVER_IMAGE_URL =
+	'https://kogaionacademy.ro/wp-content/uploads/2023/02/family-7-12-1024x576.jpg';
 
 const GALLERY_IMAGE_URLS: string[] = [
 	'https://kogaionacademy.ro/wp-content/uploads/2021/12/RDCL4585-2048x1365.jpg',
@@ -153,13 +154,34 @@ function buildSectionPayloads(
 			payload: {
 				title: 'Activitățile taberei',
 				areas: [
-					{ title: 'APARTENENȚĂ CONȘTIENTĂ – „Contractul care creează siguranță”: Construim siguranță psihologică și apartenență prin reguli cu sens, ritualuri și un contract de familie și grup, astfel încât copilul se simte văzut și inclus fără conformism, părintele își consolidează fermitatea calmă și consecventă, iar familia capătă coeziune, predictibilitate și încredere reciprocă.' },
-					{ title: 'LIMITE INTELIGENTE – „Ferm și blând, fără escaladare”: Învățăm limite ferme și blânde, cu limbaj de reparație și protocoale de “pauză” în conflict, astfel încât copilul își dezvoltă autocontrolul și respectul pentru reguli, devenind mai cooperant, părintele învață intervenții eficiente fără ridicarea tonului și fără rușinare, iar familia reduce crizele, negocierile infinite și tensiunea zilnică.' },
-					{ title: 'AUTOREGLARE – „Corpul ca bază pentru minte”: Stabilizăm atenția și emoțiile prin corp, ritm, somn, mișcare și instrumente scurte de resetare, astfel încât copilul câștigă energie bună și disponibilitate pentru învățare, părintele își regăsește prezența și capacitatea de co-reglare, iar familia își îmbunătățește tranzițiile, clima emoțională și reziliența.' },
-					{ title: 'RELAȚII ȘI STATUT – „Prietenie, frați, grup”: Exersăm cooperarea, negocierea și repararea conflictului în contexte de echipă, astfel încât copilul își dezvoltă inteligența socială și demnitatea în grup, părintele învață când să ghideze și când să lase copilul să învețe responsabil, iar familia își crește capacitatea de colaborare și reduce rivalitatea și competiția toxică.' },
-					{ title: 'COMPETENȚĂ ȘI PERSEVERENȚĂ – „Eu pot”: Construim competență prin proiecte aplicate, feedback și strategii de finalizare, astfel încât copilul își crește încrederea în învățare și toleranța la frustrare, părintele dobândește un cadru sănătos pentru motivație și rutină de lucru, iar familia transformă performanța din presiune în bucurie a efortului.' },
-					{ title: 'IDENTITATE ȘI LUME DIGITALĂ – „Atenție, AI, Tehnologie, Alegeri”: Așezăm relația cu tehnologia pe discernământ, contract și creație, astfel încât copilul își protejează atenția și demnitatea, părintele capătă reguli coerente și aplicabile fără conflict permanent, iar familia echilibrează libertatea cu limite clare, folosind tehnologia ca instrument, nu ca substitut relațional.' },
-					{ title: 'SENS ȘI DĂRUIRE – „Recunoștință, valori, continuitate acasă”: Integrăm experiența în valori, recunoștință și ritualuri concrete de continuitate, astfel încât copilul își dezvoltă orientarea către sens și contribuție, părintele pleacă cu un plan de menținere și intervenție în criză, iar familia consolidează schimbarea pe termen lung prin obiceiuri mici, stabile și asumate.' }
+					{
+						title:
+							'APARTENENȚĂ CONȘTIENTĂ – „Contractul care creează siguranță”: Construim siguranță psihologică și apartenență prin reguli cu sens, ritualuri și un contract de familie și grup, astfel încât copilul se simte văzut și inclus fără conformism, părintele își consolidează fermitatea calmă și consecventă, iar familia capătă coeziune, predictibilitate și încredere reciprocă.'
+					},
+					{
+						title:
+							'LIMITE INTELIGENTE – „Ferm și blând, fără escaladare”: Învățăm limite ferme și blânde, cu limbaj de reparație și protocoale de “pauză” în conflict, astfel încât copilul își dezvoltă autocontrolul și respectul pentru reguli, devenind mai cooperant, părintele învață intervenții eficiente fără ridicarea tonului și fără rușinare, iar familia reduce crizele, negocierile infinite și tensiunea zilnică.'
+					},
+					{
+						title:
+							'AUTOREGLARE – „Corpul ca bază pentru minte”: Stabilizăm atenția și emoțiile prin corp, ritm, somn, mișcare și instrumente scurte de resetare, astfel încât copilul câștigă energie bună și disponibilitate pentru învățare, părintele își regăsește prezența și capacitatea de co-reglare, iar familia își îmbunătățește tranzițiile, clima emoțională și reziliența.'
+					},
+					{
+						title:
+							'RELAȚII ȘI STATUT – „Prietenie, frați, grup”: Exersăm cooperarea, negocierea și repararea conflictului în contexte de echipă, astfel încât copilul își dezvoltă inteligența socială și demnitatea în grup, părintele învață când să ghideze și când să lase copilul să învețe responsabil, iar familia își crește capacitatea de colaborare și reduce rivalitatea și competiția toxică.'
+					},
+					{
+						title:
+							'COMPETENȚĂ ȘI PERSEVERENȚĂ – „Eu pot”: Construim competență prin proiecte aplicate, feedback și strategii de finalizare, astfel încât copilul își crește încrederea în învățare și toleranța la frustrare, părintele dobândește un cadru sănătos pentru motivație și rutină de lucru, iar familia transformă performanța din presiune în bucurie a efortului.'
+					},
+					{
+						title:
+							'IDENTITATE ȘI LUME DIGITALĂ – „Atenție, AI, Tehnologie, Alegeri”: Așezăm relația cu tehnologia pe discernământ, contract și creație, astfel încât copilul își protejează atenția și demnitatea, părintele capătă reguli coerente și aplicabile fără conflict permanent, iar familia echilibrează libertatea cu limite clare, folosind tehnologia ca instrument, nu ca substitut relațional.'
+					},
+					{
+						title:
+							'SENS ȘI DĂRUIRE – „Recunoștință, valori, continuitate acasă”: Integrăm experiența în valori, recunoștință și ritualuri concrete de continuitate, astfel încât copilul își dezvoltă orientarea către sens și contribuție, părintele pleacă cu un plan de menținere și intervenție în criză, iar familia consolidează schimbarea pe termen lung prin obiceiuri mici, stabile și asumate.'
+					}
 				]
 			}
 		},
@@ -243,7 +265,8 @@ function buildSectionPayloads(
 			sortOrder: 10,
 			payload: {
 				title: 'Înscriere',
-				intro: 'Înscrierea în tabăra Kogaion Family Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită nevoilor familiei dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine familiei sau copilului dvs.',
+				intro:
+					'Înscrierea în tabăra Kogaion Family Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită nevoilor familiei dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine familiei sau copilului dvs.',
 				steps: [],
 				contactNote:
 					'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci)',

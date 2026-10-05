@@ -37,7 +37,11 @@ export const PERMISSION_META: Record<
 	PermissionKey,
 	{ label: string; group: string; description?: string }
 > = {
-	'dashboard.view': { label: 'Vizualizare panou', group: 'Panou', description: 'Acces la pagina principală admin' },
+	'dashboard.view': {
+		label: 'Vizualizare panou',
+		group: 'Panou',
+		description: 'Acces la pagina principală admin'
+	},
 	'pages.view': { label: 'Vizualizare pagini', group: 'Pagini' },
 	'pages.edit': { label: 'Editare pagini', group: 'Pagini' },
 	'programs.view': { label: 'Vizualizare programe', group: 'Programe' },

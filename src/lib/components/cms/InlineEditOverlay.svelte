@@ -2,8 +2,8 @@
 	import { focusTrap } from '$lib/actions/focus-trap';
 	import { dialogBehavior } from '$lib/actions/dialog-behavior';
 	import { browser } from '$app/environment';
-	import { invalidate, invalidateAll, goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import { invalidateAll, goto } from '$app/navigation';
+
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -1456,7 +1456,6 @@
 	{/if}
 
 	{#if inlineEdit}
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div
 			class="fixed z-[9999] w-full max-w-md rounded-none border border-border bg-background shadow-xl"
 			style={inlinePopoverStyle}
@@ -1470,7 +1469,7 @@
 			<div class="p-3">
 				{#if inlineEdit.fieldGroup && inlineEdit.fieldGroup.length > 0}
 					<p class="mb-3 text-xs font-medium text-muted-foreground">Editezi</p>
-					{#each inlineEdit.fieldGroup as key}
+					{#each inlineEdit.fieldGroup as key (key)}
 						{@const sectionKey = `${inlineEdit?.page ?? ''}_${inlineEdit?.section ?? ''}`}
 						{@const fieldDef = (SECTION_FIELDS[sectionKey] ?? []).find((f) => f.key === key)}
 						{@const fieldLabel = inlineEdit?.heroLocale
@@ -1548,7 +1547,6 @@
 	{/if}
 
 	{#if modalOpen}
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 		<div
 			class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
 			role="dialog"

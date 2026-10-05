@@ -207,6 +207,7 @@
 						data-cms-id={post.id}
 						data-cms-field="body"
 					>
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 						{@html post.body}
 					</div>
 				</article>

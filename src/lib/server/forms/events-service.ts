@@ -10,12 +10,19 @@ import type { RequestEvent } from '@sveltejs/kit';
 const DEDUPE_MS = 5 * 60 * 1000;
 const dedupe = new Map<string, number>();
 
-function dedupeKey(sessionId: string, formKey: string, eventType: string, fieldKey?: string | null): string {
+function dedupeKey(
+	sessionId: string,
+	formKey: string,
+	eventType: string,
+	fieldKey?: string | null
+): string {
 	return `${sessionId}|${formKey}|${eventType}|${fieldKey ?? ''}`;
 }
 
 function shouldDedupe(eventType: string): boolean {
-	return eventType === 'form_view' || eventType === 'form_visible_50' || eventType === 'first_focus';
+	return (
+		eventType === 'form_view' || eventType === 'form_visible_50' || eventType === 'first_focus'
+	);
 }
 
 export type IncomingFormEvent = {
@@ -27,7 +34,10 @@ export type IncomingFormEvent = {
 	metadata?: Record<string, unknown> | null;
 };
 
-export async function ingestFormEvent(event: RequestEvent, body: IncomingFormEvent): Promise<{ ok: boolean }> {
+export async function ingestFormEvent(
+	event: RequestEvent,
+	body: IncomingFormEvent
+): Promise<{ ok: boolean }> {
 	pruneRateLimits();
 	const ip = getClientIp(event) ?? 'unknown';
 	if (!checkRateLimit(`fe:${ip}`, 120, 60_000)) {
@@ -64,7 +74,9 @@ export async function ingestFormEvent(event: RequestEvent, body: IncomingFormEve
 			consent: consentSnapshot(consent)
 		},
 		ipAddress: tracking ? (getClientIp(event) ?? undefined) : undefined,
-		userAgent: tracking ? event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined : undefined
+		userAgent: tracking
+			? (event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined)
+			: undefined
 	});
 
 	await bumpDailyMetricFromEvent(body.formKey, body.locale ?? '', body.eventType);

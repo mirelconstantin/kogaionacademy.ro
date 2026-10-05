@@ -9,7 +9,13 @@ import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import sharp from 'sharp';
-import { mentor, program, programLocale, programMentor, programSection } from '../src/lib/server/db/schema';
+import {
+	mentor,
+	program,
+	programLocale,
+	programMentor,
+	programSection
+} from '../src/lib/server/db/schema';
 
 const databaseUrl =
 	process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('host:port')
@@ -21,7 +27,8 @@ const PROGRAM_DIR_SLUG = 'kogaion-architecture-bootcamp';
 const UPLOAD_DIR = join(process.cwd(), 'static', 'media', 'uploads', 'programe', PROGRAM_DIR_SLUG);
 const LOCAL_BASE = `/media/uploads/programe/${PROGRAM_DIR_SLUG}`;
 
-const COVER_IMAGE_URL = 'https://kogaionacademy.ro/wp-content/uploads/2025/02/Arca-lui-Noe-1110x393.jpg';
+const COVER_IMAGE_URL =
+	'https://kogaionacademy.ro/wp-content/uploads/2025/02/Arca-lui-Noe-1110x393.jpg';
 const INTRO_IMAGE_URL =
 	'https://kogaionacademy.ro/wp-content/uploads/2025/02/WhatsApp-Image-2025-07-25-at-10.29.25.jpeg';
 const ACTIVITIES_IMAGE_URL =
@@ -245,7 +252,8 @@ function buildSectionPayloads(
 			sortOrder: 10,
 			payload: {
 				title: 'Înscriere',
-				intro: 'Înscrierea în tabăra Kogaion Architecture Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită pentru copilul dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine copilului dvs.\n\nOferte personalizate pentru grupuri de minim 5 copii.',
+				intro:
+					'Înscrierea în tabăra Kogaion Architecture Bootcamp presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită pentru copilul dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine copilului dvs.\n\nOferte personalizate pentru grupuri de minim 5 copii.',
 				steps: [],
 				contactNote:
 					'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci - consultant educațional)',

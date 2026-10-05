@@ -8,7 +8,7 @@
 </svelte:head>
 
 <div
-	class="mx-auto max-w-3xl px-6 pb-12 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] sm:pb-16"
+	class="mx-auto max-w-3xl px-6 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] pb-12 sm:pb-16"
 >
 	<h1 class="text-3xl font-semibold tracking-tight text-foreground">{data.title}</h1>
 	{#if data.lastUpdatedNote}

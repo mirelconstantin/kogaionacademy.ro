@@ -10,7 +10,8 @@
 	<header class="border-b border-border pb-6">
 		<h2 class="text-2xl font-semibold text-foreground">Pagini</h2>
 		<p class="mt-1 text-muted-foreground">
-			Alege pagina pe care vrei să o editezi. Conținutul se gestionează pe secțiuni (hero, intro, etc.).
+			Alege pagina pe care vrei să o editezi. Conținutul se gestionează pe secțiuni (hero, intro,
+			etc.).
 		</p>
 	</header>
 

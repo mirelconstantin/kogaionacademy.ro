@@ -62,7 +62,14 @@ export const load: PageServerLoad = async (event) => {
 
 	let activeAdminUsers = 0;
 	if (activeUserIds.length > 0) {
-		const adminRoles = ['super_admin', 'content_admin', 'page_editor', 'blog_editor', 'admin', 'editor'];
+		const adminRoles = [
+			'super_admin',
+			'content_admin',
+			'page_editor',
+			'blog_editor',
+			'admin',
+			'editor'
+		];
 		const activeUsers = await db
 			.select({ id: user.id, role: user.role, email: user.email })
 			.from(user)

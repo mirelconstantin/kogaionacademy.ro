@@ -4,13 +4,7 @@
  */
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import {
-	heroSettings,
-	mentor,
-	program,
-	siteSection,
-	blogPost
-} from '../src/lib/server/db/schema';
+import { heroSettings, mentor, program, siteSection, blogPost } from '../src/lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -91,7 +85,10 @@ async function main() {
 		const nv = replaceUrl(row.videoUrl);
 		const np = replaceUrl(row.posterUrl);
 		if (nv !== row.videoUrl || np !== row.posterUrl) {
-			await db.update(heroSettings).set({ videoUrl: nv!, posterUrl: np }).where(eq(heroSettings.id, row.id));
+			await db
+				.update(heroSettings)
+				.set({ videoUrl: nv!, posterUrl: np })
+				.where(eq(heroSettings.id, row.id));
 			total++;
 			console.log(`  hero_settings locale=${row.locale}`);
 		}

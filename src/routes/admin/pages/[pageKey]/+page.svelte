@@ -29,7 +29,6 @@
 	});
 
 	let result = $state<ActionData | null>(null);
-	let activeLocale = $state<'ro' | 'en'>('ro');
 
 	const homeSectionAnchors = [
 		{ id: 'admin-section-hero', label: 'Hero (banner)', sectionKey: null as string | null },
@@ -482,7 +481,7 @@
 			class="mt-4 flex flex-wrap gap-2 rounded-none border border-border/60 bg-muted/20 px-3 py-2"
 			aria-label="Secțiuni pagină"
 		>
-			{#each homeSectionAnchors.filter( (a) => (a.sectionKey === null ? data.heroRo || data.heroEn : visibleSection(a.sectionKey)) ) as { id, label }}
+			{#each homeSectionAnchors.filter( (a) => (a.sectionKey === null ? data.heroRo || data.heroEn : visibleSection(a.sectionKey)) ) as { id, label } (id)}
 				<a href="#{id}" class="text-sm text-muted-foreground underline hover:text-foreground"
 					>{label}</a
 				>
@@ -494,7 +493,7 @@
 			class="mt-4 flex flex-wrap gap-2 rounded-none border border-border/60 bg-muted/20 px-3 py-2"
 			aria-label="Secțiuni pagină"
 		>
-			{#each aboutSectionAnchors as { id, label }}
+			{#each aboutSectionAnchors as { id, label } (id)}
 				<a href="#{id}" class="text-sm text-muted-foreground underline hover:text-foreground"
 					>{label}</a
 				>
@@ -969,7 +968,7 @@
 							<Label>Introducere (text scurt)</Label>
 							<Textarea class="rounded-none" rows={2} bind:value={homeWhyUs.lead} />
 						</div>
-						{#each [homeWhyUs.item1, homeWhyUs.item2, homeWhyUs.item3] as item, i}
+						{#each [homeWhyUs.item1, homeWhyUs.item2, homeWhyUs.item3] as item, i (i)}
 							<div class="space-y-2 rounded border border-border/60 p-3 sm:col-span-2">
 								<p class="text-sm font-medium text-muted-foreground">Card {i + 1}</p>
 								<Input class="rounded-none" placeholder="Titlu" bind:value={item.title} />
@@ -1399,7 +1398,7 @@
 							rows={2}
 							bind:value={aboutTimeline.intro}
 						/>
-						{#each aboutTimeline.items as item, i}
+						{#each aboutTimeline.items as item, i (i)}
 							<div class="space-y-2 rounded border border-border/60 p-3">
 								<Label>An (ex: 2020)</Label><Input class="rounded-none" bind:value={item.year} />
 								<Label>Titlu eveniment</Label><Input class="rounded-none" bind:value={item.title} />
@@ -1510,7 +1509,7 @@
 							rows={2}
 							bind:value={aboutIntegrated.intro}
 						/>
-						{#each aboutIntegrated.items as _, i}
+						{#each aboutIntegrated.items as _, i (i)}
 							<Label>Item {i + 1}</Label><Input
 								class="rounded-none"
 								bind:value={aboutIntegrated.items[i]}
@@ -1605,7 +1604,7 @@
 							rows={2}
 							bind:value={aboutSkills.intro}
 						/>
-						{#each aboutSkills.skills as _, i}
+						{#each aboutSkills.skills as _, i (i)}
 							<Label>Competență {i + 1}</Label><Input
 								class="rounded-none"
 								bind:value={aboutSkills.skills[i]}
@@ -1701,7 +1700,7 @@
 							rows={2}
 							bind:value={aboutAgeCards.intro}
 						/>
-						{#each aboutAgeCards.cards as card, i}
+						{#each aboutAgeCards.cards as card, i (i)}
 							<div class="space-y-2 rounded border border-border/60 p-3">
 								<Label>Card {i + 1} – Titlu</Label><Input
 									class="rounded-none"
@@ -2242,7 +2241,7 @@
 						>
 							<input type="hidden" name="locale" value="ro" />
 							<div class="grid gap-3 sm:grid-cols-2">
-								{#each SOCIAL_NETWORKS as { key, label }}
+								{#each SOCIAL_NETWORKS as { key, label } (key)}
 									<div class="space-y-1">
 										<Label for={'contact-social-' + key} class="text-xs">{label}</Label>
 										<Input

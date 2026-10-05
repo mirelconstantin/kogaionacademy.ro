@@ -16,16 +16,24 @@
 	let imageError = $state(false);
 
 	$effect(() => {
-		src;
+		// Read for its side effect of registering a dependency: the image error flag
+		// has to clear whenever the source changes, or a fixed image stays broken.
+		void src;
 		imageError = false;
 	});
 
 	const initials = $derived(
-		fallback || (alt ? alt.split(/\s+/).map((s) => s[0]).join('').slice(0, 2).toUpperCase() : '')
+		fallback ||
+			(alt
+				? alt
+						.split(/\s+/)
+						.map((s) => s[0])
+						.join('')
+						.slice(0, 2)
+						.toUpperCase()
+				: '')
 	);
-	const sizeClass = $derived(
-		size === 'sm' ? 'size-8' : size === 'lg' ? 'size-12' : 'size-9'
-	);
+	const sizeClass = $derived(size === 'sm' ? 'size-8' : size === 'lg' ? 'size-12' : 'size-9');
 	const showImage = $derived(Boolean(src && !imageError));
 </script>
 
@@ -36,8 +44,8 @@
 >
 	{#if showImage}
 		<img
-			src={src}
-			alt={alt}
+			{src}
+			{alt}
 			class="aspect-square size-full object-cover"
 			data-lightview="false"
 			loading="eager"
@@ -45,12 +53,21 @@
 			onerror={() => (imageError = true)}
 		/>
 	{:else if initials}
-		<span class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground">
+		<span
+			class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
+		>
 			{initials}
 		</span>
 	{:else}
 		<span class="flex size-full items-center justify-center text-muted-foreground">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				class="size-5"
+			>
 				<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
 				<circle cx="12" cy="7" r="4" />
 			</svg>

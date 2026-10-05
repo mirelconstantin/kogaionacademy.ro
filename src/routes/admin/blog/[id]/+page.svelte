@@ -18,7 +18,19 @@
 	let {
 		data
 	}: {
-		data: { post: { id: number; title: string; slug: string; excerpt: string | null; body: string; status: string; featuredImage: string | null; publishedAt: Date | null; scheduledFor: Date | null } };
+		data: {
+			post: {
+				id: number;
+				title: string;
+				slug: string;
+				excerpt: string | null;
+				body: string;
+				status: string;
+				featuredImage: string | null;
+				publishedAt: Date | null;
+				scheduledFor: Date | null;
+			};
+		};
 	} = $props();
 	let result = $state<ActionData | null>(null);
 	let titleValue = $state('');
@@ -77,7 +89,7 @@
 		</a>
 		{#if data.post.status === 'published'}
 			<a
-				href={"/blog/" + encodeURIComponent(data.post.slug)}
+				href={'/blog/' + encodeURIComponent(data.post.slug)}
 				target="_blank"
 				rel="noopener noreferrer"
 				class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -92,13 +104,15 @@
 	<form
 		method="POST"
 		action="?/save"
-		use:enhance={() => async ({ result: r }) => {
-			if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Articol actualizat.');
-			if (r.type === 'success' && r.data) {
-				result = r.data as ActionData;
-				if ((r.data as ActionData)?.success) goto('/admin/blog');
-			}
-		}}
+		use:enhance={() =>
+			async ({ result: r }) => {
+				if (r.type === 'success' || r.type === 'failure')
+					toastFromActionWithMessage(r.data as ActionData, 'Articol actualizat.');
+				if (r.type === 'success' && r.data) {
+					result = r.data as ActionData;
+					if ((r.data as ActionData)?.success) goto('/admin/blog');
+				}
+			}}
 		class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]"
 	>
 		<div class="space-y-6 lg:order-1">
@@ -120,7 +134,13 @@
 						/>
 						<p class="mt-1 text-sm text-muted-foreground">URL: /blog/{slugValue || '…'}</p>
 					</div>
-					<Button type="button" variant="outline" class="shrink-0 rounded-none" onclick={generateSlug} title="Generează din titlu">
+					<Button
+						type="button"
+						variant="outline"
+						class="shrink-0 rounded-none"
+						onclick={generateSlug}
+						title="Generează din titlu"
+					>
 						<RefreshCw class="size-4" />
 					</Button>
 				</div>
@@ -131,14 +151,19 @@
 					id="excerpt"
 					name="excerpt"
 					rows="3"
-					class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-					placeholder="Apare pe lista de articole și în meta."
-				>{data.post.excerpt ?? ''}</textarea>
+					class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+					placeholder="Apare pe lista de articole și în meta.">{data.post.excerpt ?? ''}</textarea
+				>
 			</div>
 			<div>
 				<Label for="body">Conținut</Label>
 				<div class="mt-1">
-					<EdraFormField proseVariant="blog" name="body" value={data.post.body} placeholder="Scrie conținutul articolului..." />
+					<EdraFormField
+						proseVariant="blog"
+						name="body"
+						value={data.post.body}
+						placeholder="Scrie conținutul articolului..."
+					/>
 				</div>
 			</div>
 		</div>
@@ -149,7 +174,11 @@
 				<input type="hidden" name="status" value={statusValue} />
 				<Select.Root type="single" bind:value={statusValue}>
 					<Select.Trigger class="w-full rounded-none">
-						{statusValue === 'draft' ? 'Ciornă' : statusValue === 'scheduled' ? 'Programat' : 'Publicat'}
+						{statusValue === 'draft'
+							? 'Ciornă'
+							: statusValue === 'scheduled'
+								? 'Programat'
+								: 'Publicat'}
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="draft" label="Ciornă">Ciornă</Select.Item>
@@ -191,7 +220,12 @@
 
 		<div class="flex gap-2 border-t border-border pt-6 lg:col-span-2">
 			<Button type="submit" class="rounded-none">Salvează</Button>
-			<Button type="button" variant="outline" class="rounded-none" onclick={() => goto('/admin/blog')}>
+			<Button
+				type="button"
+				variant="outline"
+				class="rounded-none"
+				onclick={() => goto('/admin/blog')}
+			>
 				Anulare
 			</Button>
 		</div>
@@ -201,13 +235,21 @@
 			method="POST"
 			action="?/delete"
 			use:enhance={({ cancel }) => {
-				if (!confirm('Sigur vrei să ștergi acest articol? Nu va mai apărea pe site, dar poate fi recuperat din baza de date.')) {
+				if (
+					!confirm(
+						'Sigur vrei să ștergi acest articol? Nu va mai apărea pe site, dar poate fi recuperat din baza de date.'
+					)
+				) {
 					cancel();
 				}
 			}}
 			class="inline"
 		>
-			<Button type="submit" variant="outline" class="rounded-none text-destructive hover:bg-destructive/10 hover:text-destructive">
+			<Button
+				type="submit"
+				variant="outline"
+				class="rounded-none text-destructive hover:bg-destructive/10 hover:text-destructive"
+			>
 				<Trash2 class="size-4 shrink-0" aria-hidden="true" />
 				Șterge articol
 			</Button>

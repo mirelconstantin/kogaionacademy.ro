@@ -26,7 +26,14 @@ export const GET: RequestHandler = async (event) => {
 
 export const PATCH: RequestHandler = async (event) => {
 	requirePermission(event, 'media.edit_metadata');
-	let body: { url: string; title?: string; alt?: string; caption?: string; description?: string; tags?: string[] };
+	let body: {
+		url: string;
+		title?: string;
+		alt?: string;
+		caption?: string;
+		description?: string;
+		tags?: string[];
+	};
 	try {
 		body = await event.request.json();
 	} catch {

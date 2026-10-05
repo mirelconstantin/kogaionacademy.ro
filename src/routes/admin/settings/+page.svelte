@@ -53,13 +53,15 @@
 	<form
 		method="POST"
 		action="?/updateProfile"
-		use:enhance={() => async ({ result: r }) => {
-			if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Profil actualizat.');
-			if (r.type === 'success' && r.data) {
-				result = r.data as ActionData;
-				if ((r.data as { success?: boolean })?.success) await invalidateAll();
-			}
-		}}
+		use:enhance={() =>
+			async ({ result: r }) => {
+				if (r.type === 'success' || r.type === 'failure')
+					toastFromActionWithMessage(r.data as ActionData, 'Profil actualizat.');
+				if (r.type === 'success' && r.data) {
+					result = r.data as ActionData;
+					if ((r.data as { success?: boolean })?.success) await invalidateAll();
+				}
+			}}
 		class="max-w-xl space-y-6"
 	>
 		<div class="space-y-2">
@@ -68,7 +70,13 @@
 		</div>
 		<div class="space-y-2">
 			<Label for="role">Rol curent</Label>
-			<Input id="role" type="text" class="rounded-none opacity-80" value={data.account.role} disabled />
+			<Input
+				id="role"
+				type="text"
+				class="rounded-none opacity-80"
+				value={data.account.role}
+				disabled
+			/>
 		</div>
 
 		{#if result && result.error}
@@ -78,9 +86,7 @@
 			<p class="text-sm text-green-600 dark:text-green-400">Profilul contului a fost actualizat.</p>
 		{/if}
 
-		<Button type="submit" class="rounded-none">
-			Salvează profilul
-		</Button>
+		<Button type="submit" class="rounded-none">Salvează profilul</Button>
 	</form>
 
 	<section class="rounded-none border border-border bg-card p-5">
@@ -94,14 +100,17 @@
 			<form
 				method="POST"
 				action="?/revokeOtherSessions"
-				use:enhance={() => async ({ result: r }) => {
-					const payload = (r.type === 'success' || r.type === 'failure') ? (r.data as ActionData) : null;
-					if (payload) toastFromActionWithMessage(payload, 'Celelalte sesiuni au fost deconectate.');
-					if (r.type === 'success' && r.data) {
-						result = r.data as ActionData;
-						await invalidateAll();
-					}
-				}}
+				use:enhance={() =>
+					async ({ result: r }) => {
+						const payload =
+							r.type === 'success' || r.type === 'failure' ? (r.data as ActionData) : null;
+						if (payload)
+							toastFromActionWithMessage(payload, 'Celelalte sesiuni au fost deconectate.');
+						if (r.type === 'success' && r.data) {
+							result = r.data as ActionData;
+							await invalidateAll();
+						}
+					}}
 			>
 				<Button type="submit" variant="outline" class="rounded-none">
 					Deconectează celelalte sesiuni
@@ -127,18 +136,18 @@
 								<form
 									method="POST"
 									action="?/revokeSession"
-									use:enhance={() => async ({ result: r }) => {
-										if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Sesiune deconectată.');
-										if (r.type === 'success' && r.data) {
-											result = r.data as ActionData;
-											await invalidateAll();
-										}
-									}}
+									use:enhance={() =>
+										async ({ result: r }) => {
+											if (r.type === 'success' || r.type === 'failure')
+												toastFromActionWithMessage(r.data as ActionData, 'Sesiune deconectată.');
+											if (r.type === 'success' && r.data) {
+												result = r.data as ActionData;
+												await invalidateAll();
+											}
+										}}
 								>
 									<input type="hidden" name="sessionId" value={s.id} />
-									<Button type="submit" variant="outline" class="rounded-none">
-										Deconectează
-									</Button>
+									<Button type="submit" variant="outline" class="rounded-none">Deconectează</Button>
 								</form>
 							{/if}
 						</div>

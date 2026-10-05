@@ -97,9 +97,21 @@ async function seed() {
 			payload: {
 				title: m(ro, 'about_timeline_title'),
 				items: [
-					{ year: '2013', title: m(ro, 'about_timeline_2013_title'), text: m(ro, 'about_founders_intro') },
-					{ year: '2016', title: m(ro, 'about_timeline_2016_title'), text: m(ro, 'about_campaign_body') },
-					{ year: m(ro, 'about_timeline_year_today'), title: m(ro, 'about_timeline_today_title'), text: m(ro, 'about_hero_paradigm') }
+					{
+						year: '2013',
+						title: m(ro, 'about_timeline_2013_title'),
+						text: m(ro, 'about_founders_intro')
+					},
+					{
+						year: '2016',
+						title: m(ro, 'about_timeline_2016_title'),
+						text: m(ro, 'about_campaign_body')
+					},
+					{
+						year: m(ro, 'about_timeline_year_today'),
+						title: m(ro, 'about_timeline_today_title'),
+						text: m(ro, 'about_hero_paradigm')
+					}
 				]
 			}
 		},
@@ -169,9 +181,21 @@ async function seed() {
 				title: m(ro, 'about_programs_structure_title'),
 				intro: m(ro, 'about_programs_structure_intro'),
 				cards: [
-					{ title: m(ro, 'about_age_early_years'), age: '3-6', image: '/media/uploads/about/age-3-6.webp' },
-					{ title: m(ro, 'about_age_primary'), age: '7-12', image: '/media/uploads/about/age-7-12.webp' },
-					{ title: m(ro, 'about_age_secondary'), age: '13-18', image: '/media/uploads/about/age-13-18.webp' }
+					{
+						title: m(ro, 'about_age_early_years'),
+						age: '3-6',
+						image: '/media/uploads/about/age-3-6.webp'
+					},
+					{
+						title: m(ro, 'about_age_primary'),
+						age: '7-12',
+						image: '/media/uploads/about/age-7-12.webp'
+					},
+					{
+						title: m(ro, 'about_age_secondary'),
+						age: '13-18',
+						image: '/media/uploads/about/age-13-18.webp'
+					}
 				]
 			}
 		},

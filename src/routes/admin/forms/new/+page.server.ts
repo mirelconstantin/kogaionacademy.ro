@@ -15,7 +15,10 @@ export const actions: Actions = {
 	default: async (event) => {
 		requirePermission(event, 'forms.edit');
 		const data = await event.request.formData();
-		const key = ((data.get('key') as string) ?? '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+		const key = ((data.get('key') as string) ?? '')
+			.trim()
+			.toLowerCase()
+			.replace(/[^a-z0-9_-]/g, '');
 		const locale = ((data.get('locale') as string) ?? 'ro').trim().slice(0, 8) || 'ro';
 		const title = ((data.get('title') as string) ?? '').trim() || key;
 		if (!key) return fail(400, { message: 'Cheie invalidă' });

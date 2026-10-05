@@ -1,10 +1,5 @@
 import { getLocale } from '$lib/paraglide/runtime';
-import {
-	getHeroSettings,
-	getMentors,
-	getPageSections,
-	getPrograms
-} from '$lib/server/content';
+import { getHeroSettings, getMentors, getPageSections, getPrograms } from '$lib/server/content';
 import type { Locale } from '$lib/server/content';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';

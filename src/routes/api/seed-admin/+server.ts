@@ -18,7 +18,8 @@ export const POST: RequestHandler = async (event) => {
 		return json({ error: 'SEED_ADMIN_SECRET not set' }, { status: 403 });
 	}
 	const body = await event.request.json().catch(() => ({}));
-	const providedSecret = body?.secret ?? body?.SEED_ADMIN_SECRET ?? event.url.searchParams.get('secret');
+	const providedSecret =
+		body?.secret ?? body?.SEED_ADMIN_SECRET ?? event.url.searchParams.get('secret');
 	if (!isDev && secret !== providedSecret) {
 		return json({ error: 'Invalid or missing secret' }, { status: 403 });
 	}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { page } from '$app/state';
 
 	let { data }: { data: { callbackURL: string } } = $props();
 </script>
@@ -13,12 +12,7 @@
 		<p class="mt-2 text-sm text-muted-foreground">
 			Conectează-te cu Google pentru a accesa panoul de administrare.
 		</p>
-		<form
-			method="POST"
-			action="?/signInGoogle"
-			use:enhance
-			class="mt-6"
-		>
+		<form method="POST" action="?/signInGoogle" use:enhance class="mt-6">
 			<input type="hidden" name="callbackURL" value={data.callbackURL} />
 			<button
 				type="submit"

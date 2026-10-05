@@ -8,7 +8,6 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import type { FullAutoFill } from 'svelte/elements';
-	import { previewValuesFromSchema } from '$lib/forms/sample-values';
 
 	let {
 		formKey,
@@ -67,7 +66,9 @@
 
 	function fieldWidthSpan(field: (typeof schema.fields)[0]): string {
 		const fallback = field.type === 'checkbox' || field.type === 'textarea' ? 12 : 6;
-		const pct = Number(field.widthPercent ?? (field.type === 'checkbox' || field.type === 'textarea' ? 100 : 50));
+		const pct = Number(
+			field.widthPercent ?? (field.type === 'checkbox' || field.type === 'textarea' ? 100 : 50)
+		);
 		switch (pct) {
 			case 25:
 				return 'md:col-span-3';
@@ -201,9 +202,9 @@
 		<div
 			class="media-diagonal-soft mt-6 rounded-none border border-[#dfeaf8] bg-white p-5 shadow-[0_8px_20px_-16px_rgba(21,75,106,0.15)]"
 		>
-			<p class="font-medium text-[#0c3044] [font-family:var(--font-spectral)]">{successMessage}</p>
+			<p class="[font-family:var(--font-spectral)] font-medium text-[#0c3044]">{successMessage}</p>
 			{#if successExtra}
-				<p class="mt-2 text-sm text-muted-foreground [font-family:var(--font-sans)]">
+				<p class="mt-2 [font-family:var(--font-sans)] text-sm text-muted-foreground">
 					{successExtra}
 				</p>
 			{/if}
@@ -222,7 +223,7 @@
 					<div class={`space-y-2 ${fieldWidthSpan(field)}`}>
 						{#if field.type === 'checkbox'}
 							<label
-								class="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-[#0c3044] [font-family:var(--font-sans)]"
+								class="flex cursor-pointer items-center gap-2.5 [font-family:var(--font-sans)] text-sm font-medium text-[#0c3044]"
 							>
 								<input
 									type="checkbox"
@@ -240,14 +241,14 @@
 						{:else if field.type === 'select' && field.options}
 							<Label
 								for={field.key}
-								class="text-sm font-medium text-[#0c3044] [font-family:var(--font-sans)]"
+								class="[font-family:var(--font-sans)] text-sm font-medium text-[#0c3044]"
 							>
 								{labelFor(field)}
 							</Label>
 							<select
 								id={field.key}
 								name={field.key}
-								class="h-12 w-full rounded-none border border-[#dfeaf8] bg-white px-4 text-sm text-[#0c3044] transition-colors focus:border-[var(--brand-blue)] focus:outline-none focus:ring-2 focus:ring-[#154b6a]/15 [font-family:var(--font-sans)]"
+								class="h-12 w-full rounded-none border border-[#dfeaf8] bg-white px-4 [font-family:var(--font-sans)] text-sm text-[#0c3044] transition-colors focus:border-[var(--brand-blue)] focus:ring-2 focus:ring-[#154b6a]/15 focus:outline-none"
 								disabled={isPreview}
 								value={values[field.key] ?? ''}
 								onchange={(e) => {
@@ -258,7 +259,9 @@
 							>
 								<option value="">—</option>
 								{#each field.options as opt (opt.value)}
-									<option value={opt.value}>{opt.label[locale] ?? opt.label['ro'] ?? opt.value}</option>
+									<option value={opt.value}
+										>{opt.label[locale] ?? opt.label['ro'] ?? opt.value}</option
+									>
 								{/each}
 							</select>
 							{#if errors[field.key]}
@@ -267,7 +270,7 @@
 						{:else if field.type === 'textarea'}
 							<Label
 								for={field.key}
-								class="text-sm font-medium text-[#0c3044] [font-family:var(--font-sans)]"
+								class="[font-family:var(--font-sans)] text-sm font-medium text-[#0c3044]"
 							>
 								{labelFor(field)}
 							</Label>
@@ -277,7 +280,7 @@
 								rows={field.rows ?? 6}
 								readonly={isPreview}
 								value={values[field.key] ?? ''}
-								class="min-h-[150px] resize-y rounded-none border-[#dfeaf8] bg-white px-4 py-3 text-[#0c3044] shadow-none transition-colors focus-visible:border-[var(--brand-blue)] focus-visible:ring-[3px] focus-visible:ring-[#154b6a]/18 [font-family:var(--font-sans)] {isPreview
+								class="min-h-[150px] resize-y rounded-none border-[#dfeaf8] bg-white px-4 py-3 [font-family:var(--font-sans)] text-[#0c3044] shadow-none transition-colors focus-visible:border-[var(--brand-blue)] focus-visible:ring-[3px] focus-visible:ring-[#154b6a]/18 {isPreview
 									? 'cursor-default bg-muted/40'
 									: ''}"
 								aria-invalid={errors[field.key] ? true : undefined}
@@ -285,7 +288,10 @@
 								autocomplete={field.autocomplete as FullAutoFill | undefined}
 								oninput={(e) => {
 									if (isPreview) return;
-									values = { ...values, [field.key]: (e.currentTarget as HTMLTextAreaElement).value };
+									values = {
+										...values,
+										[field.key]: (e.currentTarget as HTMLTextAreaElement).value
+									};
 									scheduleFieldChange(field.key);
 								}}
 							/>
@@ -295,17 +301,21 @@
 						{:else}
 							<Label
 								for={field.key}
-								class="text-sm font-medium text-[#0c3044] [font-family:var(--font-sans)]"
+								class="[font-family:var(--font-sans)] text-sm font-medium text-[#0c3044]"
 							>
 								{labelFor(field)}
 							</Label>
 							<Input
 								id={field.key}
 								name={field.key}
-								type={field.type === 'email' ? 'email' : field.type === 'number' ? 'number' : 'text'}
+								type={field.type === 'email'
+									? 'email'
+									: field.type === 'number'
+										? 'number'
+										: 'text'}
 								readonly={isPreview}
 								value={values[field.key] ?? ''}
-								class="h-12 rounded-none border-[#dfeaf8] bg-white px-4 text-[#0c3044] shadow-none transition-colors focus-visible:border-[var(--brand-blue)] focus-visible:ring-[3px] focus-visible:ring-[#154b6a]/18 [font-family:var(--font-sans)] {isPreview
+								class="h-12 rounded-none border-[#dfeaf8] bg-white px-4 [font-family:var(--font-sans)] text-[#0c3044] shadow-none transition-colors focus-visible:border-[var(--brand-blue)] focus-visible:ring-[3px] focus-visible:ring-[#154b6a]/18 {isPreview
 									? 'cursor-default bg-muted/40'
 									: ''}"
 								autocomplete={field.autocomplete as FullAutoFill | undefined}
@@ -341,20 +351,20 @@
 			{/if}
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				{#if consentHint()}
-					<p class="text-xs text-muted-foreground [font-family:var(--font-sans)]">
+					<p class="[font-family:var(--font-sans)] text-xs text-muted-foreground">
 						{consentHint()}
 					</p>
 				{:else}
 					<span></span>
 				{/if}
 				{#if isPreview}
-					<p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+					<p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 						Previzualizare — nu se trimite
 					</p>
 					<Button
 						type="button"
 						disabled={true}
-						class="btn-diagonal h-12 min-w-[13rem] cursor-not-allowed border-2 border-[#dfeaf8] bg-[#f0f5fa] px-6 text-base font-medium normal-case tracking-normal text-[#0c3044]/60"
+						class="btn-diagonal h-12 min-w-[13rem] cursor-not-allowed border-2 border-[#dfeaf8] bg-[#f0f5fa] px-6 text-base font-medium tracking-normal text-[#0c3044]/60 normal-case"
 					>
 						<span class="inline-flex items-center gap-2">
 							{submitLabel()}
@@ -365,7 +375,7 @@
 					<Button
 						type="submit"
 						disabled={submitting}
-						class="btn-diagonal h-12 min-w-[13rem] border-2 border-[var(--brand-blue)] bg-[var(--brand-blue)] px-6 text-base font-semibold normal-case tracking-normal text-white transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)]"
+						class="btn-diagonal h-12 min-w-[13rem] border-2 border-[var(--brand-blue)] bg-[var(--brand-blue)] px-6 text-base font-semibold tracking-normal text-white normal-case transition-colors hover:border-[var(--brand-blue-hover)] hover:bg-[var(--brand-blue-hover)]"
 					>
 						<span class="inline-flex items-center gap-2">
 							{submitting ? 'Se trimite…' : submitLabel()}

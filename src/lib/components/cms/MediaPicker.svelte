@@ -33,11 +33,7 @@
 	const filteredFiles = $derived.by(() => {
 		const q = searchQuery.trim().toLowerCase();
 		if (!q) return files;
-		return files.filter(
-			(f) =>
-				f.name.toLowerCase().includes(q) ||
-				f.url.toLowerCase().includes(q)
-		);
+		return files.filter((f) => f.name.toLowerCase().includes(q) || f.url.toLowerCase().includes(q));
 	});
 
 	$effect(() => {
@@ -74,7 +70,7 @@
 		searchQuery = '';
 	}
 
-	const isVideo = $derived(value && (/\.(webm|mp4)$/i.test(value)));
+	const isVideo = $derived(value && /\.(webm|mp4)$/i.test(value));
 
 	/** Normalize URL for comparison (leading slash consistent) */
 	function normUrl(u: string | undefined): string {
@@ -110,12 +106,7 @@
 		<div class="flex items-center gap-2 rounded-none border border-border bg-muted/30 p-1.5">
 			<span class="block size-14 shrink-0 overflow-hidden rounded-none bg-muted">
 				{#if isVideo}
-					<video
-						src={value}
-						preload="metadata"
-						muted
-						playsinline
-						class="size-full object-cover"
+					<video src={value} preload="metadata" muted playsinline class="size-full object-cover"
 					></video>
 				{:else}
 					<img src={value} alt="" class="size-full object-cover" />
@@ -150,8 +141,8 @@
 	>
 		<div
 			class={inline
-				? 'max-h-[60vh] w-full overflow-hidden rounded-none bg-background flex flex-col'
-				: 'max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-none border border-border bg-background shadow-xl flex flex-col'}
+				? 'flex max-h-[60vh] w-full flex-col overflow-hidden rounded-none bg-background'
+				: 'flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-none border border-border bg-background shadow-xl'}
 		>
 			<div class="flex shrink-0 flex-col gap-3 border-b border-border px-4 py-3">
 				<div class="flex items-center justify-between gap-2">
@@ -167,7 +158,9 @@
 				</div>
 				{#if !loading && !error && files.length > 0}
 					<div class="relative">
-						<Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+						<Search
+							class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+						/>
 						<Input
 							type="search"
 							class="rounded-none pl-9"
@@ -184,7 +177,9 @@
 				{:else if error}
 					<p class="text-sm text-destructive">{error}</p>
 				{:else if files.length === 0}
-					<p class="text-muted-foreground">Nicio imagine în bibliotecă. Încarcă din pagina Media.</p>
+					<p class="text-muted-foreground">
+						Nicio imagine în bibliotecă. Încarcă din pagina Media.
+					</p>
 				{:else if filteredFiles.length === 0}
 					<p class="text-muted-foreground">Niciun rezultat pentru „{searchQuery.trim() || '…'}”.</p>
 				{:else}
@@ -193,7 +188,9 @@
 							<li>
 								<button
 									type="button"
-									class="relative block w-full rounded-none border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 {isSelected(file.url)
+									class="relative block w-full rounded-none border-2 transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none {isSelected(
+										file.url
+									)
 										? 'border-primary bg-primary/15 ring-2 ring-primary ring-offset-2'
 										: 'border-border bg-muted/30 hover:border-primary hover:bg-primary/10'}"
 									onclick={() => select(file.url)}
@@ -209,18 +206,19 @@
 												class="h-full w-full object-cover"
 											></video>
 										{:else}
-											<img
-												src={file.url}
-												alt={file.name}
-												class="h-full w-full object-cover"
-											/>
+											<img src={file.url} alt={file.name} class="h-full w-full object-cover" />
 										{/if}
 									</span>
-									<span class="truncate block px-1 py-1 text-xs text-muted-foreground" title={displayName(file.name)}>
+									<span
+										class="block truncate px-1 py-1 text-xs text-muted-foreground"
+										title={displayName(file.name)}
+									>
 										{displayName(file.name)}
 									</span>
 									{#if isSelected(file.url)}
-										<span class="absolute right-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+										<span
+											class="absolute top-1 right-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground"
+										>
 											Selectat
 										</span>
 									{/if}
@@ -234,8 +232,15 @@
 				<div class="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
 					<p class="text-sm text-muted-foreground">{selected.length} selectate</p>
 					<div class="flex gap-2">
-						<Button type="button" variant="outline" class="rounded-none" onclick={close}>Anulare</Button>
-						<Button type="button" class="rounded-none" onclick={confirmMultiple} disabled={selected.length === 0}>
+						<Button type="button" variant="outline" class="rounded-none" onclick={close}
+							>Anulare</Button
+						>
+						<Button
+							type="button"
+							class="rounded-none"
+							onclick={confirmMultiple}
+							disabled={selected.length === 0}
+						>
 							Inserează selectate
 						</Button>
 					</div>

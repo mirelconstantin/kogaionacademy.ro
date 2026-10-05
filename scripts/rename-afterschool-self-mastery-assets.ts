@@ -52,9 +52,7 @@ const FILE_MAP = [
 	['Program-after-school_Kogaion-Gifted-Academy.jpg', 'afterschool-location.webp']
 ] as const;
 
-const URL_MAP = new Map(
-	FILE_MAP.map(([from, to]) => [`${BASE_URL}/${from}`, `${BASE_URL}/${to}`])
-);
+const URL_MAP = new Map(FILE_MAP.map(([from, to]) => [`${BASE_URL}/${from}`, `${BASE_URL}/${to}`]));
 
 function rewritePayload(value: unknown): unknown {
 	if (typeof value === 'string') return URL_MAP.get(value) ?? value;
@@ -146,4 +144,3 @@ main().catch((e) => {
 	console.error(e);
 	process.exit(1);
 });
-

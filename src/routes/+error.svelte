@@ -4,7 +4,11 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import Home from '@lucide/svelte/icons/home';
 
-	let { status = 500, message = 'Ceva nu a mers bine' }: { status?: number; message?: string } = $props();
+	// Read from $app/state rather than from props. +error.svelte is rendered by the
+	// router, not by a page load, and the eslint-plugin-svelte page rule only accepts
+	// `data` and `errors` here -- so any prop name it receives is reported. page.status
+	// is the same value the prop would have carried.
+	const status = $derived(page.status ?? 500);
 	const is404 = $derived(status === 404);
 	const title = $derived(is404 ? 'Pagina nu a fost găsită' : 'Eroare');
 	const desc = $derived(
@@ -19,7 +23,9 @@
 </svelte:head>
 
 <main class="flex min-h-dvh flex-col items-center justify-center bg-muted/30 px-6 py-16">
-	<div class="mx-auto w-full max-w-sm rounded-none border border-border bg-card p-8 text-center shadow-sm">
+	<div
+		class="mx-auto w-full max-w-sm rounded-none border border-border bg-card p-8 text-center shadow-sm"
+	>
 		<p class="text-8xl font-bold text-primary/30" aria-hidden="true">{status}</p>
 		<h1 class="mt-4 text-2xl font-semibold text-foreground">{title}</h1>
 		<p class="mt-3 text-muted-foreground">{desc}</p>

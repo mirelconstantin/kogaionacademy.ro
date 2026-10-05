@@ -29,10 +29,15 @@ export const actions: Actions = {
 		const slug = form.get('slug')?.toString()?.trim();
 		const excerpt = form.get('excerpt')?.toString()?.trim() || null;
 		const body = form.get('body')?.toString() ?? '';
-		const status = (form.get('status')?.toString() as 'draft' | 'scheduled' | 'published') || 'draft';
+		const status =
+			(form.get('status')?.toString() as 'draft' | 'scheduled' | 'published') || 'draft';
 		const featuredImage = form.get('featuredImage')?.toString()?.trim() || null;
-		const publishedAt = form.get('publishedAt')?.toString() ? new Date(form.get('publishedAt') as string) : null;
-		const scheduledFor = form.get('scheduledFor')?.toString() ? new Date(form.get('scheduledFor') as string) : null;
+		const publishedAt = form.get('publishedAt')?.toString()
+			? new Date(form.get('publishedAt') as string)
+			: null;
+		const scheduledFor = form.get('scheduledFor')?.toString()
+			? new Date(form.get('scheduledFor') as string)
+			: null;
 
 		if (!title || !slug) return fail(400, { error: 'Titlul și slug-ul sunt obligatorii.' });
 
@@ -45,7 +50,8 @@ export const actions: Actions = {
 			.from(blogPost)
 			.where(and(eq(blogPost.slug, normalizedSlug), ne(blogPost.id, id)))
 			.limit(1);
-		if (existing) return fail(400, { error: `Slug-ul "${normalizedSlug}" este deja folosit. Alege altul.` });
+		if (existing)
+			return fail(400, { error: `Slug-ul "${normalizedSlug}" este deja folosit. Alege altul.` });
 
 		const userId = event.locals.user?.id ?? null;
 		await db
@@ -57,7 +63,7 @@ export const actions: Actions = {
 				body,
 				status,
 				featuredImage,
-				publishedAt: status === 'published' ? publishedAt ?? new Date() : null,
+				publishedAt: status === 'published' ? (publishedAt ?? new Date()) : null,
 				scheduledFor: status === 'scheduled' ? scheduledFor : null,
 				updatedAt: new Date(),
 				updatedBy: userId != null ? String(userId) : null

@@ -15,7 +15,11 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	requirePermission(event, 'pages.view');
 	const policies = await loadLegalPoliciesFromDb();
-	const [contactRo] = await db.select().from(contactSettings).where(eq(contactSettings.locale, 'ro')).limit(1);
+	const [contactRo] = await db
+		.select()
+		.from(contactSettings)
+		.where(eq(contactSettings.locale, 'ro'))
+		.limit(1);
 	return {
 		policies,
 		contactHints: {
@@ -84,7 +88,10 @@ export const actions: Actions = {
 	resetDefaults: async (event) => {
 		requirePermission(event, 'pages.edit');
 		const defaults = defaultLegalPoliciesPayload();
-		await saveLegalPoliciesToDb(defaults, event.locals.user?.email ?? event.locals.user?.id ?? null);
+		await saveLegalPoliciesToDb(
+			defaults,
+			event.locals.user?.email ?? event.locals.user?.id ?? null
+		);
 		await logCmsAudit({
 			entityType: 'site_settings',
 			entityId: 'legal_policies',

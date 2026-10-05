@@ -24,9 +24,13 @@ function slugFromName(name: string): string {
 async function ensureUniqueMentorSlug(base: string): Promise<string> {
 	let slug = base;
 	let n = 1;
-	// eslint-disable-next-line no-constant-condition
+
 	while (true) {
-		const [existing] = await db.select({ id: mentor.id }).from(mentor).where(eq(mentor.slug, slug)).limit(1);
+		const [existing] = await db
+			.select({ id: mentor.id })
+			.from(mentor)
+			.where(eq(mentor.slug, slug))
+			.limit(1);
 		if (!existing) return slug;
 		slug = `${base}-${++n}`;
 	}
@@ -140,7 +144,10 @@ export const actions: Actions = {
 		}
 		try {
 			for (let i = 0; i < order.length; i++) {
-				await db.update(mentor).set({ sortOrder: i, updatedAt: new Date() }).where(eq(mentor.id, order[i]));
+				await db
+					.update(mentor)
+					.set({ sortOrder: i, updatedAt: new Date() })
+					.where(eq(mentor.id, order[i]));
 			}
 		} catch (e) {
 			console.error(e);

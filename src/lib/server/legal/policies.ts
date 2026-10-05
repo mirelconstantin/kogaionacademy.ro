@@ -13,7 +13,10 @@ export {
 	type LegalPoliciesPayload
 } from './legal-policies-defaults';
 
-function mergePayload(base: LegalPoliciesPayload, patch: Partial<LegalPoliciesPayload>): LegalPoliciesPayload {
+function mergePayload(
+	base: LegalPoliciesPayload,
+	patch: Partial<LegalPoliciesPayload>
+): LegalPoliciesPayload {
 	return {
 		operatorLegalName: patch.operatorLegalName ?? base.operatorLegalName,
 		operatorAddress: patch.operatorAddress ?? base.operatorAddress,
@@ -24,8 +27,10 @@ function mergePayload(base: LegalPoliciesPayload, patch: Partial<LegalPoliciesPa
 		termsMarkdown: patch.termsMarkdown ?? base.termsMarkdown,
 		consentBannerTitle: patch.consentBannerTitle ?? base.consentBannerTitle,
 		consentBannerBodyMarkdown: patch.consentBannerBodyMarkdown ?? base.consentBannerBodyMarkdown,
-		cookiePolicyLastUpdatedNote: patch.cookiePolicyLastUpdatedNote ?? base.cookiePolicyLastUpdatedNote,
-		privacyPolicyLastUpdatedNote: patch.privacyPolicyLastUpdatedNote ?? base.privacyPolicyLastUpdatedNote,
+		cookiePolicyLastUpdatedNote:
+			patch.cookiePolicyLastUpdatedNote ?? base.cookiePolicyLastUpdatedNote,
+		privacyPolicyLastUpdatedNote:
+			patch.privacyPolicyLastUpdatedNote ?? base.privacyPolicyLastUpdatedNote,
 		termsLastUpdatedNote: patch.termsLastUpdatedNote ?? base.termsLastUpdatedNote
 	};
 }
@@ -37,14 +42,22 @@ function coercePayload(raw: unknown): Partial<LegalPoliciesPayload> {
 		typeof o[key] === 'string' ? (o[key] as string) : undefined;
 	const legacyLastUpdated = str('lastUpdatedNote') ?? '';
 	return {
-		...(str('operatorLegalName') !== undefined ? { operatorLegalName: str('operatorLegalName')! } : {}),
+		...(str('operatorLegalName') !== undefined
+			? { operatorLegalName: str('operatorLegalName')! }
+			: {}),
 		...(str('operatorAddress') !== undefined ? { operatorAddress: str('operatorAddress')! } : {}),
 		...(str('operatorEmail') !== undefined ? { operatorEmail: str('operatorEmail')! } : {}),
 		...(str('dpoEmail') !== undefined ? { dpoEmail: str('dpoEmail')! } : {}),
-		...(str('cookiePolicyMarkdown') !== undefined ? { cookiePolicyMarkdown: str('cookiePolicyMarkdown')! } : {}),
-		...(str('privacyPolicyMarkdown') !== undefined ? { privacyPolicyMarkdown: str('privacyPolicyMarkdown')! } : {}),
+		...(str('cookiePolicyMarkdown') !== undefined
+			? { cookiePolicyMarkdown: str('cookiePolicyMarkdown')! }
+			: {}),
+		...(str('privacyPolicyMarkdown') !== undefined
+			? { privacyPolicyMarkdown: str('privacyPolicyMarkdown')! }
+			: {}),
 		...(str('termsMarkdown') !== undefined ? { termsMarkdown: str('termsMarkdown')! } : {}),
-		...(str('consentBannerTitle') !== undefined ? { consentBannerTitle: str('consentBannerTitle')! } : {}),
+		...(str('consentBannerTitle') !== undefined
+			? { consentBannerTitle: str('consentBannerTitle')! }
+			: {}),
 		...(str('consentBannerBodyMarkdown') !== undefined
 			? { consentBannerBodyMarkdown: str('consentBannerBodyMarkdown')! }
 			: {}),

@@ -18,6 +18,9 @@ if (browser) {
 	hideEditIcons.subscribe((v) => {
 		try {
 			localStorage.setItem(KEY, String(v));
-		} catch {}
+		} catch {
+			// Private browsing and disabled storage both throw here. The preference is
+			// cosmetic, so failing to persist it must not take the page down with it.
+		}
 	});
 }

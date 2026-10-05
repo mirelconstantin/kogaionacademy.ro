@@ -34,9 +34,10 @@
 			,
 			<a class="underline" href="/politica-de-confidentialitate">/politica-de-confidentialitate</a>
 			și
-			<a class="underline" href="/termeni-si-conditii">/termeni-si-conditii</a>. Bannerul de consimțământ de pe site nu se
-			editează aici deocamdată. Pentru textele lungi folosești editorul <strong>Edra</strong> (toolbar implicit), cu titluri
-			afișate ca pe paginile publice; câmpurile esențiale rămân separate mai jos.
+			<a class="underline" href="/termeni-si-conditii">/termeni-si-conditii</a>. Bannerul de
+			consimțământ de pe site nu se editează aici deocamdată. Pentru textele lungi folosești
+			editorul <strong>Edra</strong> (toolbar implicit), cu titluri afișate ca pe paginile publice; câmpurile
+			esențiale rămân separate mai jos.
 		</p>
 		{#if data.contactHints.email}
 			<p class="mt-2 text-xs text-muted-foreground">
@@ -59,19 +60,41 @@
 			<div class="grid gap-4 sm:grid-cols-2">
 				<div class="space-y-2 sm:col-span-2">
 					<Label for="operatorLegalName">Denumire</Label>
-					<Input id="operatorLegalName" name="operatorLegalName" class="rounded-none" value={policies.operatorLegalName} />
+					<Input
+						id="operatorLegalName"
+						name="operatorLegalName"
+						class="rounded-none"
+						value={policies.operatorLegalName}
+					/>
 				</div>
 				<div class="space-y-2 sm:col-span-2">
 					<Label for="operatorAddress">Adresă</Label>
-					<Input id="operatorAddress" name="operatorAddress" class="rounded-none" value={policies.operatorAddress} />
+					<Input
+						id="operatorAddress"
+						name="operatorAddress"
+						class="rounded-none"
+						value={policies.operatorAddress}
+					/>
 				</div>
 				<div class="space-y-2">
 					<Label for="operatorEmail">Email contact</Label>
-					<Input id="operatorEmail" name="operatorEmail" type="email" class="rounded-none" value={policies.operatorEmail} />
+					<Input
+						id="operatorEmail"
+						name="operatorEmail"
+						type="email"
+						class="rounded-none"
+						value={policies.operatorEmail}
+					/>
 				</div>
 				<div class="space-y-2">
 					<Label for="dpoEmail">Email protecția datelor / DPO</Label>
-					<Input id="dpoEmail" name="dpoEmail" type="email" class="rounded-none" value={policies.dpoEmail} />
+					<Input
+						id="dpoEmail"
+						name="dpoEmail"
+						type="email"
+						class="rounded-none"
+						value={policies.dpoEmail}
+					/>
 				</div>
 			</div>
 		</section>
@@ -79,7 +102,9 @@
 		<section class="space-y-4 border border-border bg-card p-4">
 			<h2 class="text-lg font-medium">Politica de cookie-uri</h2>
 			<div class="space-y-2">
-				<Label for="cookiePolicyLastUpdatedNote">Ultima actualizare (afișată pe pagina politicii)</Label>
+				<Label for="cookiePolicyLastUpdatedNote"
+					>Ultima actualizare (afișată pe pagina politicii)</Label
+				>
 				<Input
 					id="cookiePolicyLastUpdatedNote"
 					name="cookiePolicyLastUpdatedNote"
@@ -88,13 +113,20 @@
 					value={policies.cookiePolicyLastUpdatedNote}
 				/>
 			</div>
-			<EdraFormField proseVariant="legal" name="cookiePolicyMarkdown" value={policies.cookiePolicyMarkdown} placeholder="Scrie politica de cookie-uri..." />
+			<EdraFormField
+				proseVariant="legal"
+				name="cookiePolicyMarkdown"
+				value={policies.cookiePolicyMarkdown}
+				placeholder="Scrie politica de cookie-uri..."
+			/>
 		</section>
 
 		<section class="space-y-4 border border-border bg-card p-4">
 			<h2 class="text-lg font-medium">Politica de confidențialitate</h2>
 			<div class="space-y-2">
-				<Label for="privacyPolicyLastUpdatedNote">Ultima actualizare (afișată pe pagina politicii)</Label>
+				<Label for="privacyPolicyLastUpdatedNote"
+					>Ultima actualizare (afișată pe pagina politicii)</Label
+				>
 				<Input
 					id="privacyPolicyLastUpdatedNote"
 					name="privacyPolicyLastUpdatedNote"
@@ -142,7 +174,8 @@
 		use:enhance
 		class="border border-dashed border-border p-4"
 		onsubmit={(e) => {
-			if (!confirm('Ștergi conținutul curent și revii la șabloanele implicite?')) e.preventDefault();
+			if (!confirm('Ștergi conținutul curent și revii la șabloanele implicite?'))
+				e.preventDefault();
 		}}
 	>
 		<p class="text-sm text-muted-foreground">

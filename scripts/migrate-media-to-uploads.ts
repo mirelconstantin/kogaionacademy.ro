@@ -29,10 +29,7 @@ async function ensureDir(p: string) {
 
 async function convertToWebp(src: string, dest: string): Promise<void> {
 	await ensureDir(path.dirname(dest));
-	await sharp(src)
-		.rotate()
-		.webp({ quality: 85 })
-		.toFile(dest);
+	await sharp(src).rotate().webp({ quality: 85 }).toFile(dest);
 }
 
 function runFfmpeg(args: string[]): Promise<void> {
@@ -45,7 +42,9 @@ function runFfmpeg(args: string[]): Promise<void> {
 			return;
 		}
 		let stderr = '';
-		proc.stderr?.on('data', (d) => { stderr += d.toString(); });
+		proc.stderr?.on('data', (d) => {
+			stderr += d.toString();
+		});
 		proc.on('error', (e) => reject(e));
 		proc.on('close', (code) => {
 			if (code === 0) resolve();
@@ -58,17 +57,23 @@ async function convertVideoToWebm(src: string, dest: string): Promise<boolean> {
 	await ensureDir(path.dirname(dest));
 	try {
 		await runFfmpeg([
-			'-i', src,
-			'-c:v', 'libvpx-vp9',
-			'-crf', '30',
-			'-b:v', '0',
+			'-i',
+			src,
+			'-c:v',
+			'libvpx-vp9',
+			'-crf',
+			'30',
+			'-b:v',
+			'0',
 			'-an',
 			'-y',
 			dest
 		]);
 		return true;
-	} catch (e) {
-		console.warn('FFmpeg indisponibil sau eroare – păstrăm video original. Instalează ffmpeg pentru conversie webm.');
+	} catch {
+		console.warn(
+			'FFmpeg indisponibil sau eroare – păstrăm video original. Instalează ffmpeg pentru conversie webm.'
+		);
 		return false;
 	}
 }
@@ -193,13 +198,17 @@ async function copyHeroPoster() {
 	}
 	await ensureDir(destDir);
 	await convertToWebp(src, destPath);
-	mappings.push({ old: '/kogaion-source/images/008-RDCL5971-scaled.jpg', new: '/media/uploads/home/hero-poster.webp' });
+	mappings.push({
+		old: '/kogaion-source/images/008-RDCL5971-scaled.jpg',
+		new: '/media/uploads/home/hero-poster.webp'
+	});
 }
 
 function buildContactAboutBlogHeroMapping() {
-	mappings.push(
-		{ old: '/kogaion-source/images/008-RDCL5971-scaled.jpg', new: '/media/uploads/home/hero-poster.webp' }
-	);
+	mappings.push({
+		old: '/kogaion-source/images/008-RDCL5971-scaled.jpg',
+		new: '/media/uploads/home/hero-poster.webp'
+	});
 }
 
 async function main() {

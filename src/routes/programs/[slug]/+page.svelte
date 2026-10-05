@@ -130,7 +130,6 @@
 			program: ProgramForDisplay;
 			programCategories: typeof programCategories;
 			mentors?: MentorForDisplay[];
-			isEditor?: boolean;
 			canonicalUrl?: string;
 			baseUrl?: string;
 		};
@@ -175,6 +174,7 @@
 				: ogImageRelative
 	);
 	const canonicalUrl = $derived(data.canonicalUrl ?? '');
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by <script type="application/ld+json"> in <svelte:head>
 	const schemaCourse = $derived.by(() => {
 		const base: Record<string, unknown> = {
 			'@context': 'https://schema.org',

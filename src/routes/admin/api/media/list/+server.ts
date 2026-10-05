@@ -20,9 +20,7 @@ export const GET: RequestHandler = async (event) => {
 
 	const urls = files.map((f) => f.url);
 	const metadataRows =
-		urls.length > 0
-			? await db.select().from(mediaAsset).where(inArray(mediaAsset.url, urls))
-			: [];
+		urls.length > 0 ? await db.select().from(mediaAsset).where(inArray(mediaAsset.url, urls)) : [];
 	const metaMap = new Map(metadataRows.map((r) => [r.url, r]));
 	const filesWithMeta = files.map((f) => {
 		const meta = metaMap.get(f.url);

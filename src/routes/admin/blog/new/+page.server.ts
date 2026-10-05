@@ -16,13 +16,24 @@ export const actions: Actions = {
 		requirePermission(event, 'blog.edit');
 		const form = await event.request.formData();
 		const title = form.get('title')?.toString()?.trim();
-		const slug = form.get('slug')?.toString()?.trim() || title?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '';
+		const slug =
+			form.get('slug')?.toString()?.trim() ||
+			title
+				?.toLowerCase()
+				.replace(/\s+/g, '-')
+				.replace(/[^a-z0-9-]/g, '') ||
+			'';
 		const excerpt = form.get('excerpt')?.toString()?.trim() || null;
 		const body = form.get('body')?.toString() ?? '';
-		const status = (form.get('status')?.toString() as 'draft' | 'scheduled' | 'published') || 'draft';
+		const status =
+			(form.get('status')?.toString() as 'draft' | 'scheduled' | 'published') || 'draft';
 		const featuredImage = form.get('featuredImage')?.toString()?.trim() || null;
-		const publishedAt = form.get('publishedAt')?.toString() ? new Date(form.get('publishedAt') as string) : null;
-		const scheduledFor = form.get('scheduledFor')?.toString() ? new Date(form.get('scheduledFor') as string) : null;
+		const publishedAt = form.get('publishedAt')?.toString()
+			? new Date(form.get('publishedAt') as string)
+			: null;
+		const scheduledFor = form.get('scheduledFor')?.toString()
+			? new Date(form.get('scheduledFor') as string)
+			: null;
 
 		if (!title) return fail(400, { error: 'Titlul este obligatoriu.' });
 
@@ -35,7 +46,11 @@ export const actions: Actions = {
 		let finalSlug = baseSlug;
 		let attempt = 0;
 		while (true) {
-			const existing = await db.select({ id: blogPost.id }).from(blogPost).where(eq(blogPost.slug, finalSlug)).limit(1);
+			const existing = await db
+				.select({ id: blogPost.id })
+				.from(blogPost)
+				.where(eq(blogPost.slug, finalSlug))
+				.limit(1);
 			if (existing.length === 0) break;
 			attempt++;
 			finalSlug = `${baseSlug}-${attempt}`;
@@ -51,13 +66,13 @@ export const actions: Actions = {
 				body: body || '',
 				status,
 				featuredImage: featuredImage || null,
-				publishedAt: status === 'published' ? publishedAt ?? new Date() : null,
+				publishedAt: status === 'published' ? (publishedAt ?? new Date()) : null,
 				scheduledFor: status === 'scheduled' ? scheduledFor : null,
 				updatedBy: userId != null ? String(userId) : null
 			});
 		} catch (e) {
 			const cause = (e as { cause?: { message?: string } })?.cause;
-			const msg = (cause?.message ?? (e instanceof Error ? e.message : String(e)));
+			const msg = cause?.message ?? (e instanceof Error ? e.message : String(e));
 			if (msg.includes('unique') || msg.includes('duplicate')) {
 				return fail(400, { error: `Slug-ul "${finalSlug}" există deja. Alege altul.` });
 			}

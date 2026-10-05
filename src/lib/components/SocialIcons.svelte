@@ -6,11 +6,7 @@
 	import Globe from '@lucide/svelte/icons/globe';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
-	const ICON_MAP: Record<
-		string,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		typeof Instagram | null
-	> = {
+	const ICON_MAP: Record<string, typeof Instagram | null> = {
 		instagram: Instagram,
 		facebook: Facebook,
 		linkedin: Linkedin,
@@ -42,7 +38,7 @@
 	);
 </script>
 
-{#each socials as { name, url }}
+{#each socials as { name, url } (name)}
 	{@const key = name.toLowerCase().replace(/\s+/g, '')}
 	{@const IconComponent = ICON_MAP[key] ?? Globe}
 	{@const label = LABELS[key] ?? name}

@@ -123,7 +123,9 @@
 		controlsVisible = false;
 		isOpen = false;
 
-		const originRect = originImage?.isConnected ? toViewRect(originImage.getBoundingClientRect()) : null;
+		const originRect = originImage?.isConnected
+			? toViewRect(originImage.getBoundingClientRect())
+			: null;
 		if (originRect && originRect.width > 6 && originRect.height > 6) {
 			animatedRect = originRect;
 		} else {

@@ -194,7 +194,8 @@
 		} catch {
 			return;
 		}
-		if (!parsed || typeof parsed !== 'object' || !Array.isArray((parsed as FormSchemaV1).fields)) return;
+		if (!parsed || typeof parsed !== 'object' || !Array.isArray((parsed as FormSchemaV1).fields))
+			return;
 		const next = parsed as FormSchemaV1;
 		pushUndo();
 		schema = { ...schema, ...next, fields: next.fields };
@@ -203,22 +204,32 @@
 
 	$effect(() => {
 		if (showJsonAdvanced) {
-			jsonDraft = JSON.stringify(
-				{ ...schema, fields: items.map((r) => r.field) },
-				null,
-				2
-			);
+			jsonDraft = JSON.stringify({ ...schema, fields: items.map((r) => r.field) }, null, 2);
 		}
 	});
 
-	const paletteTypes: FormFieldType[] = ['text', 'email', 'textarea', 'tel', 'number', 'checkbox', 'select'];
+	const paletteTypes: FormFieldType[] = [
+		'text',
+		'email',
+		'textarea',
+		'tel',
+		'number',
+		'checkbox',
+		'select'
+	];
 </script>
 
 <div class="space-y-6">
 	<div class="flex flex-wrap items-center gap-2">
 		<span class="text-sm font-medium text-muted-foreground">Adaugă câmp:</span>
 		{#each paletteTypes as t (t)}
-			<Button type="button" variant="outline" size="sm" class="rounded-none text-xs" onclick={() => addField(t)}>
+			<Button
+				type="button"
+				variant="outline"
+				size="sm"
+				class="rounded-none text-xs"
+				onclick={() => addField(t)}
+			>
 				{t}
 			</Button>
 		{/each}
@@ -248,7 +259,10 @@
 					animate:flip={{ duration: flipDurationMs }}
 				>
 					<div class="flex items-center gap-2 border-b border-border/60 px-2 py-2">
-						<span class="cursor-grab text-muted-foreground active:cursor-grabbing" aria-hidden="true">
+						<span
+							class="cursor-grab text-muted-foreground active:cursor-grabbing"
+							aria-hidden="true"
+						>
 							<GripVertical class="size-4" />
 						</span>
 						<button
@@ -257,10 +271,13 @@
 							onclick={() => (expandedId = expandedId === item.id ? null : item.id)}
 						>
 							<span class="font-mono text-xs text-muted-foreground">{item.field.key}</span>
-							<span class="ml-2">{item.field.label.ro ?? item.field.label.en ?? item.field.type}</span>
+							<span class="ml-2"
+								>{item.field.label.ro ?? item.field.label.en ?? item.field.type}</span
+							>
 							<span class="ml-2 text-xs text-muted-foreground">({item.field.type})</span>
 							<span class="ml-2 text-xs text-muted-foreground">
-								{item.field.widthPercent ?? (item.field.type === 'checkbox' || item.field.type === 'textarea' ? 100 : 50)}%
+								{item.field.widthPercent ??
+									(item.field.type === 'checkbox' || item.field.type === 'textarea' ? 100 : 50)}%
 							</span>
 						</button>
 						<Button
@@ -365,7 +382,8 @@
 									}}
 								/>
 								<p class="text-xs text-muted-foreground">
-									Text subțire afișat în interiorul câmpului când utilizatorul nu a scris încă nimic.
+									Text subțire afișat în interiorul câmpului când utilizatorul nu a scris încă
+									nimic.
 								</p>
 							</div>
 							<div class="space-y-1">
@@ -380,16 +398,23 @@
 									}}
 								/>
 								<p class="text-xs text-muted-foreground">
-									Nu apare pe site; umple câmpul în tab-ul Design ca să vezi cum arată formularul completat.
+									Nu apare pe site; umple câmpul în tab-ul Design ca să vezi cum arată formularul
+									completat.
 								</p>
 							</div>
 							<div class="space-y-1">
 								<Label>Lățime pe rând (desktop)</Label>
 								<select
 									class="h-9 w-full border border-input bg-background px-2 text-sm"
-									value={String(item.field.widthPercent ?? (item.field.type === 'checkbox' || item.field.type === 'textarea' ? 100 : 50))}
+									value={String(
+										item.field.widthPercent ??
+											(item.field.type === 'checkbox' || item.field.type === 'textarea' ? 100 : 50)
+									)}
 									onchange={(e) => {
-										item.field.widthPercent = parseInt((e.currentTarget as HTMLSelectElement).value, 10);
+										item.field.widthPercent = parseInt(
+											(e.currentTarget as HTMLSelectElement).value,
+											10
+										);
 										syncSchema();
 									}}
 								>
@@ -440,7 +465,8 @@
 										class="w-24 rounded-none"
 										value={String(item.field.rows ?? 6)}
 										onchange={(e) => {
-											item.field.rows = parseInt((e.currentTarget as HTMLInputElement).value, 10) || 4;
+											item.field.rows =
+												parseInt((e.currentTarget as HTMLInputElement).value, 10) || 4;
 											syncSchema();
 										}}
 									/>
@@ -453,7 +479,9 @@
 										class="min-h-[100px] rounded-none font-mono text-xs"
 										value={optionsToText(item.field)}
 										onchange={(e) => {
-											item.field.options = textToOptions((e.currentTarget as HTMLTextAreaElement).value);
+											item.field.options = textToOptions(
+												(e.currentTarget as HTMLTextAreaElement).value
+											);
 											syncSchema();
 										}}
 									/>
@@ -466,11 +494,21 @@
 		</section>
 	</div>
 
-	<details class="rounded-none border border-dashed border-border bg-muted/10" bind:open={showJsonAdvanced}>
-		<summary class="cursor-pointer px-3 py-2 text-sm font-medium">JSON avansat (editare brută)</summary>
+	<details
+		class="rounded-none border border-dashed border-border bg-muted/10"
+		bind:open={showJsonAdvanced}
+	>
+		<summary class="cursor-pointer px-3 py-2 text-sm font-medium"
+			>JSON avansat (editare brută)</summary
+		>
 		<div class="space-y-2 border-t border-border p-3">
 			<Textarea class="min-h-[200px] rounded-none font-mono text-xs" bind:value={jsonDraft} />
-			<Button type="button" variant="secondary" class="rounded-none" onclick={applyJsonFromAdvanced}>
+			<Button
+				type="button"
+				variant="secondary"
+				class="rounded-none"
+				onclick={applyJsonFromAdvanced}
+			>
 				Aplică JSON în builder
 			</Button>
 		</div>

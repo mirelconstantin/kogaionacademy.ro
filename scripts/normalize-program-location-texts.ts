@@ -93,13 +93,13 @@ async function main() {
 		for (const loc of locales) {
 			const currentLocation = loc.locationText?.trim() || null;
 			const derivedLocation =
-				currentLocation ||
-				extractLocationFromDatesText(loc.datesText) ||
-				roDerivedLocation ||
-				null;
+				currentLocation || extractLocationFromDatesText(loc.datesText) || roDerivedLocation || null;
 			const cleanedDatesText = stripLocationFromDatesText(loc.datesText, derivedLocation);
 
-			if (derivedLocation !== currentLocation || cleanedDatesText !== (loc.datesText?.trim() || null)) {
+			if (
+				derivedLocation !== currentLocation ||
+				cleanedDatesText !== (loc.datesText?.trim() || null)
+			) {
 				await db
 					.update(programLocale)
 					.set({

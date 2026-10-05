@@ -12,7 +12,13 @@ import { join } from 'path';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { and, eq } from 'drizzle-orm';
-import { program, programLocale, programSection, programMentor, mentor } from '../src/lib/server/db/schema';
+import {
+	program,
+	programLocale,
+	programSection,
+	programMentor,
+	mentor
+} from '../src/lib/server/db/schema';
 import sharp from 'sharp';
 
 const databaseUrl =
@@ -227,11 +233,17 @@ function buildSectionPayloads(
 					{
 						title: 'Copiii',
 						areas: [
-							{ title: 'Științele complexității împreună cu dr. Florin Munteanu – derulare proiect Tehnologie inovativă.' },
+							{
+								title:
+									'Științele complexității împreună cu dr. Florin Munteanu – derulare proiect Tehnologie inovativă.'
+							},
 							{ title: 'Fizică experimentală împreună cu Dumitru Bădilă.' },
 							{ title: 'Biologie experimentală împreună cu Andreea Drăghici.' },
 							{ title: 'Anatomia corpului uman împreună cu Andreea Drăghici.' },
-							{ title: 'Cunoaștere de sine împreună cu Cristina Dinu-Popa, având ca temă Creație de detensionare, povești și boardgames.' },
+							{
+								title:
+									'Cunoaștere de sine împreună cu Cristina Dinu-Popa, având ca temă Creație de detensionare, povești și boardgames.'
+							},
 							{ title: 'Atenție și creativitate împreună cu Andrei Stan.' }
 						]
 					},
@@ -242,13 +254,22 @@ function buildSectionPayloads(
 								title:
 									'Științele complexității împreună cu dr. Florin Munteanu: Cum să fim părinți/învățători mai buni? De ce ar trebui să ne schimbăm viziunea față de realitate? Ce este de făcut? Știință – între necesitate și respingere; Programe STEM și STEAM; Programul NEXUS-Kogaion.'
 							},
-							{ title: 'Științele complexității împreună cu dr. Florin Munteanu: Aplicație – Dacă aș fi părintele lui Chopin, ce aș face?' },
+							{
+								title:
+									'Științele complexității împreună cu dr. Florin Munteanu: Aplicație – Dacă aș fi părintele lui Chopin, ce aș face?'
+							},
 							{
 								title:
 									'Științele complexității împreună cu dr. Florin Munteanu: Prezentare proiect tehnologie inovativă. Pregătirea pentru desfășurarea părții experimentale, definirea protocolului experimental, cunoașterea echipamentelor, formarea atelierelor.'
 							},
-							{ title: 'Armonie interioară și relațională împreună cu Cristina Dinu-Popa: Workshop dezvoltare personală prin experiență și mișcare.' },
-							{ title: 'Armonie interioară și relațională împreună cu Cristina Dinu-Popa: Workshop dezvoltare personală. Integrarea experienței.' },
+							{
+								title:
+									'Armonie interioară și relațională împreună cu Cristina Dinu-Popa: Workshop dezvoltare personală prin experiență și mișcare.'
+							},
+							{
+								title:
+									'Armonie interioară și relațională împreună cu Cristina Dinu-Popa: Workshop dezvoltare personală. Integrarea experienței.'
+							},
 							{
 								title:
 									'Omul și relația dintre generații. Oportunități și provocări în educația adultului de mâine, împreună cu Diana Antoci.'
@@ -277,12 +298,18 @@ function buildSectionPayloads(
 					{
 						title: 'Copiii și Părinții',
 						areas: [
-							{ title: 'Armonie relațională în familie, Atelierul lui Împreună, împreună cu Cristina Dinu-Popa.' },
+							{
+								title:
+									'Armonie relațională în familie, Atelierul lui Împreună, împreună cu Cristina Dinu-Popa.'
+							},
 							{
 								title:
 									'Prezentare proiect tehnologie inovativă, împreună cu dr. Florin Munteanu: Colectarea și centralizarea datelor obținute prin măsurători preliminare, realizate cu copiii în zilele anterioare; Desfășurarea experimentului „obiectivarea rezistenței la efort prin măsurarea tonusului muscular”; Analiză întregii baze de date și pregătirea posterului final.'
 							},
-							{ title: 'Prezentare proiect tehnologie inovativă, împreună cu dr. Florin Munteanu: Prezentarea rezultatelor în cadrul unei „mini sesiuni științifice”.' },
+							{
+								title:
+									'Prezentare proiect tehnologie inovativă, împreună cu dr. Florin Munteanu: Prezentarea rezultatelor în cadrul unei „mini sesiuni științifice”.'
+							},
 							{ title: 'Atenție și creativitate, împreună cu Andrei Stan.' },
 							{ title: 'Drumeție în Parcul Național Bucegi.' },
 							{ title: 'Carnaval.' },
@@ -292,21 +319,45 @@ function buildSectionPayloads(
 					}
 				],
 				areas: [
-					{ title: 'Copiii: Științele complexității cu dr. Florin Munteanu – derulare proiect Tehnologie inovativă.' },
+					{
+						title:
+							'Copiii: Științele complexității cu dr. Florin Munteanu – derulare proiect Tehnologie inovativă.'
+					},
 					{ title: 'Copiii: Fizică experimentală cu Dumitru Bădilă.' },
 					{ title: 'Copiii: Biologie experimentală cu Andreea Drăghici.' },
 					{ title: 'Copiii: Anatomia corpului uman cu Andreea Drăghici.' },
-					{ title: 'Copiii: Cunoaștere de sine cu Cristina Dinu-Popa (Creație de detensionare, povești și boardgames).' },
+					{
+						title:
+							'Copiii: Cunoaștere de sine cu Cristina Dinu-Popa (Creație de detensionare, povești și boardgames).'
+					},
 					{ title: 'Copiii: Atenție și creativitate cu Andrei Stan.' },
-					{ title: 'Părinții: Științele complexității cu dr. Florin Munteanu – proiect tehnologie inovativă, protocol experimental, STEM/STEAM, Programul NEXUS-Kogaion.' },
-					{ title: 'Părinții: Armonie interioară și relațională cu Cristina Dinu-Popa – workshop dezvoltare personală prin experiență și mișcare + integrarea experienței.' },
-					{ title: 'Părinții: Omul și relația dintre generații. Oportunități și provocări în educația adultului de mâine, cu Diana Antoci.' },
-					{ title: 'Părinții: Cultivarea și educarea dăruirii cu Diana Antoci – copilul gifted, Dabrowski, etică, rolul modelului uman.' },
+					{
+						title:
+							'Părinții: Științele complexității cu dr. Florin Munteanu – proiect tehnologie inovativă, protocol experimental, STEM/STEAM, Programul NEXUS-Kogaion.'
+					},
+					{
+						title:
+							'Părinții: Armonie interioară și relațională cu Cristina Dinu-Popa – workshop dezvoltare personală prin experiență și mișcare + integrarea experienței.'
+					},
+					{
+						title:
+							'Părinții: Omul și relația dintre generații. Oportunități și provocări în educația adultului de mâine, cu Diana Antoci.'
+					},
+					{
+						title:
+							'Părinții: Cultivarea și educarea dăruirii cu Diana Antoci – copilul gifted, Dabrowski, etică, rolul modelului uman.'
+					},
 					{ title: 'Părinții: Explorarea universului interior prin artă cu Andrei Stan.' },
 					{ title: 'Părinții: Atenție și creativitate cu Andrei Stan.' },
 					{ title: 'Părinții: Inovația – cheia împlinirii copiilor cu Dumitru Bădilă.' },
-					{ title: 'Copiii și părinții: Armonie relațională în familie, Atelierul lui Împreună, cu Cristina Dinu-Popa.' },
-					{ title: 'Copiii și părinții: Prezentare proiect tehnologie inovativă cu dr. Florin Munteanu (colectare/centralizare date, experiment, analiză, poster, mini sesiune științifică).' },
+					{
+						title:
+							'Copiii și părinții: Armonie relațională în familie, Atelierul lui Împreună, cu Cristina Dinu-Popa.'
+					},
+					{
+						title:
+							'Copiii și părinții: Prezentare proiect tehnologie inovativă cu dr. Florin Munteanu (colectare/centralizare date, experiment, analiză, poster, mini sesiune științifică).'
+					},
 					{ title: 'Copiii și părinții: Atenție și creativitate cu Andrei Stan.' },
 					{ title: 'Copiii și părinții: Drumeție în Parcul Național Bucegi.' },
 					{ title: 'Copiii și părinții: Carnaval.' },
@@ -353,7 +404,10 @@ function buildSectionPayloads(
 			sortOrder: 6,
 			payload: {
 				title: 'Galerie foto',
-				images: galleryImageUrls.map((url, idx) => ({ url, alt: `Galerie Gifted Family ${idx + 1}` }))
+				images: galleryImageUrls.map((url, idx) => ({
+					url,
+					alt: `Galerie Gifted Family ${idx + 1}`
+				}))
 			}
 		},
 		{
@@ -392,9 +446,11 @@ function buildSectionPayloads(
 			sortOrder: 10,
 			payload: {
 				title: 'Înscriere',
-				intro: 'Înscrierea în tabăra Kogaion Gifted Family presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită nevoilor familiei dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine familiei sau copilului dvs.',
+				intro:
+					'Înscrierea în tabăra Kogaion Gifted Family presupune o primă discuție cu reprezentanții Kogaion, pentru stabilirea împreună a măsurii în care tabăra este potrivită nevoilor familiei dvs. și pentru ghidarea către programul educațional care se potrivește cel mai bine familiei sau copilului dvs.',
 				steps: [],
-				contactNote: 'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci)',
+				contactNote:
+					'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci)',
 				buttons: [
 					{ label: 'Sună', type: 'tel', value: '0720529398' },
 					{ label: 'Cere detalii', type: 'link', href: '/contact' },

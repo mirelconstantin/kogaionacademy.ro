@@ -14,7 +14,8 @@
 		<div>
 			<h1 class="text-2xl font-semibold tracking-tight">Formulare</h1>
 			<p class="mt-1 text-sm text-muted-foreground">
-				Definiții versionate, răspunsuri și analiză. Formularul public se actualizează după publicare.
+				Definiții versionate, răspunsuri și analiză. Formularul public se actualizează după
+				publicare.
 			</p>
 		</div>
 		{#if canEdit}
@@ -54,8 +55,9 @@
 
 	{#if data.forms.length === 0}
 		<p class="text-sm text-muted-foreground">
-			Nicio definiție încă. Rulează <code class="rounded bg-muted px-1">bun run scripts/seed-forms-default.ts</code> sau
-			creează un formular nou.
+			Nicio definiție încă. Rulează <code class="rounded bg-muted px-1"
+				>bun run scripts/seed-forms-default.ts</code
+			> sau creează un formular nou.
 		</p>
 	{/if}
 </div>

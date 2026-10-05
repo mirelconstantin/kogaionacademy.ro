@@ -72,7 +72,9 @@ function normalizeDetailPath(path: string): string {
 /**
  * Returns where a single media URL is referenced (for modal and delete guard).
  */
-export async function getMediaUsage(url: string): Promise<{ used: boolean; locations: UsageLocation[] }> {
+export async function getMediaUsage(
+	url: string
+): Promise<{ used: boolean; locations: UsageLocation[] }> {
 	const locations: UsageLocation[] = [];
 
 	const norm = url.startsWith('/') ? url : `/${url}`;
@@ -134,7 +136,10 @@ export async function getMediaUsage(url: string): Promise<{ used: boolean; locat
 		.from(blogPost)
 		.where(like(blogPost.body, `%${norm}%`));
 	for (const p of postsWithBody) {
-		if (p.body?.includes(norm) && !locations.some((l) => l.type === 'blog' && l.id === String(p.id))) {
+		if (
+			p.body?.includes(norm) &&
+			!locations.some((l) => l.type === 'blog' && l.id === String(p.id))
+		) {
 			locations.push({
 				type: 'blog',
 				id: String(p.id),
@@ -234,7 +239,9 @@ export async function getAllUsedMediaUrls(): Promise<Set<string>> {
 	const programs = await db.select({ image: program.image }).from(program);
 	programs.forEach((p) => add(p.image));
 
-	const posts = await db.select({ featuredImage: blogPost.featuredImage, body: blogPost.body }).from(blogPost);
+	const posts = await db
+		.select({ featuredImage: blogPost.featuredImage, body: blogPost.body })
+		.from(blogPost);
 	for (const p of posts) {
 		add(p.featuredImage);
 		if (p.body && p.body.includes(MEDIA_PREFIX)) {
@@ -243,7 +250,9 @@ export async function getAllUsedMediaUrls(): Promise<Set<string>> {
 		}
 	}
 
-	const heroRows = await db.select({ videoUrl: heroSettings.videoUrl, posterUrl: heroSettings.posterUrl }).from(heroSettings);
+	const heroRows = await db
+		.select({ videoUrl: heroSettings.videoUrl, posterUrl: heroSettings.posterUrl })
+		.from(heroSettings);
 	for (const h of heroRows) {
 		add(h.videoUrl);
 		add(h.posterUrl);

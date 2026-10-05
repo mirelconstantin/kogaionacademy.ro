@@ -13,7 +13,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import type { ActionData } from './$types';
 
-	let { formAction, data }: { formAction: string; data: { success?: boolean; error?: string } } = $props();
+	let { data }: { data: { success?: boolean } } = $props();
 	let titleValue = $state('');
 	let slugValue = $state('');
 	let slugManuallyEdited = $state(false);
@@ -50,25 +50,23 @@
 	</a>
 	<h2 class="mt-4 text-2xl font-semibold text-foreground">Articol nou</h2>
 
+	<!-- No `action`: +page.server.ts exports a `default` action, and a form that
+	     posts to the current URL is routed to it. The old `action={formAction}` read a
+	     prop that load() never returned, so it was silently undefined. -->
 	<form
 		method="POST"
-		action={formAction}
-		use:enhance={() => async ({ result: r }) => {
-			if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Articol creat.');
-			if (r.type === 'success' && (r.data as ActionData)?.success) goto('/admin/blog');
-		}}
+		use:enhance={() =>
+			async ({ result: r }) => {
+				if (r.type === 'success' || r.type === 'failure')
+					toastFromActionWithMessage(r.data as ActionData, 'Articol creat.');
+				if (r.type === 'success' && (r.data as ActionData)?.success) goto('/admin/blog');
+			}}
 		class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]"
 	>
 		<div class="space-y-6 lg:order-1">
 			<div>
 				<Label for="title">Titlu</Label>
-				<Input
-					id="title"
-					name="title"
-					class="mt-1 rounded-none"
-					required
-					bind:value={titleValue}
-				/>
+				<Input id="title" name="title" class="mt-1 rounded-none" required bind:value={titleValue} />
 			</div>
 			<div>
 				<div class="flex items-end gap-2">
@@ -84,7 +82,13 @@
 						/>
 						<p class="mt-1 text-sm text-muted-foreground">URL: /blog/{slugValue || '…'}</p>
 					</div>
-					<Button type="button" variant="outline" class="shrink-0 rounded-none" onclick={generateSlug} title="Generează din titlu">
+					<Button
+						type="button"
+						variant="outline"
+						class="shrink-0 rounded-none"
+						onclick={generateSlug}
+						title="Generează din titlu"
+					>
 						<RefreshCw class="size-4" />
 					</Button>
 				</div>
@@ -95,14 +99,19 @@
 					id="excerpt"
 					name="excerpt"
 					rows="3"
-					class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					class="mt-1 w-full rounded-none border border-input bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 					placeholder="Apare pe lista de articole și în meta."
 				></textarea>
 			</div>
 			<div>
 				<Label for="body">Conținut</Label>
 				<div class="mt-1">
-					<EdraFormField proseVariant="blog" name="body" value="" placeholder="Scrie conținutul articolului..." />
+					<EdraFormField
+						proseVariant="blog"
+						name="body"
+						value=""
+						placeholder="Scrie conținutul articolului..."
+					/>
 				</div>
 			</div>
 		</div>
@@ -113,7 +122,11 @@
 				<input type="hidden" name="status" value={statusValue} />
 				<Select.Root type="single" bind:value={statusValue}>
 					<Select.Trigger class="w-full rounded-none">
-						{statusValue === 'draft' ? 'Ciornă' : statusValue === 'scheduled' ? 'Programat' : 'Publicat'}
+						{statusValue === 'draft'
+							? 'Ciornă'
+							: statusValue === 'scheduled'
+								? 'Programat'
+								: 'Publicat'}
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Item value="draft" label="Ciornă">Ciornă</Select.Item>
@@ -124,13 +137,23 @@
 				{#if statusValue === 'published'}
 					<div class="mt-3">
 						<Label for="publishedAt">Data publicării</Label>
-						<Input id="publishedAt" name="publishedAt" type="datetime-local" class="mt-1 rounded-none" />
+						<Input
+							id="publishedAt"
+							name="publishedAt"
+							type="datetime-local"
+							class="mt-1 rounded-none"
+						/>
 					</div>
 				{/if}
 				{#if statusValue === 'scheduled'}
 					<div class="mt-3">
 						<Label for="scheduledFor">Programat pentru</Label>
-						<Input id="scheduledFor" name="scheduledFor" type="datetime-local" class="mt-1 rounded-none" />
+						<Input
+							id="scheduledFor"
+							name="scheduledFor"
+							type="datetime-local"
+							class="mt-1 rounded-none"
+						/>
 					</div>
 				{/if}
 			</div>
@@ -143,7 +166,12 @@
 
 		<div class="flex gap-2 border-t border-border pt-6 lg:col-span-2">
 			<Button type="submit" class="rounded-none">Salvează articol</Button>
-			<Button type="button" variant="outline" class="rounded-none" onclick={() => goto('/admin/blog')}>
+			<Button
+				type="button"
+				variant="outline"
+				class="rounded-none"
+				onclick={() => goto('/admin/blog')}
+			>
 				Anulare
 			</Button>
 		</div>

@@ -1,6 +1,12 @@
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { program, programLocale, programSection, programMentor, mentor } from '$lib/server/db/schema';
+import {
+	program,
+	programLocale,
+	programSection,
+	programMentor,
+	mentor
+} from '$lib/server/db/schema';
 import { requirePermission } from '$lib/server/permissions';
 import { eq, asc } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
@@ -11,10 +17,7 @@ export const load: PageServerLoad = async (event) => {
 	if (Number.isNaN(id)) throw error(404, 'Program negăsit');
 	const [p] = await db.select().from(program).where(eq(program.id, id)).limit(1);
 	if (!p) throw error(404, 'Program negăsit');
-	const locales = await db
-		.select()
-		.from(programLocale)
-		.where(eq(programLocale.programId, id));
+	const locales = await db.select().from(programLocale).where(eq(programLocale.programId, id));
 	const ro = locales.find((l) => l.locale === 'ro');
 	const sectionRows = await db
 		.select()

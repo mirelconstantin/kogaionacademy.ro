@@ -103,7 +103,8 @@
 	type BackLink = { href: string; label: string };
 	const backLink = $derived.by((): BackLink | null => {
 		if (!isAdminContext || !pathname) return null;
-		if (pathname.startsWith('/admin/blog/')) return { href: '/admin/blog', label: 'Înapoi la Blog' };
+		if (pathname.startsWith('/admin/blog/'))
+			return { href: '/admin/blog', label: 'Înapoi la Blog' };
 		if (pathname.startsWith('/admin/programs/'))
 			return { href: '/admin/pages/programs', label: 'Înapoi la Programe' };
 		return null;
@@ -140,9 +141,7 @@
 		hideEditIcons.update((v) => !v);
 	}
 
-	const breadcrumbText = $derived(
-		breadcrumbs.map((b) => b.label).join(' › ')
-	);
+	const breadcrumbText = $derived(breadcrumbs.map((b) => b.label).join(' › '));
 </script>
 
 <!-- Mobile: single row — Panou/Site cu text; nume lângă avatar; edit = icon lângă meniu -->
@@ -204,78 +203,84 @@
 			</Tooltip.Root>
 		{/if}
 
-	<details class="admin-bar-more relative z-[110] shrink-0">
-		<summary
-			class="flex size-9 cursor-pointer list-none items-center justify-center rounded-none border border-border bg-background text-foreground hover:bg-muted [&::-webkit-details-marker]:hidden"
-			aria-label="Mai multe opțiuni admin"
-		>
-			<EllipsisVertical class="size-4" />
-		</summary>
-		<div
-			class="absolute right-0 z-[120] mt-1 flex min-w-[16rem] max-w-[min(18rem,calc(100vw-1rem))] flex-col gap-2 border border-border bg-card p-3 text-sm shadow-lg"
-		>
-			<p class="flex items-center gap-1.5 text-xs text-muted-foreground">
-				<span class="inline-block size-2 shrink-0 rounded-full bg-emerald-500" aria-hidden="true"></span>
-				{activeCount} activi (ultimele 5 min)
-			</p>
+		<details class="admin-bar-more relative z-[110] shrink-0">
+			<summary
+				class="flex size-9 cursor-pointer list-none items-center justify-center rounded-none border border-border bg-background text-foreground hover:bg-muted [&::-webkit-details-marker]:hidden"
+				aria-label="Mai multe opțiuni admin"
+			>
+				<EllipsisVertical class="size-4" />
+			</summary>
+			<div
+				class="absolute right-0 z-[120] mt-1 flex max-w-[min(18rem,calc(100vw-1rem))] min-w-[16rem] flex-col gap-2 border border-border bg-card p-3 text-sm shadow-lg"
+			>
+				<p class="flex items-center gap-1.5 text-xs text-muted-foreground">
+					<span class="inline-block size-2 shrink-0 rounded-full bg-emerald-500" aria-hidden="true"
+					></span>
+					{activeCount} activi (ultimele 5 min)
+				</p>
 
-			{#if isAdminContext}
-				{#if backLink}
+				{#if isAdminContext}
+					{#if backLink}
+						<a
+							href={backLink.href}
+							class="inline-flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-foreground hover:bg-muted"
+						>
+							<ArrowLeft class="size-4 shrink-0" />
+							{backLink.label}
+						</a>
+					{/if}
 					<a
-						href={backLink.href}
+						href="/admin/blog/new"
 						class="inline-flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-foreground hover:bg-muted"
 					>
-						<ArrowLeft class="size-4 shrink-0" />
-						{backLink.label}
+						<FilePlus class="size-4 shrink-0" />
+						Articol nou
 					</a>
-				{/if}
-				<a
-					href="/admin/blog/new"
-					class="inline-flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-foreground hover:bg-muted"
-				>
-					<FilePlus class="size-4 shrink-0" />
-					Articol nou
-				</a>
-				<a
-					href="/admin/media"
-					class="inline-flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-foreground hover:bg-muted"
-				>
-					<ImagePlus class="size-4 shrink-0" />
-					Media
-				</a>
-				{#if breadcrumbs.length > 0}
-					<p class="text-xs text-muted-foreground">{breadcrumbText}</p>
-				{/if}
-			{:else}
-				<button
-					type="button"
-					class="inline-flex w-full items-center justify-center gap-2 rounded-none border px-3 py-2 text-left text-xs font-medium transition-colors {$hideEditIcons
-						? 'border-primary bg-primary/10 text-primary'
-						: 'border-border bg-background text-foreground hover:bg-muted'}"
-					aria-pressed={$hideEditIcons}
-					onclick={() => toggleHideIcons()}
-				>
-					{#if $hideEditIcons}
-						<EyeOff class="size-4 shrink-0" />
-						Afișează buton editare
-					{:else}
-						<Eye class="size-4 shrink-0" />
-						Ascunde buton editare
+					<a
+						href="/admin/media"
+						class="inline-flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-foreground hover:bg-muted"
+					>
+						<ImagePlus class="size-4 shrink-0" />
+						Media
+					</a>
+					{#if breadcrumbs.length > 0}
+						<p class="text-xs text-muted-foreground">{breadcrumbText}</p>
 					{/if}
-				</button>
-			{/if}
+				{:else}
+					<button
+						type="button"
+						class="inline-flex w-full items-center justify-center gap-2 rounded-none border px-3 py-2 text-left text-xs font-medium transition-colors {$hideEditIcons
+							? 'border-primary bg-primary/10 text-primary'
+							: 'border-border bg-background text-foreground hover:bg-muted'}"
+						aria-pressed={$hideEditIcons}
+						onclick={() => toggleHideIcons()}
+					>
+						{#if $hideEditIcons}
+							<EyeOff class="size-4 shrink-0" />
+							Afișează buton editare
+						{:else}
+							<Eye class="size-4 shrink-0" />
+							Ascunde buton editare
+						{/if}
+					</button>
+				{/if}
 
-			<form method="POST" action="/login?/signOut" use:enhance class="border-t border-border pt-2">
-				<button
-					type="submit"
-					class="inline-flex w-full items-center justify-center gap-2 rounded-none border border-border bg-background px-3 py-2 font-medium text-foreground hover:bg-muted"
+				<form
+					method="POST"
+					action="/login?/signOut"
+					use:enhance
+					class="border-t border-border pt-2"
 				>
-					<LogOut class="size-4" />
-					Deconectare
-				</button>
-			</form>
-		</div>
-	</details>
+					<button
+						type="submit"
+						class="inline-flex w-full items-center justify-center gap-2 rounded-none border border-border bg-background px-3 py-2 font-medium text-foreground hover:bg-muted"
+					>
+						<LogOut class="size-4" />
+						Deconectare
+					</button>
+				</form>
+			</div>
+		</details>
 	</div>
 </div>
 
@@ -342,7 +347,9 @@
 						<span aria-hidden="true" class="shrink-0 opacity-60">›</span>
 					{/if}
 					{#if item.href}
-						<a href={item.href} class="shrink-0 transition-colors hover:text-foreground">{item.label}</a>
+						<a href={item.href} class="shrink-0 transition-colors hover:text-foreground"
+							>{item.label}</a
+						>
 					{:else}
 						<span class="shrink-0 font-medium text-foreground">{item.label}</span>
 					{/if}

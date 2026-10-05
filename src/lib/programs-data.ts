@@ -86,7 +86,8 @@ export const programsList: ProgramItem[] = [
 		durationKey: 'programs_duration_7_days',
 		datesKey: 'program_family_4_6_dates',
 		badge: 'early_bird',
-		image: '/media/uploads/programe/kogaion-family-bootcamp-4-6-ani/kogaion-family-bootcamp-4-6-ani-cover.webp'
+		image:
+			'/media/uploads/programe/kogaion-family-bootcamp-4-6-ani/kogaion-family-bootcamp-4-6-ani-cover.webp'
 	},
 	{
 		slug: 'kogaion-family-bootcamp',
@@ -131,7 +132,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_moieciu',
 		durationKey: 'programs_duration_6_days',
 		datesKey: 'program_architecture_bc_dates',
-		image: '/media/uploads/programe/kogaion-architecture-bootcamp/kogaion-architecture-bootcamp-cover.webp'
+		image:
+			'/media/uploads/programe/kogaion-architecture-bootcamp/kogaion-architecture-bootcamp-cover.webp'
 	},
 	{
 		slug: 'kogaion-engineer-bootcamp-2',
@@ -142,7 +144,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_moieciu',
 		durationKey: 'programs_duration_6_days',
 		datesKey: 'program_engineer_dates',
-		image: '/media/uploads/programe/kogaion-engineer-bootcamp-2/kogaion-engineer-bootcamp-2-cover.webp'
+		image:
+			'/media/uploads/programe/kogaion-engineer-bootcamp-2/kogaion-engineer-bootcamp-2-cover.webp'
 	},
 	{
 		slug: 'kogaion-astronomy-bootcamp',
@@ -153,7 +156,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_moieciu',
 		durationKey: 'programs_duration_6_days',
 		datesKey: 'program_astronomy_dates',
-		image: '/media/uploads/programe/kogaion-astronomy-bootcamp/kogaion-astronomy-bootcamp-cover.webp'
+		image:
+			'/media/uploads/programe/kogaion-astronomy-bootcamp/kogaion-astronomy-bootcamp-cover.webp'
 	},
 	{
 		slug: 'kogaion-arts-bootcamp-2',
@@ -175,7 +179,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_moieciu',
 		durationKey: 'programs_duration_6_days',
 		datesKey: 'program_robotics_dates',
-		image: '/media/uploads/programe/kogaion-robotics-bootcamp-2/kogaion-robotics-bootcamp-2-cover.webp'
+		image:
+			'/media/uploads/programe/kogaion-robotics-bootcamp-2/kogaion-robotics-bootcamp-2-cover.webp'
 	},
 	// Teens (5)
 	{
@@ -187,7 +192,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_bran',
 		durationKey: 'programs_duration_10_days',
 		datesKey: 'program_film_photo_dates',
-		image: '/media/uploads/programe/film-and-photo-advanced-learning/film-and-photo-advanced-learning-cover.webp'
+		image:
+			'/media/uploads/programe/film-and-photo-advanced-learning/film-and-photo-advanced-learning-cover.webp'
 	},
 	{
 		slug: 'architecture-advanced-learning',
@@ -198,7 +204,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_bran',
 		durationKey: 'programs_duration_10_days',
 		datesKey: 'program_architecture_al_dates',
-		image: '/media/uploads/programe/architecture-advanced-learning/architecture-advanced-learning-cover.webp'
+		image:
+			'/media/uploads/programe/architecture-advanced-learning/architecture-advanced-learning-cover.webp'
 	},
 	{
 		slug: 'technology-advanced-learning',
@@ -209,7 +216,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_bran',
 		durationKey: 'programs_duration_10_days',
 		datesKey: 'program_technology_dates',
-		image: '/media/uploads/programe/technology-advanced-learning/technology-advanced-learning-cover.webp'
+		image:
+			'/media/uploads/programe/technology-advanced-learning/technology-advanced-learning-cover.webp'
 	},
 	{
 		slug: 'interior-architecture-advanced-learning',
@@ -220,7 +228,8 @@ export const programsList: ProgramItem[] = [
 		locationKey: 'programs_location_bran',
 		durationKey: 'programs_duration_10_days',
 		datesKey: 'program_interior_dates',
-		image: '/media/uploads/programe/interior-architecture-advanced-learning/interior-architecture-advanced-learning-cover.webp'
+		image:
+			'/media/uploads/programe/interior-architecture-advanced-learning/interior-architecture-advanced-learning-cover.webp'
 	},
 	{
 		slug: 'conectom-advanced-learning-2',
@@ -232,6 +241,7 @@ export const programsList: ProgramItem[] = [
 		durationKey: 'programs_duration_10_days',
 		datesKey: 'program_conectom_dates',
 		badge: 'new',
-		image: '/media/uploads/programe/conectom-advanced-learning-2/conectom-advanced-learning-2-cover.webp'
+		image:
+			'/media/uploads/programe/conectom-advanced-learning-2/conectom-advanced-learning-2-cover.webp'
 	}
 ];

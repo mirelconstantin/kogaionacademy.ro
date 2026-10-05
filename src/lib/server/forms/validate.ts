@@ -6,7 +6,10 @@ export type ValidationResult =
 	| { ok: true; values: Record<string, string> }
 	| { ok: false; errors: Record<string, string>; values: Record<string, string> };
 
-export function validateAgainstSchema(schema: FormSchemaV1, body: Record<string, unknown>): ValidationResult {
+export function validateAgainstSchema(
+	schema: FormSchemaV1,
+	body: Record<string, unknown>
+): ValidationResult {
 	const values: Record<string, string> = {};
 	const errors: Record<string, string> = {};
 
@@ -32,7 +35,8 @@ export function validateAgainstSchema(schema: FormSchemaV1, body: Record<string,
 				// expect 'on' or 'true'
 				break;
 			case 'select':
-				if (field.options && !field.options.some((o) => o.value === str)) errors[field.key] = 'invalid';
+				if (field.options && !field.options.some((o) => o.value === str))
+					errors[field.key] = 'invalid';
 				break;
 			default:
 				break;

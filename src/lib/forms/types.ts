@@ -1,7 +1,14 @@
 /**
  * Shared form definition schema (stored in forms_definition.schema_json).
  */
-export type FormFieldType = 'text' | 'email' | 'textarea' | 'tel' | 'number' | 'checkbox' | 'select';
+export type FormFieldType =
+	| 'text'
+	| 'email'
+	| 'textarea'
+	| 'tel'
+	| 'number'
+	| 'checkbox'
+	| 'select';
 
 export type LocalizedString = Record<string, string>;
 

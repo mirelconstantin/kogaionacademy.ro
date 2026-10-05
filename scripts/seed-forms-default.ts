@@ -21,7 +21,11 @@ async function seed() {
 		.select({ id: formsDefinition.id })
 		.from(formsDefinition)
 		.where(
-			and(eq(formsDefinition.key, 'contact'), eq(formsDefinition.locale, locale), eq(formsDefinition.status, 'published'))
+			and(
+				eq(formsDefinition.key, 'contact'),
+				eq(formsDefinition.locale, locale),
+				eq(formsDefinition.status, 'published')
+			)
 		)
 		.limit(1);
 

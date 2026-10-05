@@ -12,11 +12,29 @@
 
 	let {
 		open = $bindable(false),
-		file = null as { name: string; url: string; mtime: number; title?: string; alt?: string; caption?: string; description?: string; tags?: string[] } | null,
+		file = null as {
+			name: string;
+			url: string;
+			mtime: number;
+			title?: string;
+			alt?: string;
+			caption?: string;
+			description?: string;
+			tags?: string[];
+		} | null,
 		onClose = () => {}
 	}: {
 		open?: boolean;
-		file?: { name: string; url: string; mtime: number; title?: string; alt?: string; caption?: string; description?: string; tags?: string[] } | null;
+		file?: {
+			name: string;
+			url: string;
+			mtime: number;
+			title?: string;
+			alt?: string;
+			caption?: string;
+			description?: string;
+			tags?: string[];
+		} | null;
 		onClose?: () => void;
 	} = $props();
 
@@ -48,12 +66,20 @@
 			usage = null;
 			fetch(`/admin/api/media/usage?url=${encodeURIComponent(file.url)}`)
 				.then((r) => r.json())
-				.then((data: {
-					used?: boolean;
-					locations?: { type: string; id: string; label: string; href?: string; detail?: string }[];
-				}) => {
-					usage = { used: data.used ?? false, locations: data.locations ?? [] };
-				})
+				.then(
+					(data: {
+						used?: boolean;
+						locations?: {
+							type: string;
+							id: string;
+							label: string;
+							href?: string;
+							detail?: string;
+						}[];
+					}) => {
+						usage = { used: data.used ?? false, locations: data.locations ?? [] };
+					}
+				)
 				.catch(() => {});
 		}
 	});
@@ -114,6 +140,9 @@
 		deleting = true;
 		deleteError = null;
 		try {
+			// Local query string: built, optionally mutated and interpolated within
+			// this block, and never held in the template.
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			const q = new URLSearchParams({ url: file.url });
 			if (force) q.set('force', '1');
 			const res = await fetch(`/admin/api/media/delete?${q}`, { method: 'DELETE' });
@@ -161,8 +190,10 @@
 		use:focusTrap={{ initialFocus: false }}
 		use:dialogBehavior={{ onClose: close, backdrop: true, initialFocus: true }}
 	>
-		<div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-none border border-border bg-background shadow-xl flex flex-col">
-			<div class="flex items-center justify-between border-b border-border px-4 py-3 shrink-0">
+		<div
+			class="flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-none border border-border bg-background shadow-xl"
+		>
+			<div class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
 				<h2 class="text-lg font-semibold text-foreground">Detalii media</h2>
 				<button
 					type="button"
@@ -174,7 +205,9 @@
 				</button>
 			</div>
 			<div class="flex flex-col gap-4 p-4">
-				<div class="flex aspect-video items-center justify-center overflow-hidden rounded-none bg-muted/30">
+				<div
+					class="flex aspect-video items-center justify-center overflow-hidden rounded-none bg-muted/30"
+				>
 					{#if file.url.match(/\.(webm|mp4)$/i)}
 						<video
 							src={file.url}
@@ -199,7 +232,10 @@
 							{#each usage.locations as location (location.id)}
 								<li class="flex items-center gap-1">
 									{#if location.href}
-										<a class="inline-flex items-center gap-1 underline hover:no-underline" href={location.href}>
+										<a
+											class="inline-flex items-center gap-1 underline hover:no-underline"
+											href={location.href}
+										>
 											{location.label}
 											<ExternalLink class="size-3" />
 										</a>
@@ -216,11 +252,21 @@
 				{/if}
 				<div>
 					<Label for="alt">Alt Text</Label>
-					<Input id="alt" class="mt-1 rounded-none" bind:value={alt} placeholder="Descriere scurtă pentru accesibilitate" />
+					<Input
+						id="alt"
+						class="mt-1 rounded-none"
+						bind:value={alt}
+						placeholder="Descriere scurtă pentru accesibilitate"
+					/>
 				</div>
 				<div>
 					<Label for="tags">Tag-uri (separate prin virgulă)</Label>
-					<Input id="tags" class="mt-1 rounded-none" bind:value={tagsStr} placeholder="ex: hero, despre" />
+					<Input
+						id="tags"
+						class="mt-1 rounded-none"
+						bind:value={tagsStr}
+						placeholder="ex: hero, despre"
+					/>
 				</div>
 				{#if error}
 					<p class="text-sm text-destructive">{error}</p>
@@ -269,7 +315,11 @@
 							variant="outline"
 							class="rounded-none"
 							disabled={deleting}
-							onclick={() => { showDeleteConfirm = false; deleteForceConfirm = false; deleteError = null; }}
+							onclick={() => {
+								showDeleteConfirm = false;
+								deleteForceConfirm = false;
+								deleteError = null;
+							}}
 						>
 							Anulare
 						</Button>

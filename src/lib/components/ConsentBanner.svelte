@@ -72,16 +72,19 @@
 					</div>
 				{:else}
 					<p class="leading-relaxed">
-						Folosim cookie-uri esențiale pentru funcționarea site-ului. Date tehnice pentru analiză (trafic,
-						evenimente anonimizate pe formulare) sunt folosite doar dacă accepți categoria „Analiză”.
+						Folosim cookie-uri esențiale pentru funcționarea site-ului. Date tehnice pentru analiză
+						(trafic, evenimente anonimizate pe formulare) sunt folosite doar dacă accepți categoria
+						„Analiză”.
 					</p>
 					<p class="text-xs">
 						<a
 							class="font-medium text-foreground underline"
-							href={`${cookiePolicyHref}#preferinte-cookie`}>Politica de cookie-uri</a>
+							href={`${cookiePolicyHref}#preferinte-cookie`}>Politica de cookie-uri</a
+						>
 						<span class="mx-1 text-muted-foreground">·</span>
 						<a class="font-medium text-foreground underline" href={privacyPolicyHref}
-							>Confidențialitate</a>
+							>Confidențialitate</a
+						>
 					</p>
 				{/if}
 			</div>

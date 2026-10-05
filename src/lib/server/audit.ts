@@ -73,17 +73,28 @@ function describeAdminAction(pathname: string, method: string, actionKey: string
 	if (pathname.startsWith('/admin/api/media/metadata')) return 'A editat metadate media';
 	if (pathname.startsWith('/admin/api/contact/socials')) return 'A actualizat linkurile de contact';
 	if (pathname.startsWith('/admin/api/cms')) return 'A salvat modificări în CMS';
-	if (pathname.includes('/admin/forms') && pathname.includes('/export')) return 'A exportat răspunsuri formular';
+	if (pathname.includes('/admin/forms') && pathname.includes('/export'))
+		return 'A exportat răspunsuri formular';
 	return `${method} ${pathname}`;
 }
 
-function classifyAdminAction(pathname: string): { entityType: string; action: string; entityId: string } {
-	if (pathname.startsWith('/admin/api/media/upload')) return { entityType: 'media', action: 'upload', entityId: pathname };
-	if (pathname.startsWith('/admin/api/media/replace')) return { entityType: 'media', action: 'replace', entityId: pathname };
-	if (pathname.startsWith('/admin/api/media/delete')) return { entityType: 'media', action: 'delete', entityId: pathname };
-	if (pathname.startsWith('/admin/api/media/metadata')) return { entityType: 'media_metadata', action: 'update', entityId: pathname };
-	if (pathname.startsWith('/admin/api/contact/socials')) return { entityType: 'contact_settings', action: 'update', entityId: pathname };
-	if (pathname.startsWith('/admin/api/cms')) return { entityType: 'cms', action: 'update', entityId: pathname };
+function classifyAdminAction(pathname: string): {
+	entityType: string;
+	action: string;
+	entityId: string;
+} {
+	if (pathname.startsWith('/admin/api/media/upload'))
+		return { entityType: 'media', action: 'upload', entityId: pathname };
+	if (pathname.startsWith('/admin/api/media/replace'))
+		return { entityType: 'media', action: 'replace', entityId: pathname };
+	if (pathname.startsWith('/admin/api/media/delete'))
+		return { entityType: 'media', action: 'delete', entityId: pathname };
+	if (pathname.startsWith('/admin/api/media/metadata'))
+		return { entityType: 'media_metadata', action: 'update', entityId: pathname };
+	if (pathname.startsWith('/admin/api/contact/socials'))
+		return { entityType: 'contact_settings', action: 'update', entityId: pathname };
+	if (pathname.startsWith('/admin/api/cms'))
+		return { entityType: 'cms', action: 'update', entityId: pathname };
 	if (pathname.includes('/admin/forms') && pathname.includes('/export'))
 		return { entityType: 'forms_export', action: 'export', entityId: pathname };
 	return { entityType: 'admin_action', action: 'execute', entityId: pathname };

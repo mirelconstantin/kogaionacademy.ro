@@ -10,7 +10,6 @@
 	import History from '@lucide/svelte/icons/history';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import Image from '@lucide/svelte/icons/image';
-	import Mail from '@lucide/svelte/icons/mail';
 	import Settings from '@lucide/svelte/icons/settings';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import Scale from '@lucide/svelte/icons/scale';
@@ -20,16 +19,41 @@
 	const permissions = $derived((data as { permissions?: string[] }).permissions ?? []);
 
 	const allNav = [
-		{ href: '/admin', label: 'Panou', icon: LayoutDashboard, permission: 'dashboard.view' as const },
+		{
+			href: '/admin',
+			label: 'Panou',
+			icon: LayoutDashboard,
+			permission: 'dashboard.view' as const
+		},
 		{ href: '/admin/pages', label: 'Pagini', icon: FileStack, permission: 'pages.view' as const },
 		{ href: '/admin/media', label: 'Media', icon: Image, permission: 'media.view' as const },
-		{ href: '/admin/history', label: 'Istoric acțiuni', icon: History, permission: 'history.view' as const },
+		{
+			href: '/admin/history',
+			label: 'Istoric acțiuni',
+			icon: History,
+			permission: 'history.view' as const
+		},
 		{ href: '/admin/mentors', label: 'Mentori', icon: Users, permission: 'mentors.view' as const },
-		{ href: '/admin/forms', label: 'Formulare', icon: ClipboardList, permission: 'forms.view' as const },
-		{ href: '/admin/legal', label: 'Politici & GDPR', icon: Scale, permission: 'pages.view' as const },
+		{
+			href: '/admin/forms',
+			label: 'Formulare',
+			icon: ClipboardList,
+			permission: 'forms.view' as const
+		},
+		{
+			href: '/admin/legal',
+			label: 'Politici & GDPR',
+			icon: Scale,
+			permission: 'pages.view' as const
+		},
 		{ href: '/admin/blog', label: 'Blog', icon: Newspaper, permission: 'blog.view' as const },
 		{ href: '/admin/team', label: 'Echipa', icon: UsersRound, permission: 'team.view' as const },
-		{ href: '/admin/settings', label: 'Setări', icon: Settings, permission: 'settings.view' as const }
+		{
+			href: '/admin/settings',
+			label: 'Setări',
+			icon: Settings,
+			permission: 'settings.view' as const
+		}
 	];
 	const nav = $derived(allNav.filter((item) => permissions.includes(item.permission)));
 </script>

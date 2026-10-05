@@ -152,7 +152,7 @@
 						({locale}).
 					</p>
 					<div class="space-y-3">
-						{#each SOCIAL_NETWORKS as { key, label }}
+						{#each SOCIAL_NETWORKS as { key, label } (key)}
 							<div class="space-y-1">
 								<Label for="social-{key}" class="text-xs">{label}</Label>
 								<Input

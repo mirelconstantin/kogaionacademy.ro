@@ -30,7 +30,8 @@ function randomToken(): string {
 export const load: PageServerLoad = async (event) => {
 	requirePermission(event, 'team.view');
 	const currentUserId = event.locals.user?.id ?? '';
-	const isCurrentUserSuperAdmin = (event.locals.user?.email ?? '').toLowerCase() === SUPER_ADMIN_EMAIL;
+	const isCurrentUserSuperAdmin =
+		(event.locals.user?.email ?? '').toLowerCase() === SUPER_ADMIN_EMAIL;
 	const adminUsers = await db
 		.select({
 			id: user.id,
@@ -61,19 +62,12 @@ export const load: PageServerLoad = async (event) => {
 		list.push({ permissionKey: row.permissionKey, mode: row.mode });
 		overridesByUser.set(row.userId, list);
 	}
-	const invites = await db
-		.select()
-		.from(adminInvite)
-		.orderBy(desc(adminInvite.createdAt));
+	const invites = await db.select().from(adminInvite).orderBy(desc(adminInvite.createdAt));
 	const now = new Date();
 	const invitesWithStatus = invites.map((inv) => ({
 		...inv,
 		effectiveStatus:
-			inv.status !== 'pending'
-				? inv.status
-				: inv.expiresAt < now
-					? 'expired'
-					: 'pending'
+			inv.status !== 'pending' ? inv.status : inv.expiresAt < now ? 'expired' : 'pending'
 	}));
 	return {
 		adminUsers: normalizedAdminUsers,
@@ -149,7 +143,8 @@ export const actions: Actions = {
 		const id = parseInt(formData.get('id') as string, 10);
 		if (Number.isNaN(id)) return fail(400, { error: 'ID invalid', action: 'resendInvite' });
 		const [inv] = await db.select().from(adminInvite).where(eq(adminInvite.id, id)).limit(1);
-		if (!inv || inv.status !== 'pending') return fail(400, { error: 'Invitație invalidă', action: 'resendInvite' });
+		if (!inv || inv.status !== 'pending')
+			return fail(400, { error: 'Invitație invalidă', action: 'resendInvite' });
 		const expiresAt = new Date();
 		expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRY_DAYS);
 		await db
@@ -161,7 +156,10 @@ export const actions: Actions = {
 	updateUserRole: async (event) => {
 		requirePermission(event, 'team.edit_roles');
 		if ((event.locals.user?.email ?? '').toLowerCase() !== SUPER_ADMIN_EMAIL) {
-			return fail(403, { error: 'Doar Super Admin poate modifica roluri.', action: 'updateUserRole' });
+			return fail(403, {
+				error: 'Doar Super Admin poate modifica roluri.',
+				action: 'updateUserRole'
+			});
 		}
 		const formData = await event.request.formData();
 		const userId = (formData.get('userId') as string)?.trim();

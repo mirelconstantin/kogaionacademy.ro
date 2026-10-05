@@ -20,6 +20,10 @@
 	let editingId = $state<number | null>(null);
 	let showNew = $state(false);
 	let imageUrl = $state('');
+	// Deliberately $state, not $derived: handleDragOver reassigns it directly on
+	// line ~78 when a mentor is dropped in a new position. A $derived would be
+	// recomputed from data.mentors and silently discard the reorder.
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let orderedIds = $state<number[]>([]);
 	let dragFromIndex = $state<number | null>(null);
 	let dragOverIndex = $state<number | null>(null);
@@ -38,8 +42,6 @@
 	$effect(() => {
 		orderedIds = data.mentors.map((m) => m.id);
 	});
-
-	const editingMentor = $derived(editingId ? data.mentors.find((m) => m.id === editingId) : null);
 
 	function handleDragStart(e: DragEvent, index: number) {
 		dragFromIndex = index;
@@ -97,7 +99,9 @@
 			Istoric modificări
 		</Button>
 	</div>
-	<p class="mt-1 text-muted-foreground">Adaugă, editează sau șterge mentori. Ordinea de aici se afișează pe site.</p>
+	<p class="mt-1 text-muted-foreground">
+		Adaugă, editează sau șterge mentori. Ordinea de aici se afișează pe site.
+	</p>
 
 	{#if result?.error}
 		<p class="mt-4 text-sm text-destructive">{result.error}</p>
@@ -125,14 +129,16 @@
 			<form
 				method="POST"
 				action={`${base}?/create`}
-				use:enhance={() => ({ result: r }) => {
-					if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Mentor creat.');
-					if (r.type === 'success' && r.data != null) {
-						const actionData = r.data as ActionData;
-						result = actionData;
-						if (actionData?.success) showNew = false;
-					}
-				}}
+				use:enhance={() =>
+					({ result: r }) => {
+						if (r.type === 'success' || r.type === 'failure')
+							toastFromActionWithMessage(r.data as ActionData, 'Mentor creat.');
+						if (r.type === 'success' && r.data != null) {
+							const actionData = r.data as ActionData;
+							result = actionData;
+							if (actionData?.success) showNew = false;
+						}
+					}}
 				class="mt-4 grid gap-4 sm:grid-cols-2"
 			>
 				<div class="space-y-2 sm:col-span-2">
@@ -171,21 +177,25 @@
 		</div>
 	{/if}
 
-	<p class="mt-2 text-sm text-muted-foreground">Trage mentori în sus/jos pentru a schimba ordinea pe site.</p>
+	<p class="mt-2 text-sm text-muted-foreground">
+		Trage mentori în sus/jos pentru a schimba ordinea pe site.
+	</p>
 
 	<form
 		method="POST"
 		action={`${base}?/reorder`}
-		use:enhance={() => async ({ result: r }) => {
-			const data = r.type === 'success' || r.type === 'failure' ? (r.data as ActionData | null) : null;
-			if (data) toastFromAction(data);
-			if (r.type === 'success' && data != null) {
-				result = data;
-				if (data.success) await invalidateAll();
-			} else if (r.type === 'failure' && data != null) {
-				result = { error: data.error ?? 'Reorder failed', action: 'reorder' };
-			}
-		}}
+		use:enhance={() =>
+			async ({ result: r }) => {
+				const data =
+					r.type === 'success' || r.type === 'failure' ? (r.data as ActionData | null) : null;
+				if (data) toastFromAction(data);
+				if (r.type === 'success' && data != null) {
+					result = data;
+					if (data.success) await invalidateAll();
+				} else if (r.type === 'failure' && data != null) {
+					result = { error: data.error ?? 'Reorder failed', action: 'reorder' };
+				}
+			}}
 		class="hidden"
 		bind:this={reorderForm}
 	>
@@ -203,143 +213,148 @@
 						aria-hidden="true"
 					></div>
 				{/if}
-			{#if editingId === m.id}
-				<div class="rounded-none border border-border bg-card p-6">
-					<h3 class="font-medium text-foreground">Editează {m.nameRo}</h3>
-					<form
-						method="POST"
-						action={`${base}?/update`}
-						use:enhance={() => ({ result: r }) => {
-							if (r.type === 'success' || r.type === 'failure') toastFromAction(r.data as ActionData);
-							if (r.type === 'success' && r.data != null) {
-								const actionData = r.data as ActionData;
-								result = actionData;
-								if (actionData?.success) editingId = null;
-							}
-						}}
-						class="mt-4 grid gap-4 sm:grid-cols-2"
+				{#if editingId === m.id}
+					<div class="rounded-none border border-border bg-card p-6">
+						<h3 class="font-medium text-foreground">Editează {m.nameRo}</h3>
+						<form
+							method="POST"
+							action={`${base}?/update`}
+							use:enhance={() =>
+								({ result: r }) => {
+									if (r.type === 'success' || r.type === 'failure')
+										toastFromAction(r.data as ActionData);
+									if (r.type === 'success' && r.data != null) {
+										const actionData = r.data as ActionData;
+										result = actionData;
+										if (actionData?.success) editingId = null;
+									}
+								}}
+							class="mt-4 grid gap-4 sm:grid-cols-2"
+						>
+							<input type="hidden" name="id" value={m.id} />
+							<div class="space-y-2 sm:col-span-2">
+								<Label for="nameRo-{m.id}">Nume</Label>
+								<Input
+									id="nameRo-{m.id}"
+									name="nameRo"
+									value={m.nameRo}
+									class="rounded-none"
+									required
+								/>
+							</div>
+							<div class="space-y-2 sm:col-span-2">
+								<Label for="titleRo-{m.id}">Titlu</Label>
+								<Input
+									id="titleRo-{m.id}"
+									name="titleRo"
+									value={m.titleRo}
+									class="rounded-none"
+									required
+								/>
+							</div>
+							<div class="space-y-2 sm:col-span-2">
+								<Label for="bioRo-{m.id}">Bio</Label>
+								<Textarea
+									id="bioRo-{m.id}"
+									name="bioRo"
+									rows={8}
+									value={m.bioRo}
+									class="rounded-none"
+									required
+								/>
+							</div>
+							<div class="space-y-2 sm:col-span-2">
+								<Label>Imagine</Label>
+								<input type="hidden" name="image" value={imageUrl} />
+								<MediaPicker bind:value={imageUrl} label="Selectează din Media" />
+							</div>
+							<div class="space-y-2">
+								<Label for="yearJoined-{m.id}">An adăugare</Label>
+								<Input
+									id="yearJoined-{m.id}"
+									name="yearJoined"
+									type="number"
+									value={m.yearJoined ?? ''}
+									class="rounded-none"
+								/>
+							</div>
+							<div class="flex gap-2 sm:col-span-2">
+								<Button type="submit" class="rounded-none">Salvează</Button>
+								<Button
+									type="button"
+									variant="outline"
+									class="rounded-none"
+									onclick={() => (editingId = null)}
+								>
+									Anulare
+								</Button>
+							</div>
+						</form>
+					</div>
+				{:else}
+					<div
+						class="flex items-center justify-between gap-4 rounded-none border border-border bg-card p-4 transition-opacity {isDragging &&
+						dragFromIndex === index
+							? 'opacity-50'
+							: ''}"
+						draggable="true"
+						role="button"
+						tabindex="0"
+						ondragstart={(e) => handleDragStart(e, index)}
+						ondragover={(e) => handleDragOver(e, index)}
+						ondragleave={handleDragLeave}
+						ondragend={handleDragEnd}
+						ondrop={(e) => handleDrop(e, index)}
 					>
-						<input type="hidden" name="id" value={m.id} />
-						<div class="space-y-2 sm:col-span-2">
-							<Label for="nameRo-{m.id}">Nume</Label>
-							<Input
-								id="nameRo-{m.id}"
-								name="nameRo"
-								value={m.nameRo}
-								class="rounded-none"
-								required
-							/>
+						<div class="flex min-w-0 items-center gap-2">
+							<span
+								class="cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+								aria-label="Trage pentru a reordona"
+							>
+								<GripVertical class="size-5" />
+							</span>
+							<div class="min-w-0">
+								<p class="font-medium text-foreground">{m.nameRo}</p>
+								<p class="truncate text-sm text-muted-foreground">{m.titleRo}</p>
+							</div>
 						</div>
-						<div class="space-y-2 sm:col-span-2">
-							<Label for="titleRo-{m.id}">Titlu</Label>
-							<Input
-								id="titleRo-{m.id}"
-								name="titleRo"
-								value={m.titleRo}
-								class="rounded-none"
-								required
-							/>
-						</div>
-						<div class="space-y-2 sm:col-span-2">
-							<Label for="bioRo-{m.id}">Bio</Label>
-							<Textarea
-								id="bioRo-{m.id}"
-								name="bioRo"
-								rows={8}
-								value={m.bioRo}
-								class="rounded-none"
-								required
-							/>
-						</div>
-						<div class="space-y-2 sm:col-span-2">
-							<Label>Imagine</Label>
-							<input type="hidden" name="image" value={imageUrl} />
-							<MediaPicker bind:value={imageUrl} label="Selectează din Media" />
-						</div>
-						<div class="space-y-2">
-							<Label for="yearJoined-{m.id}">An adăugare</Label>
-							<Input
-								id="yearJoined-{m.id}"
-								name="yearJoined"
-								type="number"
-								value={m.yearJoined ?? ''}
-								class="rounded-none"
-							/>
-						</div>
-						<div class="flex gap-2 sm:col-span-2">
-							<Button type="submit" class="rounded-none">Salvează</Button>
+						<div class="flex shrink-0 gap-2">
 							<Button
 								type="button"
 								variant="outline"
-								class="rounded-none"
-								onclick={() => (editingId = null)}
-							>
-								Anulare
-							</Button>
-						</div>
-					</form>
-				</div>
-			{:else}
-				<div
-					class="flex items-center justify-between gap-4 rounded-none border border-border bg-card p-4 transition-opacity {isDragging && dragFromIndex === index
-						? 'opacity-50'
-						: ''}"
-					draggable="true"
-					role="button"
-					tabindex="0"
-					ondragstart={(e) => handleDragStart(e, index)}
-					ondragover={(e) => handleDragOver(e, index)}
-					ondragleave={handleDragLeave}
-					ondragend={handleDragEnd}
-					ondrop={(e) => handleDrop(e, index)}
-				>
-					<div class="flex min-w-0 items-center gap-2">
-						<span
-							class="touch-none cursor-grab text-muted-foreground active:cursor-grabbing"
-							aria-label="Trage pentru a reordona"
-						>
-							<GripVertical class="size-5" />
-						</span>
-						<div class="min-w-0">
-							<p class="font-medium text-foreground">{m.nameRo}</p>
-							<p class="truncate text-sm text-muted-foreground">{m.titleRo}</p>
-						</div>
-					</div>
-					<div class="flex shrink-0 gap-2">
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							class="rounded-none"
-							onclick={() => {
-								editingId = m.id;
-								showNew = false;
-							}}
-						>
-							Editează
-						</Button>
-						<form
-							method="POST"
-							action={`${base}?/delete`}
-							use:enhance={() => async ({ result: r }) => {
-								if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Mentor șters.');
-								if (r.type === 'success') await invalidateAll();
-							}}
-							class="inline"
-						>
-							<input type="hidden" name="id" value={m.id} />
-							<Button
-								type="submit"
-								variant="outline"
 								size="sm"
-								class="rounded-none text-destructive"
+								class="rounded-none"
+								onclick={() => {
+									editingId = m.id;
+									showNew = false;
+								}}
 							>
-								Șterge
+								Editează
 							</Button>
-						</form>
+							<form
+								method="POST"
+								action={`${base}?/delete`}
+								use:enhance={() =>
+									async ({ result: r }) => {
+										if (r.type === 'success' || r.type === 'failure')
+											toastFromActionWithMessage(r.data as ActionData, 'Mentor șters.');
+										if (r.type === 'success') await invalidateAll();
+									}}
+								class="inline"
+							>
+								<input type="hidden" name="id" value={m.id} />
+								<Button
+									type="submit"
+									variant="outline"
+									size="sm"
+									class="rounded-none text-destructive"
+								>
+									Șterge
+								</Button>
+							</form>
+						</div>
 					</div>
-				</div>
-			{/if}
+				{/if}
 			</div>
 		{/each}
 	</div>

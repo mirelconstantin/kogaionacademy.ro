@@ -27,7 +27,10 @@ export function sampleValueForField(field: FormFieldDef, locale: string): string
 }
 
 /** Build initial values map for preview mode. */
-export function previewValuesFromSchema(schema: FormSchemaV1, locale: string): Record<string, string> {
+export function previewValuesFromSchema(
+	schema: FormSchemaV1,
+	locale: string
+): Record<string, string> {
 	const out: Record<string, string> = {};
 	for (const f of schema.fields) {
 		out[f.key] = sampleValueForField(f, locale);

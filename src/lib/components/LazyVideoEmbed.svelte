@@ -30,13 +30,14 @@
 	});
 
 	const posterUrl = $derived(
-		provider === 'youtube' && videoId
-			? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
-			: null
+		provider === 'youtube' && videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
 	);
 </script>
 
-<div bind:this={container} class="relative aspect-video w-full overflow-hidden rounded-none border border-border bg-black">
+<div
+	bind:this={container}
+	class="relative aspect-video w-full overflow-hidden rounded-none border border-border bg-black"
+>
 	{#if loaded}
 		<iframe
 			src={embedSrc}

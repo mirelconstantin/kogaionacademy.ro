@@ -27,7 +27,12 @@ export type UserWithRole = {
 export function isEditor(user: unknown): user is UserWithRole {
 	const u = user as UserWithRole | undefined;
 	if (!u) return false;
-	return u.email === SUPER_ADMIN_EMAIL || u.role === EDITOR_ROLE || u.role === 'admin' || u.role === 'super_admin';
+	return (
+		u.email === SUPER_ADMIN_EMAIL ||
+		u.role === EDITOR_ROLE ||
+		u.role === 'admin' ||
+		u.role === 'super_admin'
+	);
 }
 
 /**
@@ -49,7 +54,10 @@ export async function resolveUserPermissions(user: UserWithRole): Promise<Set<Pe
 	const allow = new Set<PermissionKey>();
 	const deny = new Set<PermissionKey>();
 	const rows = await db
-		.select({ permissionKey: userPermissionOverride.permissionKey, mode: userPermissionOverride.mode })
+		.select({
+			permissionKey: userPermissionOverride.permissionKey,
+			mode: userPermissionOverride.mode
+		})
 		.from(userPermissionOverride)
 		.where(eq(userPermissionOverride.userId, user.id));
 	for (const row of rows) {
@@ -118,9 +126,7 @@ export function requireAnyPermission(
  * Use in admin layout load or form actions.
  * Compatible with legacy flow: checks dashboard.view when permissions are present, else isEditor.
  */
-export function requireEditor(
-	event: RequestEvent
-): asserts event is RequestEvent & {
+export function requireEditor(event: RequestEvent): asserts event is RequestEvent & {
 	locals: { user: UserWithRole; session: NonNullable<RequestEvent['locals']['session']> };
 } {
 	const { locals } = event;

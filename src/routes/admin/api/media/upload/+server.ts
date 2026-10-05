@@ -23,7 +23,9 @@ function runFfmpeg(args: string[]): Promise<void> {
 			return;
 		}
 		let stderr = '';
-		proc.stderr?.on('data', (d) => { stderr += d.toString(); });
+		proc.stderr?.on('data', (d) => {
+			stderr += d.toString();
+		});
 		proc.on('error', (e) => reject(e));
 		proc.on('close', (code) => {
 			if (code === 0) resolve();
@@ -35,10 +37,14 @@ function runFfmpeg(args: string[]): Promise<void> {
 async function convertVideoToWebm(src: string, dest: string): Promise<boolean> {
 	try {
 		await runFfmpeg([
-			'-i', src,
-			'-c:v', 'libvpx-vp9',
-			'-crf', '30',
-			'-b:v', '0',
+			'-i',
+			src,
+			'-c:v',
+			'libvpx-vp9',
+			'-crf',
+			'30',
+			'-b:v',
+			'0',
 			'-an',
 			'-y',
 			dest
@@ -58,7 +64,13 @@ export const POST: RequestHandler = async (event) => {
 		return json({ error: 'Fișier lipsă' }, { status: 400 });
 	}
 	if (!ALLOWED_TYPES.includes(file.type)) {
-		return json({ error: 'Tip fișier neacceptat. Folosiți imagini (JPEG, PNG, GIF, WebP, SVG) sau video (MP4, WebM).' }, { status: 400 });
+		return json(
+			{
+				error:
+					'Tip fișier neacceptat. Folosiți imagini (JPEG, PNG, GIF, WebP, SVG) sau video (MP4, WebM).'
+			},
+			{ status: 400 }
+		);
 	}
 	if (!SAFE_FOLDER.test(folder)) {
 		return json({ error: 'Folder invalid. Doar litere, cifre, _ și -.' }, { status: 400 });
@@ -105,10 +117,7 @@ export const POST: RequestHandler = async (event) => {
 	} else {
 		finalName = `${timestamp}-${nameWithoutExt}.webp`;
 		const destPath = path.join(targetDir, finalName);
-		await sharp(buffer)
-			.rotate()
-			.webp({ quality: 85 })
-			.toFile(destPath);
+		await sharp(buffer).rotate().webp({ quality: 85 }).toFile(destPath);
 		finalUrl = `/media/uploads/${folder}/${finalName}`;
 	}
 

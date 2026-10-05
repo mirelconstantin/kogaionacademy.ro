@@ -16,6 +16,7 @@ export function maskEmail(value: string): string {
 export function maskSensitiveField(piiClass: string, value: string | null | undefined): string {
 	if (value == null || value === '') return '';
 	if (piiClass === 'contact' && value.includes('@')) return maskEmail(value);
-	if (piiClass === 'sensitive') return value.length > 12 ? `${value.slice(0, 6)}…${value.slice(-4)}` : '***';
+	if (piiClass === 'sensitive')
+		return value.length > 12 ? `${value.slice(0, 6)}…${value.slice(-4)}` : '***';
 	return value;
 }

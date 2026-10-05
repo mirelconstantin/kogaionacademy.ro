@@ -20,13 +20,34 @@
 
 	const cards = $derived([
 		...(permissions.includes('pages.view')
-			? [{ href: '/admin/pages', label: 'Pagini', icon: FileText, desc: 'Principală, Despre, Programe, Contact' }]
+			? [
+					{
+						href: '/admin/pages',
+						label: 'Pagini',
+						icon: FileText,
+						desc: 'Principală, Despre, Programe, Contact'
+					}
+				]
 			: []),
 		...(permissions.includes('history.view')
-			? [{ href: '/admin/history', label: 'Istoric modificări', icon: History, desc: 'Istoricul modificărilor din CMS' }]
+			? [
+					{
+						href: '/admin/history',
+						label: 'Istoric modificări',
+						icon: History,
+						desc: 'Istoricul modificărilor din CMS'
+					}
+				]
 			: []),
 		...(permissions.includes('mentors.view')
-			? [{ href: '/admin/mentors', label: 'Mentori', icon: Users, desc: 'Mentori, biografii și imagini' }]
+			? [
+					{
+						href: '/admin/mentors',
+						label: 'Mentori',
+						icon: Users,
+						desc: 'Mentori, biografii și imagini'
+					}
+				]
 			: []),
 		...(permissions.includes('forms.view')
 			? [
@@ -39,7 +60,14 @@
 				]
 			: []),
 		...(permissions.includes('blog.view')
-			? [{ href: '/admin/blog', label: 'Blog', icon: Newspaper, desc: 'Articole (draft, programat, publicat)' }]
+			? [
+					{
+						href: '/admin/blog',
+						label: 'Blog',
+						icon: Newspaper,
+						desc: 'Articole (draft, programat, publicat)'
+					}
+				]
 			: []),
 		...(permissions.includes('media.view')
 			? [{ href: '/admin/media', label: 'Media', icon: Image, desc: 'Imagini și video' }]
@@ -56,9 +84,13 @@
 	]);
 
 	const kpi = $derived(data?.kpi ?? null);
-	const needsAttention = $derived(data?.needsAttention ?? { draftsWithoutImage: [], expiredInvites: [] });
+	const needsAttention = $derived(
+		data?.needsAttention ?? { draftsWithoutImage: [], expiredInvites: [] }
+	);
 	const hasAlerts = $derived(
-		(needsAttention.draftsWithoutImage?.length ?? 0) + (needsAttention.expiredInvites?.length ?? 0) > 0
+		(needsAttention.draftsWithoutImage?.length ?? 0) +
+			(needsAttention.expiredInvites?.length ?? 0) >
+			0
 	);
 </script>
 
@@ -66,7 +98,8 @@
 	<header class="border-b border-border pb-6">
 		<h2 class="text-2xl font-semibold text-foreground">Panou de administrare</h2>
 		<p class="mt-1 text-muted-foreground">
-			Bine ai venit, <strong class="text-foreground">{displayName}</strong>. Rezumat detaliat al stării site-ului.
+			Bine ai venit, <strong class="text-foreground">{displayName}</strong>. Rezumat detaliat al
+			stării site-ului.
 		</p>
 	</header>
 
@@ -106,9 +139,7 @@
 				<div class="rounded-none border border-border bg-card p-4 shadow-sm">
 					<p class="text-sm font-medium text-muted-foreground">Activitate 24h</p>
 					<p class="mt-1 text-xl font-semibold text-foreground">{kpi.changes24h}</p>
-					<p class="mt-1 text-xs text-muted-foreground">
-						CMS 24h
-					</p>
+					<p class="mt-1 text-xs text-muted-foreground">CMS 24h</p>
 					{#if permissions.includes('team.view')}
 						<p class="text-xs text-muted-foreground">
 							Invitații: {kpi.pendingInvites}
@@ -120,8 +151,14 @@
 	{/if}
 
 	{#if hasAlerts}
-		<section class="rounded-none border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30" aria-labelledby="alerts-heading">
-			<h3 id="alerts-heading" class="flex items-center gap-2 text-lg font-medium text-amber-800 dark:text-amber-200">
+		<section
+			class="rounded-none border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30"
+			aria-labelledby="alerts-heading"
+		>
+			<h3
+				id="alerts-heading"
+				class="flex items-center gap-2 text-lg font-medium text-amber-800 dark:text-amber-200"
+			>
 				<AlertCircle class="size-5" />
 				Atenție
 			</h3>
@@ -143,7 +180,9 @@
 	{/if}
 
 	<section aria-labelledby="sectiuni-heading">
-		<h3 id="sectiuni-heading" class="mb-4 text-lg font-medium text-foreground">Secțiuni de conținut</h3>
+		<h3 id="sectiuni-heading" class="mb-4 text-lg font-medium text-foreground">
+			Secțiuni de conținut
+		</h3>
 		<div class="grid gap-4 sm:grid-cols-2">
 			{#each cards as card (card.href)}
 				{@const Icon = card.icon}

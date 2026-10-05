@@ -33,7 +33,8 @@ function isMissingRevisionTableError(e: unknown): boolean {
 		if (c.code === '42P01') return true;
 	}
 	const msg = String(o.message ?? '');
-	const causeMsg = cause && typeof cause === 'object' ? String((cause as { message?: string }).message ?? '') : '';
+	const causeMsg =
+		cause && typeof cause === 'object' ? String((cause as { message?: string }).message ?? '') : '';
 	const full = `${msg} ${causeMsg}`;
 	return /forms_definition_revision/i.test(full) && /does not exist/i.test(full);
 }
@@ -125,7 +126,12 @@ export const load: PageServerLoad = async (event) => {
 	const metricsRows = await db
 		.select()
 		.from(formsMetricDaily)
-		.where(and(eq(formsMetricDaily.formKey, def.key), gte(formsMetricDaily.day, thirtyDaysAgo.toISOString().slice(0, 10))))
+		.where(
+			and(
+				eq(formsMetricDaily.formKey, def.key),
+				gte(formsMetricDaily.day, thirtyDaysAgo.toISOString().slice(0, 10))
+			)
+		)
 		.orderBy(desc(formsMetricDaily.day));
 
 	const views = Number(funnelRows.find((r) => r.eventType === 'form_view')?.n ?? 0);
@@ -216,7 +222,11 @@ export const actions: Actions = {
 		const fieldCheck = validateFormSchemaFields(parsed);
 		if (!fieldCheck.ok) return fail(400, { message: fieldCheck.message });
 
-		const [before] = await db.select().from(formsDefinition).where(eq(formsDefinition.id, id)).limit(1);
+		const [before] = await db
+			.select()
+			.from(formsDefinition)
+			.where(eq(formsDefinition.id, id))
+			.limit(1);
 		if (!before) return fail(404, { message: 'Not found' });
 
 		await db
@@ -257,7 +267,7 @@ export const actions: Actions = {
 		const revId = parseInt((data.get('revisionId') as string) ?? '', 10);
 		if (Number.isNaN(revId)) return fail(400, { message: 'Invalid revision' });
 
-		let rev: (typeof formsDefinitionRevision.$inferSelect) | undefined;
+		let rev: typeof formsDefinitionRevision.$inferSelect | undefined;
 		try {
 			const rows = await db
 				.select()
@@ -313,7 +323,11 @@ export const actions: Actions = {
 		const id = parseInt(event.params.id ?? '', 10);
 		if (Number.isNaN(id)) return fail(400, { message: 'Invalid id' });
 
-		const [row] = await db.select().from(formsDefinition).where(eq(formsDefinition.id, id)).limit(1);
+		const [row] = await db
+			.select()
+			.from(formsDefinition)
+			.where(eq(formsDefinition.id, id))
+			.limit(1);
 		if (!row) return fail(404, { message: 'Not found' });
 
 		const [m] = await db

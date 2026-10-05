@@ -16,9 +16,10 @@
 	let inviteEmail = $state('');
 	let inviteRole = $state('blog_editor');
 
-	const pendingInvites = $derived(data.invites.filter((i) => i.effectiveStatus === 'pending'));
 	const permissions = $derived((data as { permissions?: string[] }).permissions ?? []);
-	const isCurrentUserSuperAdmin = $derived((data as { isCurrentUserSuperAdmin?: boolean }).isCurrentUserSuperAdmin === true);
+	const isCurrentUserSuperAdmin = $derived(
+		(data as { isCurrentUserSuperAdmin?: boolean }).isCurrentUserSuperAdmin === true
+	);
 	const canInvite = $derived(permissions.includes('team.invite') && isCurrentUserSuperAdmin);
 	const canEditRoles = $derived(permissions.includes('team.edit_roles') && isCurrentUserSuperAdmin);
 </script>
@@ -51,12 +52,14 @@
 								<form
 									method="POST"
 									action="?/updateUserRole"
-									use:enhance={() => async ({ result: r }) => {
-										if (r.type === 'success' || r.type === 'failure') toastFromAction(r.data as ActionData);
-										if (r.type === 'success') await invalidateAll();
-									}}
+									use:enhance={() =>
+										async ({ result: r }) => {
+											if (r.type === 'success' || r.type === 'failure')
+												toastFromAction(r.data as ActionData);
+											if (r.type === 'success') await invalidateAll();
+										}}
 									class="inline-flex items-center gap-1"
-									id={"role-form-" + u.id}
+									id={'role-form-' + u.id}
 								>
 									<input type="hidden" name="userId" value={u.id} />
 									<input type="hidden" name="role" value={u.role ?? 'user'} />
@@ -65,7 +68,9 @@
 										value={u.role ?? 'user'}
 										onValueChange={(v: string | undefined) => {
 											if (!v) return;
-											const form = document.getElementById('role-form-' + u.id) as HTMLFormElement | null;
+											const form = document.getElementById(
+												'role-form-' + u.id
+											) as HTMLFormElement | null;
 											const roleInput = form?.elements.namedItem('role') as HTMLInputElement | null;
 											if (!form || !roleInput) return;
 											roleInput.value = v;
@@ -74,7 +79,8 @@
 									>
 										<Select.Trigger class="h-8 w-[190px] rounded-none text-sm">
 											{data.roleOptions.find((opt) => opt.value === (u.role ?? 'user'))?.label ??
-												(u.role ?? 'user')}
+												u.role ??
+												'user'}
 										</Select.Trigger>
 										<Select.Content>
 											{#each data.roleOptions as opt (opt.value)}
@@ -90,13 +96,16 @@
 									class="rounded-none border border-border bg-muted/50 px-2 py-1 text-xs font-medium text-foreground"
 								>
 									{data.roleOptions.find((opt) => opt.value === (u.role ?? 'user'))?.label ??
-										(u.role ?? 'user')}
+										u.role ??
+										'user'}
 								</span>
 							{/if}
 						</div>
 						{#if (data.overridesByUser[u.id] ?? []).length > 0}
 							<p class="text-xs text-muted-foreground">
-								Override: {(data.overridesByUser[u.id] ?? []).map((o) => `${o.permissionKey}:${o.mode}`).join(', ')}
+								Override: {(data.overridesByUser[u.id] ?? [])
+									.map((o) => `${o.permissionKey}:${o.mode}`)
+									.join(', ')}
 							</p>
 						{/if}
 					</li>
@@ -112,13 +121,15 @@
 				<form
 					method="POST"
 					action="?/invite"
-					use:enhance={() => async ({ result: r }) => {
-						if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Invitație creată.');
-						if (r.type === 'success' && r.data && (r.data as { success?: boolean }).success) {
-							inviteEmail = '';
-							await invalidateAll();
-						}
-					}}
+					use:enhance={() =>
+						async ({ result: r }) => {
+							if (r.type === 'success' || r.type === 'failure')
+								toastFromActionWithMessage(r.data as ActionData, 'Invitație creată.');
+							if (r.type === 'success' && r.data && (r.data as { success?: boolean }).success) {
+								inviteEmail = '';
+								await invalidateAll();
+							}
+						}}
 					class="flex flex-wrap items-end gap-2"
 				>
 					<div class="space-y-1">
@@ -138,7 +149,8 @@
 						<input type="hidden" name="role" value={inviteRole} />
 						<Select.Root type="single" bind:value={inviteRole}>
 							<Select.Trigger id="invite-role" class="h-9 w-[210px] rounded-none text-sm">
-								{data.roleOptions.find((opt) => opt.value === inviteRole)?.label ?? 'Selectează rol'}
+								{data.roleOptions.find((opt) => opt.value === inviteRole)?.label ??
+									'Selectează rol'}
 							</Select.Trigger>
 							<Select.Content>
 								{#each data.roleOptions as opt (opt.value)}
@@ -164,34 +176,46 @@
 						<div class="min-w-0 flex-1">
 							<p class="font-medium text-foreground">{inv.email}</p>
 							<p class="text-sm text-muted-foreground">
-								Rol: {data.roleOptions.find((opt) => opt.value === inv.role)?.label ?? inv.role} · {inv.effectiveStatus} · expiră {new Date(inv.expiresAt).toLocaleDateString()}
+								Rol: {data.roleOptions.find((opt) => opt.value === inv.role)?.label ?? inv.role} · {inv.effectiveStatus}
+								· expiră {new Date(inv.expiresAt).toLocaleDateString()}
 							</p>
 						</div>
 						{#if inv.effectiveStatus === 'pending'}
 							<form
 								method="POST"
 								action="?/resendInvite"
-								use:enhance={() => async ({ result: r }) => {
-									const payload = (r.type === 'success' || r.type === 'failure') ? (r.data as ActionData) : null;
-									if (payload) toastFromActionWithMessage(payload, 'Invitație prelungită.');
-									if (r.type === 'success') await invalidateAll();
-								}}
+								use:enhance={() =>
+									async ({ result: r }) => {
+										const payload =
+											r.type === 'success' || r.type === 'failure' ? (r.data as ActionData) : null;
+										if (payload) toastFromActionWithMessage(payload, 'Invitație prelungită.');
+										if (r.type === 'success') await invalidateAll();
+									}}
 								class="inline"
 							>
 								<input type="hidden" name="id" value={inv.id} />
-								<Button type="submit" variant="outline" size="sm" class="rounded-none">Prelungește</Button>
+								<Button type="submit" variant="outline" size="sm" class="rounded-none"
+									>Prelungește</Button
+								>
 							</form>
 							<form
 								method="POST"
 								action="?/revokeInvite"
-								use:enhance={() => async ({ result: r }) => {
-									if (r.type === 'success' || r.type === 'failure') toastFromActionWithMessage(r.data as ActionData, 'Invitație revocată.');
-									if (r.type === 'success') await invalidateAll();
-								}}
+								use:enhance={() =>
+									async ({ result: r }) => {
+										if (r.type === 'success' || r.type === 'failure')
+											toastFromActionWithMessage(r.data as ActionData, 'Invitație revocată.');
+										if (r.type === 'success') await invalidateAll();
+									}}
 								class="inline"
 							>
 								<input type="hidden" name="id" value={inv.id} />
-								<Button type="submit" variant="outline" size="sm" class="rounded-none text-destructive">
+								<Button
+									type="submit"
+									variant="outline"
+									size="sm"
+									class="rounded-none text-destructive"
+								>
 									Revocă
 								</Button>
 							</form>
@@ -209,8 +233,14 @@
 		<h3 class="text-lg font-medium text-foreground">Roluri predefinite</h3>
 		<ul class="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
 			<li><strong class="text-foreground">Super Admin</strong> — toate permisiunile</li>
-			<li><strong class="text-foreground">Admin</strong> — pagini, programe, mentori, blog, media, setări, istoric</li>
-			<li><strong class="text-foreground">Page Editor</strong> — pagini, programe, mentori, media (fără blog/setări)</li>
+			<li>
+				<strong class="text-foreground">Admin</strong> — pagini, programe, mentori, blog, media, setări,
+				istoric
+			</li>
+			<li>
+				<strong class="text-foreground">Page Editor</strong> — pagini, programe, mentori, media (fără
+				blog/setări)
+			</li>
 			<li><strong class="text-foreground">Blog Editor</strong> — doar blog și media</li>
 		</ul>
 		<p class="mt-2 text-xs text-muted-foreground">

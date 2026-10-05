@@ -201,13 +201,34 @@ function buildSectionPayloads(
 			payload: {
 				title: 'Activitățile taberei',
 				areas: [
-					{ title: 'SIGURANȚĂ & APARTENENȚĂ – ACASĂ ÎN CETATE: Construim siguranță și apartenență prin reguli simple, ritualuri și comunitate, astfel încât copilul capătă încredere și liniște, părintele își consolidează o prezență fermă și calmă, iar familia dobândește coeziune și stabilitate.' },
-					{ title: 'LIMITE BLÂNDE – CORPUL VIU: Învățăm limite ferme și blânde, susținute de autoreglare prin corp, simțuri și mișcare, astfel încât copilul devine mai cooperant și își crește autocontrolul, părintele aplică intervenții fără ridicarea tonului, iar familia reduce crizele și câștigă echilibru.' },
-					{ title: 'RITM – SUNETUL CARE UNEȘTE: Stabilizăm ritmul familiei prin poveste, muzică și limbaj emoțional care conectează, astfel încât copilul își dezvoltă exprimarea și vocabularul emoțional, părintele comunică mai clar și repară mai ușor tensiunile, iar familia trăiește relații mai calde și tranziții mai line.' },
-					{ title: 'COOPERARE – LUMINA ȘI DRUMURILE: Exersăm cooperarea prin orientare, jocuri de echipă și explorare ghidată în spațiu și natură, astfel încât copilul își dezvoltă abilitățile sociale și atenția, părintele ghidează fără control excesiv, iar familia își crește încrederea reciprocă și capacitatea de colaborare.' },
-					{ title: 'DEMNITATE – TRANSFORMAREA: Consolidăm demnitatea prin procese reale de creație, hrană și contribuție în comunitate, astfel încât copilul își construiește o stimă de sine sănătoasă, părintele învață recunoașterea corectă a efortului, iar familia creează ritualuri comune care întăresc apartenența.' },
-					{ title: 'ÎNȚELEGERE – EU POT: Dezvoltăm autonomia și curajul prin expresie, inițiativă și gândire flexibilă aplicată, astfel încât copilul capătă inițiativă și curaj social, părintele susține fără etichetare și fără supracontrol, iar familia echilibrează libertatea cu limite clare și respect reciproc.' },
-					{ title: 'DĂRUIRE – RECUNOȘTINȚĂ: Integrăm experiența în recunoștință și ritualuri concrete de continuitate acasă, astfel încât copilul își dezvoltă sensul și bucuria contribuției, părintele pleacă cu un plan simplu de menținere, iar familia susține progresul pe termen lung.' }
+					{
+						title:
+							'SIGURANȚĂ & APARTENENȚĂ – ACASĂ ÎN CETATE: Construim siguranță și apartenență prin reguli simple, ritualuri și comunitate, astfel încât copilul capătă încredere și liniște, părintele își consolidează o prezență fermă și calmă, iar familia dobândește coeziune și stabilitate.'
+					},
+					{
+						title:
+							'LIMITE BLÂNDE – CORPUL VIU: Învățăm limite ferme și blânde, susținute de autoreglare prin corp, simțuri și mișcare, astfel încât copilul devine mai cooperant și își crește autocontrolul, părintele aplică intervenții fără ridicarea tonului, iar familia reduce crizele și câștigă echilibru.'
+					},
+					{
+						title:
+							'RITM – SUNETUL CARE UNEȘTE: Stabilizăm ritmul familiei prin poveste, muzică și limbaj emoțional care conectează, astfel încât copilul își dezvoltă exprimarea și vocabularul emoțional, părintele comunică mai clar și repară mai ușor tensiunile, iar familia trăiește relații mai calde și tranziții mai line.'
+					},
+					{
+						title:
+							'COOPERARE – LUMINA ȘI DRUMURILE: Exersăm cooperarea prin orientare, jocuri de echipă și explorare ghidată în spațiu și natură, astfel încât copilul își dezvoltă abilitățile sociale și atenția, părintele ghidează fără control excesiv, iar familia își crește încrederea reciprocă și capacitatea de colaborare.'
+					},
+					{
+						title:
+							'DEMNITATE – TRANSFORMAREA: Consolidăm demnitatea prin procese reale de creație, hrană și contribuție în comunitate, astfel încât copilul își construiește o stimă de sine sănătoasă, părintele învață recunoașterea corectă a efortului, iar familia creează ritualuri comune care întăresc apartenența.'
+					},
+					{
+						title:
+							'ÎNȚELEGERE – EU POT: Dezvoltăm autonomia și curajul prin expresie, inițiativă și gândire flexibilă aplicată, astfel încât copilul capătă inițiativă și curaj social, părintele susține fără etichetare și fără supracontrol, iar familia echilibrează libertatea cu limite clare și respect reciproc.'
+					},
+					{
+						title:
+							'DĂRUIRE – RECUNOȘTINȚĂ: Integrăm experiența în recunoștință și ritualuri concrete de continuitate acasă, astfel încât copilul își dezvoltă sensul și bucuria contribuției, părintele pleacă cu un plan simplu de menținere, iar familia susține progresul pe termen lung.'
+					}
 				]
 			}
 		},
@@ -279,9 +300,11 @@ function buildSectionPayloads(
 			sortOrder: 8,
 			payload: {
 				title: 'Înscriere',
-				intro: 'Înscrierea începe cu o conversație cu echipa Kogaion: verificăm împreună dacă formatul de tabără se potrivește familiei voastre și, dacă da, vă ghidăm spre pașii următori — fără presiune, cu claritate.',
+				intro:
+					'Înscrierea începe cu o conversație cu echipa Kogaion: verificăm împreună dacă formatul de tabără se potrivește familiei voastre și, dacă da, vă ghidăm spre pașii următori — fără presiune, cu claritate.',
 				steps: [],
-				contactNote: 'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci)',
+				contactNote:
+					'Te rugăm să completezi formularul de detalii pentru a fi contactat sau sună la 0720.529.398 (Diana Antoci)',
 				buttons: [
 					{ label: 'Sună', type: 'tel', value: '0720529398' },
 					{ label: 'Cere detalii', type: 'link', href: '/contact' },

@@ -21,7 +21,11 @@ export async function getPublishedFormDefinition(
 		.select()
 		.from(formsDefinition)
 		.where(
-			and(eq(formsDefinition.key, formKey), eq(formsDefinition.locale, locale), eq(formsDefinition.status, 'published'))
+			and(
+				eq(formsDefinition.key, formKey),
+				eq(formsDefinition.locale, locale),
+				eq(formsDefinition.status, 'published')
+			)
 		)
 		.orderBy(desc(formsDefinition.version))
 		.limit(1);

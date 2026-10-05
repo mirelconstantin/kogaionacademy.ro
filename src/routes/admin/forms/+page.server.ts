@@ -19,6 +19,8 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	return {
-		forms: [...latestByPair.values()].sort((a, b) => a.key.localeCompare(b.key) || a.locale.localeCompare(b.locale))
+		forms: [...latestByPair.values()].sort(
+			(a, b) => a.key.localeCompare(b.key) || a.locale.localeCompare(b.locale)
+		)
 	};
 };

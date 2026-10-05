@@ -103,7 +103,7 @@
 				pagina Contact.
 			</p>
 			<div class="grid gap-3 sm:grid-cols-2">
-				{#each SOCIAL_NETWORKS as { key, label }}
+				{#each SOCIAL_NETWORKS as { key, label } (key)}
 					<div class="space-y-1">
 						<Label for={'social_' + key} class="text-xs">{label}</Label>
 						<Input

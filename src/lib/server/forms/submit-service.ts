@@ -22,7 +22,11 @@ export type SubmitBody = {
 	utm?: Record<string, string> | null;
 };
 
-async function resolveSchema(formKey: string, locale: string, formVersion: number): Promise<FormSchemaV1 | null> {
+async function resolveSchema(
+	formKey: string,
+	locale: string,
+	formVersion: number
+): Promise<FormSchemaV1 | null> {
 	const row = await getPublishedFormDefinition(formKey, locale);
 	if (row) {
 		if (row.version !== formVersion) return null;
@@ -38,7 +42,10 @@ export type SubmitResult =
 	| { ok: true; submissionId: number }
 	| { ok: false; errors: Record<string, string>; values: Record<string, string> };
 
-export async function ingestFormSubmit(event: RequestEvent, body: SubmitBody): Promise<SubmitResult> {
+export async function ingestFormSubmit(
+	event: RequestEvent,
+	body: SubmitBody
+): Promise<SubmitResult> {
 	pruneRateLimits();
 	const ip = getClientIp(event) ?? 'unknown';
 	if (!checkRateLimit(`fs:${ip}`, 40, 60_000)) {
@@ -67,7 +74,9 @@ export async function ingestFormSubmit(event: RequestEvent, body: SubmitBody): P
 			locale,
 			metadata: { errors: validation.errors, consent: consentSnapshot(consent) },
 			ipAddress: tracking ? (getClientIp(event) ?? undefined) : undefined,
-			userAgent: tracking ? event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined : undefined
+			userAgent: tracking
+				? (event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined)
+				: undefined
 		});
 		await bumpDailyMetricFromEvent(body.formKey, locale, 'submit_error');
 		if (tracking) {
@@ -99,8 +108,10 @@ export async function ingestFormSubmit(event: RequestEvent, body: SubmitBody): P
 			userId: userId ?? undefined,
 			consentSnapshot: consentSnapshot(consent),
 			ipAddress: tracking ? (getClientIp(event) ?? undefined) : undefined,
-			userAgent: tracking ? event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined : undefined,
-			referrer: tracking ? referrer ?? undefined : undefined,
+			userAgent: tracking
+				? (event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined)
+				: undefined,
+			referrer: tracking ? (referrer ?? undefined) : undefined,
 			utm: body.utm ?? undefined,
 			pageUrl: body.pageUrl.slice(0, 2048),
 			locale,
@@ -135,7 +146,9 @@ export async function ingestFormSubmit(event: RequestEvent, body: SubmitBody): P
 		locale,
 		metadata: { submissionId, consent: consentSnapshot(consent) },
 		ipAddress: tracking ? (getClientIp(event) ?? undefined) : undefined,
-		userAgent: tracking ? event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined : undefined
+		userAgent: tracking
+			? (event.request.headers.get('user-agent')?.slice(0, 512) ?? undefined)
+			: undefined
 	});
 	await bumpDailyMetricFromEvent(body.formKey, locale, 'submit_success');
 	if (tracking) {

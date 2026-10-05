@@ -45,10 +45,7 @@ async function seed() {
 		const perms = ROLE_PERMISSIONS[role];
 		if (!perms) continue;
 		for (const permissionKey of perms) {
-			await db
-				.insert(rolePermission)
-				.values({ role, permissionKey })
-				.onConflictDoNothing();
+			await db.insert(rolePermission).values({ role, permissionKey }).onConflictDoNothing();
 		}
 	}
 

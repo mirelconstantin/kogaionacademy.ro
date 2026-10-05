@@ -106,10 +106,7 @@ export const actions: Actions = {
 		await db
 			.delete(session)
 			.where(
-				and(
-					eq(session.userId, event.locals.user.id),
-					ne(session.id, event.locals.session.id)
-				)
+				and(eq(session.userId, event.locals.user.id), ne(session.id, event.locals.session.id))
 			);
 		return { success: true, action: 'revokeOtherSessions' };
 	}

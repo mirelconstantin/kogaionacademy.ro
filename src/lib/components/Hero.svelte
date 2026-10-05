@@ -54,13 +54,18 @@
 	const secondaryLabelIsAbout = $derived(rawSecondaryLabel.trim().toLowerCase() === 'despre');
 	const ctaSecondaryLabel = $derived(secondaryLabelIsAbout ? 'CONTACTEAZĂ-NE' : rawSecondaryLabel);
 	const ctaSecondaryLink = $derived(
-		secondaryLabelIsAbout ? contentHref('contact') : (hero?.ctaSecondaryLink ?? contentHref('about'))
+		secondaryLabelIsAbout
+			? contentHref('contact')
+			: (hero?.ctaSecondaryLink ?? contentHref('about'))
 	);
 	const headingText = $derived(introHeading ?? m.home_intro_heading());
 	const bodyText = $derived(introBody ?? m.home_intro_body());
 </script>
 
-<section class="relative min-h-[44vh] overflow-hidden border-b-2 border-white/20 rounded-br-[5.6rem] md:min-h-[46vh] md:rounded-br-[7rem]" aria-label="Hero">
+<section
+	class="relative min-h-[44vh] overflow-hidden rounded-br-[5.6rem] border-b-2 border-white/20 md:min-h-[46vh] md:rounded-br-[7rem]"
+	aria-label="Hero"
+>
 	{#if videoError}
 		<div
 			class="absolute inset-0 size-full bg-cover bg-center"
@@ -92,7 +97,7 @@
 
 	<!-- Spațiu sub AdminBar (variabilă CSS) + nav fixă (--nav-height / extra pe md+) -->
 	<div
-		class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pb-10 text-center md:min-h-[46vh] md:px-12 md:pb-12 lg:px-16 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))]"
+		class="relative mx-auto flex min-h-[44vh] max-w-6xl flex-col items-center justify-center px-6 pt-[calc(var(--admin-bar-height,0px)+var(--nav-height,5rem)+var(--below-nav-gap,0px))] pb-10 text-center md:min-h-[46vh] md:px-12 md:pt-[calc(var(--admin-bar-height,0px)+7rem+var(--below-nav-gap,0px))] md:pb-12 lg:px-16"
 	>
 		{#if showEyebrow && heroLabel}
 			<div
@@ -102,7 +107,9 @@
 				data-cms-field={eyebrowCmsField}
 				data-cms-locale="ro"
 			>
-				<p class="text-xs font-semibold tracking-[0.2em] text-white/85 uppercase [font-family:var(--font-sans)]">
+				<p
+					class="[font-family:var(--font-sans)] text-xs font-semibold tracking-[0.2em] text-white/85 uppercase"
+				>
 					{heroLabel}
 				</p>
 			</div>
@@ -152,7 +159,7 @@
 		>
 			<a
 				href={ctaPrimaryLink}
-				class="btn-diagonal inline-flex min-h-12 w-fit max-w-full items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center text-[0.85rem] font-semibold text-[var(--brand-blue)] transition-colors hover:bg-[var(--brand-blue)] hover:text-white sm:px-7 sm:text-[0.9rem] md:px-7 md:py-3 md:text-[0.96rem] [font-family:var(--font-sans)]"
+				class="btn-diagonal inline-flex min-h-12 w-fit max-w-full items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.85rem] font-semibold text-[var(--brand-blue)] transition-colors hover:bg-[var(--brand-blue)] hover:text-white sm:px-7 sm:text-[0.9rem] md:px-7 md:py-3 md:text-[0.96rem]"
 				data-cms-type="hero"
 				data-cms-field-group="ctaPrimaryLabel,ctaPrimaryLink"
 				data-cms-locale="ro"
@@ -161,7 +168,7 @@
 			</a>
 			<a
 				href={ctaSecondaryLink}
-				class="btn-diagonal inline-flex min-h-12 w-fit max-w-full items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center text-[0.85rem] font-semibold text-white transition-colors hover:bg-[var(--brand-blue)] hover:text-white sm:px-7 sm:text-[0.9rem] md:px-7 md:py-3 md:text-[0.96rem] [font-family:var(--font-sans)]"
+				class="btn-diagonal inline-flex min-h-12 w-fit max-w-full items-center justify-center gap-2 border border-white bg-transparent px-6 py-3 text-center [font-family:var(--font-sans)] text-[0.85rem] font-semibold text-white transition-colors hover:bg-[var(--brand-blue)] hover:text-white sm:px-7 sm:text-[0.9rem] md:px-7 md:py-3 md:text-[0.96rem]"
 				data-cms-type="hero"
 				data-cms-field-group="ctaSecondaryLabel,ctaSecondaryLink"
 				data-cms-locale="ro"

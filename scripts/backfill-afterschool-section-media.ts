@@ -16,9 +16,12 @@ const databaseUrl =
 
 const PROGRAM_SLUG = 'afterschool-kogaion-self-mastery';
 const MEDIA = {
-	introBetweenBlocks: '/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-gallery-08.webp',
-	benefitsMain: '/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-benefits-main.webp',
-	location: '/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-location.webp'
+	introBetweenBlocks:
+		'/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-gallery-08.webp',
+	benefitsMain:
+		'/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-benefits-main.webp',
+	location:
+		'/media/uploads/programe/afterschool-self-mastery/afterschool-self-mastery-location.webp'
 };
 
 async function main() {
@@ -48,10 +51,7 @@ async function main() {
 			next = { ...payload, image: MEDIA.location };
 		}
 		if (next) {
-			await db
-				.update(programSection)
-				.set({ payload: next })
-				.where(eq(programSection.id, row.id));
+			await db.update(programSection).set({ payload: next }).where(eq(programSection.id, row.id));
 			console.log('  Updated', row.section);
 		}
 	}

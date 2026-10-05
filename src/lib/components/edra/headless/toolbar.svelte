@@ -9,9 +9,7 @@
 
 	const { editor, class: className, excludedCommands, children }: EdraToolbarProps = $props();
 
-	const allKeys = $derived(
-		Object.keys(commands).filter((key) => !excludedCommands?.includes(key))
-	);
+	const allKeys = $derived(Object.keys(commands).filter((key) => !excludedCommands?.includes(key)));
 	const mainKeys = $derived(allKeys.filter((k) => k !== UNDO_REDO_KEY));
 	const undoRedoKeys = $derived(allKeys.includes(UNDO_REDO_KEY) ? [UNDO_REDO_KEY] : []);
 

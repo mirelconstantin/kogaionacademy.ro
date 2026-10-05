@@ -61,7 +61,8 @@ export function buildScheduleLines(
 	if (durations.length === 0) return [];
 
 	if (dates.length === 0) return durations;
-	if (dates.length > 1 && durations.length === 1) durations = Array.from({ length: dates.length }, () => durations[0]);
+	if (dates.length > 1 && durations.length === 1)
+		durations = Array.from({ length: dates.length }, () => durations[0]);
 	if (dates.length > durations.length) {
 		const padded = [...durations];
 		for (let i = durations.length; i < dates.length; i++) {
@@ -77,4 +78,3 @@ export function buildScheduleLines(
 		})
 		.filter(Boolean);
 }
-

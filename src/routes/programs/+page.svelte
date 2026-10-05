@@ -19,7 +19,6 @@
 		data: {
 			programs: ProgramForDisplay[];
 			programCategories: typeof programCategories;
-			sections?: Record<string, Record<string, unknown>>;
 			activeAgeFilter?: string | null;
 			canonicalUrl?: string;
 			baseUrl?: string;

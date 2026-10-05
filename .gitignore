@@ -1,26 +1,68 @@
-node_modules
+# =============================================================================
+# Dependencies
+# =============================================================================
+node_modules/
 
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
+# =============================================================================
+# Build output
+# =============================================================================
+# Both are produced on the machine that builds, never committed, and never
+# shipped. /build is adapter-node's output; /.svelte-kit is what `svelte-kit sync`
+# and vite generate.
+/build/
+/.svelte-kit/
+/.output/
+/.vercel/
+/.netlify/
+/.wrangler/
 
-# OS
-.DS_Store
-Thumbs.db
+# Compiled translations. The paraglide Vite plugin regenerates this whole tree in
+# buildStart(), so committing it only creates merge conflicts with a file that is
+# derived. project.inlang/ already ignores everything but settings.json on its own;
+# only this second output directory needs listing here.
+/src/lib/paraglide/
 
-# Env
+# =============================================================================
+# Secrets
+# =============================================================================
+# .env holds the production DATABASE_URL and the OAuth client secret. The two
+# negations matter: .env.example is the CONTRACT every developer copies, so it is
+# tracked, and the negation is required because `.env.*` would otherwise catch it.
 .env
 .env.*
 !.env.example
 !.env.test
 
-# Vite
+# =============================================================================
+# Editor and OS
+# =============================================================================
+.DS_Store
+Thumbs.db
+.idea/
+
+# .vscode/, .cursor/ and .gemini/ are deliberately NOT ignored: they hold the MCP
+# server wiring and editor settings the team shares, and they are tracked on
+# purpose.
+
+# =============================================================================
+# Logs, caches and coverage
+# =============================================================================
+*.log
+npm-debug.log*
+bun-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+*.tsbuildinfo
+
+# =============================================================================
+# Tooling artifacts
+# =============================================================================
+# Vite writes a timestamped copy of the config while the dev server is running.
+# It is machine-specific, changes on every start, and must never be committed.
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-# Paraglide
-src/lib/paraglide
-project.inlang/cache/
+
+# Output of tools/scrape-kogaion-assets.mjs. Regenerable, and large enough to
+# slow every clone for no benefit.
+/_crawl-report/

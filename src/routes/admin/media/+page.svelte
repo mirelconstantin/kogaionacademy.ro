@@ -38,6 +38,9 @@
 
 	const usedUrls = $derived(data.usedUrls ?? []);
 	const allTags = $derived.by(() => {
+		// Local accumulator: consumed by the spread on the next line and never
+		// observed as reactive state, so SvelteSet would only add proxy overhead.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const set = new Set<string>();
 		for (const f of data.files) {
 			for (const t of f.tags ?? []) if (t) set.add(t);
@@ -209,12 +212,19 @@
 
 	async function bulkDelete() {
 		if (selectedUrls.length === 0) return;
-		if (!confirm(`Ștergi ${selectedUrls.length} fișier(e)? Fișierele folosite în conținut vor necesita confirmare.`)) return;
+		if (
+			!confirm(
+				`Ștergi ${selectedUrls.length} fișier(e)? Fișierele folosite în conținut vor necesita confirmare.`
+			)
+		)
+			return;
 		bulkDeleting = true;
 		let ok = 0;
 		let blocked = 0;
 		for (const url of selectedUrls) {
-			const res = await fetch(`/admin/api/media/delete?url=${encodeURIComponent(url)}`, { method: 'DELETE' });
+			const res = await fetch(`/admin/api/media/delete?url=${encodeURIComponent(url)}`, {
+				method: 'DELETE'
+			});
 			const json = await res.json();
 			if (res.ok) ok++;
 			else if (res.status === 403 && json.used) blocked++;
@@ -223,13 +233,19 @@
 		selectedUrls = [];
 		await invalidateAll();
 		if (ok) toastFromAction({ success: true });
-		if (blocked) toastFromAction({ error: `${blocked} fișier(e) sunt folosite; șterge-le din detaliu cu „Șterge oricum”.` });
+		if (blocked)
+			toastFromAction({
+				error: `${blocked} fișier(e) sunt folosite; șterge-le din detaliu cu „Șterge oricum”.`
+			});
 	}
 </script>
 
-	<div>
+<div>
 	<h2 class="text-2xl font-semibold text-foreground">Bibliotecă Media</h2>
-	<p class="mt-1 text-muted-foreground">Imaginile și video-urile se convertesc automat în WebP/WebM. Folosiți „Selectează” în formulare pentru a alege un fișier.</p>
+	<p class="mt-1 text-muted-foreground">
+		Imaginile și video-urile se convertesc automat în WebP/WebM. Folosiți „Selectează” în formulare
+		pentru a alege un fișier.
+	</p>
 
 	<div
 		class="mt-6 flex flex-wrap items-center gap-4 rounded-none border-2 border-dashed p-6 transition-colors {dragOver
@@ -254,9 +270,7 @@
 			<p class="font-medium text-foreground">
 				{dragOver ? 'Lasă fișierele aici' : 'Trage imaginile sau video-urile aici'}
 			</p>
-			<p class="mt-0.5 text-sm text-muted-foreground">
-				sau click pentru a selecta din calculator
-			</p>
+			<p class="mt-0.5 text-sm text-muted-foreground">sau click pentru a selecta din calculator</p>
 		</div>
 		<Button
 			type="button"
@@ -274,7 +288,9 @@
 	{#if data.files.length > 0}
 		<div class="mt-4 flex flex-col gap-3">
 			<div class="relative max-w-sm">
-				<Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+				/>
 				<Input
 					type="search"
 					class="rounded-none pl-9"
@@ -376,37 +392,67 @@
 			>
 				<Upload class="size-14 text-muted-foreground" />
 				<p class="mt-4 font-medium text-foreground">Nicio imagine încărcată</p>
-				<p class="mt-1 text-sm text-muted-foreground">Trage imaginile sau video-urile aici pentru upload</p>
+				<p class="mt-1 text-sm text-muted-foreground">
+					Trage imaginile sau video-urile aici pentru upload
+				</p>
 				<p class="mt-0.5 text-xs text-muted-foreground">sau folosește butonul de mai sus</p>
 			</div>
 		{:else if filteredFiles.length === 0}
 			<p class="text-muted-foreground">Niciun rezultat pentru „{searchQuery.trim() || '…'}”.</p>
 		{:else}
 			{#if selectedUrls.length > 0}
-				<div class="mb-3 flex flex-wrap items-center gap-2 rounded-none border border-border bg-muted/30 px-3 py-2">
+				<div
+					class="mb-3 flex flex-wrap items-center gap-2 rounded-none border border-border bg-muted/30 px-3 py-2"
+				>
 					<span class="text-sm font-medium text-foreground">{selectedUrls.length} selectate</span>
-					<Button size="sm" variant="outline" class="rounded-none" onclick={bulkCopyUrls} disabled={bulkDeleting}>
+					<Button
+						size="sm"
+						variant="outline"
+						class="rounded-none"
+						onclick={bulkCopyUrls}
+						disabled={bulkDeleting}
+					>
 						Copiază URL-uri
 					</Button>
-					<Button size="sm" variant="outline" class="rounded-none text-destructive hover:bg-destructive/10" onclick={bulkDelete} disabled={bulkDeleting}>
+					<Button
+						size="sm"
+						variant="outline"
+						class="rounded-none text-destructive hover:bg-destructive/10"
+						onclick={bulkDelete}
+						disabled={bulkDeleting}
+					>
 						{bulkDeleting ? 'Se șterg...' : 'Șterge'}
 					</Button>
-					<Button size="sm" variant="ghost" class="rounded-none" onclick={selectNone} disabled={bulkDeleting}>
+					<Button
+						size="sm"
+						variant="ghost"
+						class="rounded-none"
+						onclick={selectNone}
+						disabled={bulkDeleting}
+					>
 						Deselectează
 					</Button>
 				</div>
 			{/if}
 			<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 				{#each filteredFiles as file (file.url)}
-					<div class="group relative overflow-hidden rounded-none border border-border bg-card {selectedUrls.includes(file.url) ? 'ring-2 ring-primary' : ''}">
+					<div
+						class="group relative overflow-hidden rounded-none border border-border bg-card {selectedUrls.includes(
+							file.url
+						)
+							? 'ring-2 ring-primary'
+							: ''}"
+					>
 						{#if data.usedUrls?.includes(file.url)}
-							<span class="absolute left-2 top-2 z-10 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+							<span
+								class="absolute top-2 left-2 z-10 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground"
+							>
 								Folosit
 							</span>
 						{/if}
 						<button
 							type="button"
-							class="absolute right-2 top-2 z-10 flex size-6 items-center justify-center rounded border border-border bg-background shadow"
+							class="absolute top-2 right-2 z-10 flex size-6 items-center justify-center rounded border border-border bg-background shadow"
 							onclick={(e) => toggleSelect(file.url, e)}
 							aria-pressed={selectedUrls.includes(file.url)}
 						>
@@ -439,7 +485,9 @@
 								{/if}
 							</span>
 						</button>
-						<div class="flex items-center justify-between gap-2 border-t border-border bg-muted/30 px-2 py-2">
+						<div
+							class="flex items-center justify-between gap-2 border-t border-border bg-muted/30 px-2 py-2"
+						>
 							<span class="truncate text-xs text-muted-foreground">{displayFileName(file)}</span>
 							<Button
 								size="icon"
