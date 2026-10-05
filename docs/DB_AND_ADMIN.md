@@ -84,15 +84,15 @@ descrie traseul imaginii — acolo totul este un singur workflow, `.github/workf
 
 ### Ce s-a schimbat
 
-| | înainte | acum |
-| --- | --- | --- |
-| Platformă | Easypanel (build de pe server) | Coolify, resursă **Docker Image** care doar *trage* |
-| Build args | `DATABASE_URL`, `ORIGIN`, `PUBLIC_SITE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GIT_SHA` | doar `GIT_SHA` și `IMAGE_CREATED` (label-uri OCI) |
-| Runtime | `bun run start` (`bun`, proces copil) | `bun ./build/index.js` în formă exec, ca serverul să fie PID 1 și să primească SIGTERM |
-| Secret în imagine | `BETTER_AUTH_SECRET` și `GOOGLE_CLIENT_SECRET` treceau prin `ARG` + `ENV` în builder — `docker build` avertiza `SecretsUsedInArgOrEnv` | **niciun secret nu mai este `ARG`** |
-| Imagine | ~1.6 GB (toate devDependencies copiate în runner) | ~350–400 MB (stadiu `prod-deps` cu `bun install --production`) |
-| Utilizator | root | `1001:1001` |
-| Health check | absent | `HEALTHCHECK` în imagine, pe `/api/health`, cu `bun -e` |
+|                   | înainte                                                                                                                                | acum                                                                                   |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Platformă         | Easypanel (build de pe server)                                                                                                         | Coolify, resursă **Docker Image** care doar _trage_                                    |
+| Build args        | `DATABASE_URL`, `ORIGIN`, `PUBLIC_SITE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GIT_SHA`               | doar `GIT_SHA` și `IMAGE_CREATED` (label-uri OCI)                                      |
+| Runtime           | `bun run start` (`bun`, proces copil)                                                                                                  | `bun ./build/index.js` în formă exec, ca serverul să fie PID 1 și să primească SIGTERM |
+| Secret în imagine | `BETTER_AUTH_SECRET` și `GOOGLE_CLIENT_SECRET` treceau prin `ARG` + `ENV` în builder — `docker build` avertiza `SecretsUsedInArgOrEnv` | **niciun secret nu mai este `ARG`**                                                    |
+| Imagine           | ~1.6 GB (toate devDependencies copiate în runner)                                                                                      | ~350–400 MB (stadiu `prod-deps` cu `bun install --production`)                         |
+| Utilizator        | root                                                                                                                                   | `1001:1001`                                                                            |
+| Health check      | absent                                                                                                                                 | `HEALTHCHECK` în imagine, pe `/api/health`, cu `bun -e`                                |
 
 ### De ce build-ul nu are nevoie de secrete
 
@@ -133,7 +133,6 @@ Dezintenționat, prin decizie. Un commit care adaugă o coloană ajunge live în
 o aibă, și eșuează ca o eroare Postgres la runtime — de obicei pe un cod pe care nimeni nu
 l-a exersat. Pipeline-ul **verifică** migrările (`drizzle-kit check`), nu le aplică.
 Migrarea rămâne un pas operator, de mai jos, cu `DATABASE_URL`.
-
 
 ## Cont admin (doar Google)
 
